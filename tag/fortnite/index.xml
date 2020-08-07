@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Fortnite | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
+    <link>https://shikihuiku.github.io/tag/fortnite/</link>
+      <atom:link href="https://shikihuiku.github.io/tag/fortnite/index.xml" rel="self" type="application/rss+xml" />
+    <description>Fortnite</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 16 Jun 2020 01:33:02 +0900</lastBuildDate>
+    <image>
+      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png</url>
+      <title>Fortnite</title>
+      <link>https://shikihuiku.github.io/tag/fortnite/</link>
+    </image>
+    
+    <item>
+      <title>フォートナイトの入力遅延を観測してみた</title>
+      <link>https://shikihuiku.github.io/post/check_input_latency_of_fortnite/</link>
+      <pubDate>Tue, 16 Jun 2020 01:33:02 +0900</pubDate>
+      <guid>https://shikihuiku.github.io/post/check_input_latency_of_fortnite/</guid>
+      <description>&lt;pre&gt;&lt;code&gt;この記事は、旧サイトからテスト用に移植しました。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;入力遅延の問題はゲーム開発において悩ましい問題の一つです。特にPCでは、他のプロセスが勝手な都合で動作しますし、リソースの競合も発生します。また、PC本体のCPU/GPUパフォーマンスの違いも大きいです。ここでは一般的なデスクトップPC上で、フォートナイトの描画がどのように実行されているかをソフトウェアの見地から、GPUViewを用いて観測してみます。ここで言う入力遅延は、Windows上のゲームのプロセスがキーやマウスのステートを取得すると思われるタイミングから、描画された画面が、ディスプレイへの出力対象になるまでを指します。実際には、マウスやキーボードのハードウェアとドライバにも遅延がありますし、ディスプレイにも実際に輝点として可視化されるまでに遅延がありますが、これらは今回は考慮しません。またゲームのプロセスが正確にいつ入力デバイスの情報を取得しているかは考慮しません。あるフレームのCPU処理の開始を入力取得時間として考えます。&lt;br&gt;
+ちなみに今回使用したデスクトップPCは、Core-i7 7700KとGeForce RTX2080Tiが搭載されています。モニタは一般的な60Hzの4Kディスプレイです。&lt;br&gt;
+テストに使ったシーンは、クリエイティブの島です。描画としては極めて軽い状態がテスト対象です。&lt;/p&gt;
+&lt;p&gt;UE4の開発者の方は、すでにご存じかと思いますが、以下の資料に入力遅延に関する詳しい解説がご覧いただけると思います。&lt;/p&gt;
+&lt;p align=&#34;center&#34; style=&#34;text-align:center&#34;&gt;
+&lt;iframe src=&#34;//www.slideshare.net/slideshow/embed_code/key/k13Vz8lkoluqKW&#34; width=&#34;595&#34; height=&#34;485&#34; frameborder=&#34;0&#34; marginwidth=&#34;0&#34; marginheight=&#34;0&#34; scrolling=&#34;no&#34; style=&#34;border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;&#34; allowfullscreen&gt; &lt;/iframe&gt;&lt;br&gt;
+&lt;strong&gt; &lt;a href=&#34;//www.slideshare.net/EpicGamesJapan/ue4input-latency&#34; title=&#34;UE4のスレッドの流れと Input Latency改善の仕組み&#34; target=&#34;_blank&#34;&gt;UE4のスレッドの流れと Input Latency改善の仕組み&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href=&#34;https://www.slideshare.net/EpicGamesJapan&#34; target=&#34;_blank&#34;&gt;エピック・ゲームズ・ジャパン Epic Games Japan&lt;/a&gt;&lt;/strong&gt;
+&lt;/p&gt;
+&lt;p&gt;今回は、フォートナイトをプレイする上でどのような設定が一番自分にとって好ましいかを調べる過程で分かったことを説明していきます。フォートナイトの描画設定で、入力遅延に関係のある設定は、フレームレートの上限値、VSync、それから、マルチスレッドレンダリングです。描画APIはD3D11と12に対応していますが、D3D12にすることによる利点があまり感じられなかったため、今回はD3D11のみをテストしています。&lt;/p&gt;
+&lt;h2 id=&#34;vsync-off-マルチスレッドレンダリング-off-フレームレート上限-60&#34;&gt;VSync: OFF マルチスレッドレンダリング: OFF フレームレート上限: 60&lt;/h2&gt;
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-vsyncoff_mtoff_60&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_60_hu33bc11a1f895fdcc3ac8673383111945_278989_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncoff_mtoff_60&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_60_hu33bc11a1f895fdcc3ac8673383111945_278989_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1435&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    vsyncoff_mtoff_60
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;おなじみのGPUViewのログです。詳しく見たい方はクリックして拡大してください。まずは、スレッドのアクティビティを理解するために一番簡単な例を示します。VSyncがOffなので、青い縦線で示されたVSyncのタイミングとは全く関係なく描画されています。描画スレッドが、D3D11の描画APIを呼び出して、Present()を呼び出し、GPUが描画を完了するのとほぼ同時にフロントバッファへのFlipが行われ、ディスプレイへの表示対象になります。ドライバのスレッドに描画命令を発行しているスレッドが、UE4のRHIスレッドと思われますが、マルチスレッドレンダリングをOffにしているので、Renderのスレッドが、直接RHIを呼び出しているのではないかと思われます。それに先立ち動作しているスレッドがゲームのメインスレッドと思われます。ゲームのメインスレッドは、Render/RHIスレッドに渡す描画情報を構築するタイミングと思われるところで、フレームレートのペーシングを行っていると思われます。計測された入力遅延は、12.8msですが、CPUもGPUもアイドル時間が長いので、処理クロックを落としていると思われます。実際の場合も何も小細工しなければ、ユーザーの知らないところでクロックが下がるので、今回はこの設定の入力遅延は12ms前後と考えます。&lt;/p&gt;
+&lt;h2 id=&#34;vsync-off-マルチスレッドレンダリング-on-フレームレート上限-60&#34;&gt;VSync: OFF マルチスレッドレンダリング: ON フレームレート上限: 60&lt;/h2&gt;
+&lt;p&gt;次は、先ほどの設定から、マルチスレッドレンダリングを有効にしてみます。他の設定は同じです。&lt;/p&gt;
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-vsyncoff_mton_60&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_60_hu1169490fbcbadeadc14156a6fb3266a4_276171_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncoff_mton_60&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_60_hu1169490fbcbadeadc14156a6fb3266a4_276171_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1640&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    vsyncoff_mton_60
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;見た目ががらりと変わっていますが、アイドリングしているWorkerスレッドにRenderと思われるスレッドが埋もれてしまったため、このような見た目になっています。実際は、どの設定でも多数のWorkerスレッドやサウンドのスレッドが立ち上げられていますが、描画に関係ないものは省略しています。先ほどの例と異なり、RHIのスレッドと思われるスレッドと、Renderと思われるスレッドが別になりました。基本的な仕組みや、遅延の状況はほぼ同じです。こちらもおそらく動作クロックが下がっているので、本来の描画パフォーマンスと比べると処理時間がかかっています。&lt;/p&gt;
+&lt;h2 id=&#34;vsync-off-マルチスレッドレンダリング-off-フレームレート上限-120&#34;&gt;VSync: OFF マルチスレッドレンダリング: OFF フレームレート上限: 120&lt;/h2&gt;
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-vsyncoff_mtoff_120&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_120_hu577993647c8741ecb07125375c0cb93a_249296_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncoff_mtoff_120&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_120_hu577993647c8741ecb07125375c0cb93a_249296_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1071&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    vsyncoff_mtoff_120
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;次は、再びマルチスレッドレンダリングをOFFに戻しました。そして、フレームレート上限を120にしてみました。基本的な動作は一番初めの例と同じですが、フレームのペーシングが8.3msになったことで、120FPSのレンダリングになりました。そして、アイドリングのデューティ比が変わったことにより、動作クロックが引き上げられた関係で、入力遅延も短縮され、9.5ms程度になりました。&lt;/p&gt;
+&lt;h2 id=&#34;vsync-off-マルチスレッドレンダリング-on-フレームレート上限-120&#34;&gt;VSync: OFF マルチスレッドレンダリング: ON フレームレート上限: 120&lt;/h2&gt;
+&lt;p&gt;次は、上記の設定でマルチスレッドレンダリングをONにします。
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-vsyncoff_mton_120&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_120_hucb7e813ec08e0a34392eae9da6d7a916_251387_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncoff_mton_120&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_120_hucb7e813ec08e0a34392eae9da6d7a916_251387_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1018&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    vsyncoff_mton_120
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;やはり、RenderスレッドとRHIスレッドが分かれました。今回のテスト対象になっているシーンは軽いので、マルチスレッドレンダリングの恩恵は少ないですが、もっと複雑なシーンでは、これらのスレッドが並列動作することにより、Renderスレッドの描画命令発行によるストールが軽減され、より顕著な差になると思われます。少なくとも遅くなることはなさそうなので、私はこの設定でプレイすることにします。&lt;/p&gt;
+&lt;h2 id=&#34;vsync-on-マルチスレッドレンダリング-off-フレームレート上限-制限なし&#34;&gt;VSync: ON マルチスレッドレンダリング: OFF フレームレート上限: 制限なし&lt;/h2&gt;
+&lt;p&gt;次は、いわゆる、VSyncを守って、画面のティアリングを起こさない描画になります。見た目は一番スムーズなのですが、入力遅延の観点からはあまりお勧めできない設定となりそうです。
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-vsyncon_mtoff_60&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncon_mtoff_60_hu1e8bb69aa4e2d9153699b0a96e4ee908_517763_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncon_mtoff_60&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncon_mtoff_60_hu1e8bb69aa4e2d9153699b0a96e4ee908_517763_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1619&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    vsyncon_mtoff_60
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;まず、VSyncを取ると、メインスレッドの動作がかなり変わります。およそ2ms単位でスレッドをポーリングしながら、処理開始のタイミングを計っているようです。rhi.SyncSlackMSのデフォルト設定と思われる、VSyncの10ms前に、メインスレッドの処理を開始しています。Renderスレッドは、前の前のフレームのGPU描画処理が完了してから、RHIの呼び出しを開始しているようです。そして、RHIが呼び出すD3DAPIによって生成されたGPUタスクは、ドライバのGPUタスクキューに積み上げられます。そのフレームのGPU描画処理がGPU上で実行されるのは、Renderスレッドが動作したフレームの次の次のフレームです。そして、ディスプレイの出力対象になるFlipが行われるのは、VSyncに同期しているので、実際の表示はその次のフレームとなります。メインスレッドが動作を開始してから、ディスプレイの出力対象になるまでの入力遅延は60msほどとなります。&lt;/p&gt;
+&lt;h3 id=&#34;まとめ&#34;&gt;まとめ&lt;/h3&gt;
+&lt;p&gt;少なくとも私の環境では、VSyncをOFFにして、CPUのフレームペーシングがボトルネックになる状態（つまりGPUの処理時間には余裕がある状態）で、なるべく高いフレームレートが入力遅延が一番小さくなる状態だといえると思います。入力遅延を最短にするという目的ならば、私のPCでは、おそらく200フレーム以上の設定の方が短くなると思われます。しかし、使用しているディスプレイも60Hzですし、描画解像度など他の設定に妥協が必要になります。
+また、これらの状況は、個々のPCの、CPUとGPUの処理能力のバランスによって変動するので、皆さんに一概にこの設定がおすすめですとはなりません。しかし、VSyncはOff、なるべく早いCPU、なるべく早いGPU、なるべく軽い描画が、入力遅延低減につながると思われます。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

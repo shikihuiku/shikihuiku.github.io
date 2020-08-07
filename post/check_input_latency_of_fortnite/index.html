@@ -1,0 +1,1188 @@
+<!DOCTYPE html><html lang="en-us" >
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.8.0">
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="shikihuiku">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="タイトルは緩いですけど、ゲーム開発者向けの話です。プラットフォームはPC限定です。">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://shikihuiku.github.io/post/check_input_latency_of_fortnite/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin="anonymous">
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+  
+
+
+  
+  
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu127225d7ed9c50974404790b7c221374_401884_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu127225d7ed9c50974404790b7c221374_401884_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="https://shikihuiku.github.io/post/check_input_latency_of_fortnite/">
+
+  
+  
+  
+  
+  
+  
+  
+    
+  
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="og:site_name" content="shikihuiku – 色不異空 – Real-time rendering topics in Japanese.">
+  <meta property="og:url" content="https://shikihuiku.github.io/post/check_input_latency_of_fortnite/">
+  <meta property="og:title" content="フォートナイトの入力遅延を観測してみた | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.">
+  <meta property="og:description" content="タイトルは緩いですけど、ゲーム開発者向けの話です。プラットフォームはPC限定です。"><meta property="og:image" content="https://shikihuiku.github.io/post/check_input_latency_of_fortnite/featured.png">
+  <meta property="twitter:image" content="https://shikihuiku.github.io/post/check_input_latency_of_fortnite/featured.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2020-06-16T01:33:02&#43;09:00">
+    
+    <meta property="article:modified_time" content="2020-06-16T01:33:02&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://shikihuiku.github.io/post/check_input_latency_of_fortnite/"
+  },
+  "headline": "フォートナイトの入力遅延を観測してみた",
+  
+  "image": [
+    "https://shikihuiku.github.io/post/check_input_latency_of_fortnite/featured.png"
+  ],
+  
+  "datePublished": "2020-06-16T01:33:02+09:00",
+  "dateModified": "2020-06-16T01:33:02+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "shikihuiku"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "shikihuiku – 色不異空 – Real-time rendering topics in Japanese.",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_192x192_fill_lanczos_center_2.png"
+    }
+  },
+  "description": "タイトルは緩いですけど、ゲーム開発者向けの話です。プラットフォームはPC限定です。"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>フォートナイトの入力遅延を観測してみた | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-end" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+            
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="https://shikihuiku.wordpress.com/" target="_blank" rel="noopener"><span>Old Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#" aria-label="Search"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item dropdown theme-dropdown">
+        <a href="#" class="nav-link js-theme-selector" data-toggle="dropdown" aria-haspopup="true">
+          <i class="fas fa-palette" aria-hidden="true"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item js-set-theme-light">
+            <span>Light</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-dark">
+            <span>Dark</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-auto">
+            <span>Automatic</span>
+          </a>
+        </div>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>フォートナイトの入力遅延を観測してみた</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    2020/06/16
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    7 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <pre><code>この記事は、旧サイトからテスト用に移植しました。
+</code></pre>
+<p>入力遅延の問題はゲーム開発において悩ましい問題の一つです。特にPCでは、他のプロセスが勝手な都合で動作しますし、リソースの競合も発生します。また、PC本体のCPU/GPUパフォーマンスの違いも大きいです。ここでは一般的なデスクトップPC上で、フォートナイトの描画がどのように実行されているかをソフトウェアの見地から、GPUViewを用いて観測してみます。ここで言う入力遅延は、Windows上のゲームのプロセスがキーやマウスのステートを取得すると思われるタイミングから、描画された画面が、ディスプレイへの出力対象になるまでを指します。実際には、マウスやキーボードのハードウェアとドライバにも遅延がありますし、ディスプレイにも実際に輝点として可視化されるまでに遅延がありますが、これらは今回は考慮しません。またゲームのプロセスが正確にいつ入力デバイスの情報を取得しているかは考慮しません。あるフレームのCPU処理の開始を入力取得時間として考えます。<br>
+ちなみに今回使用したデスクトップPCは、Core-i7 7700KとGeForce RTX2080Tiが搭載されています。モニタは一般的な60Hzの4Kディスプレイです。<br>
+テストに使ったシーンは、クリエイティブの島です。描画としては極めて軽い状態がテスト対象です。</p>
+<p>UE4の開発者の方は、すでにご存じかと思いますが、以下の資料に入力遅延に関する詳しい解説がご覧いただけると思います。</p>
+<p align="center" style="text-align:center">
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/k13Vz8lkoluqKW" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe><br>
+<strong> <a href="//www.slideshare.net/EpicGamesJapan/ue4input-latency" title="UE4のスレッドの流れと Input Latency改善の仕組み" target="_blank">UE4のスレッドの流れと Input Latency改善の仕組み</a> </strong> from <strong><a href="https://www.slideshare.net/EpicGamesJapan" target="_blank">エピック・ゲームズ・ジャパン Epic Games Japan</a></strong>
+</p>
+<p>今回は、フォートナイトをプレイする上でどのような設定が一番自分にとって好ましいかを調べる過程で分かったことを説明していきます。フォートナイトの描画設定で、入力遅延に関係のある設定は、フレームレートの上限値、VSync、それから、マルチスレッドレンダリングです。描画APIはD3D11と12に対応していますが、D3D12にすることによる利点があまり感じられなかったため、今回はD3D11のみをテストしています。</p>
+<h2 id="vsync-off-マルチスレッドレンダリング-off-フレームレート上限-60">VSync: OFF マルチスレッドレンダリング: OFF フレームレート上限: 60</h2>
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-vsyncoff_mtoff_60">
+
+
+  <a data-fancybox="" href="/post/check_input_latency_of_fortnite/vsyncoff_mtoff_60_hu33bc11a1f895fdcc3ac8673383111945_278989_2000x2000_fit_lanczos_2.png" data-caption="vsyncoff_mtoff_60">
+
+
+  <img data-src="/post/check_input_latency_of_fortnite/vsyncoff_mtoff_60_hu33bc11a1f895fdcc3ac8673383111945_278989_2000x2000_fit_lanczos_2.png" class="lazyload" alt="" width="70%" height="1435">
+</a>
+
+
+  
+  
+  <figcaption>
+    vsyncoff_mtoff_60
+  </figcaption>
+
+
+</figure>
+
+<p>おなじみのGPUViewのログです。詳しく見たい方はクリックして拡大してください。まずは、スレッドのアクティビティを理解するために一番簡単な例を示します。VSyncがOffなので、青い縦線で示されたVSyncのタイミングとは全く関係なく描画されています。描画スレッドが、D3D11の描画APIを呼び出して、Present()を呼び出し、GPUが描画を完了するのとほぼ同時にフロントバッファへのFlipが行われ、ディスプレイへの表示対象になります。ドライバのスレッドに描画命令を発行しているスレッドが、UE4のRHIスレッドと思われますが、マルチスレッドレンダリングをOffにしているので、Renderのスレッドが、直接RHIを呼び出しているのではないかと思われます。それに先立ち動作しているスレッドがゲームのメインスレッドと思われます。ゲームのメインスレッドは、Render/RHIスレッドに渡す描画情報を構築するタイミングと思われるところで、フレームレートのペーシングを行っていると思われます。計測された入力遅延は、12.8msですが、CPUもGPUもアイドル時間が長いので、処理クロックを落としていると思われます。実際の場合も何も小細工しなければ、ユーザーの知らないところでクロックが下がるので、今回はこの設定の入力遅延は12ms前後と考えます。</p>
+<h2 id="vsync-off-マルチスレッドレンダリング-on-フレームレート上限-60">VSync: OFF マルチスレッドレンダリング: ON フレームレート上限: 60</h2>
+<p>次は、先ほどの設定から、マルチスレッドレンダリングを有効にしてみます。他の設定は同じです。</p>
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-vsyncoff_mton_60">
+
+
+  <a data-fancybox="" href="/post/check_input_latency_of_fortnite/vsyncoff_mton_60_hu1169490fbcbadeadc14156a6fb3266a4_276171_2000x2000_fit_lanczos_2.png" data-caption="vsyncoff_mton_60">
+
+
+  <img data-src="/post/check_input_latency_of_fortnite/vsyncoff_mton_60_hu1169490fbcbadeadc14156a6fb3266a4_276171_2000x2000_fit_lanczos_2.png" class="lazyload" alt="" width="70%" height="1640">
+</a>
+
+
+  
+  
+  <figcaption>
+    vsyncoff_mton_60
+  </figcaption>
+
+
+</figure>
+
+<p>見た目ががらりと変わっていますが、アイドリングしているWorkerスレッドにRenderと思われるスレッドが埋もれてしまったため、このような見た目になっています。実際は、どの設定でも多数のWorkerスレッドやサウンドのスレッドが立ち上げられていますが、描画に関係ないものは省略しています。先ほどの例と異なり、RHIのスレッドと思われるスレッドと、Renderと思われるスレッドが別になりました。基本的な仕組みや、遅延の状況はほぼ同じです。こちらもおそらく動作クロックが下がっているので、本来の描画パフォーマンスと比べると処理時間がかかっています。</p>
+<h2 id="vsync-off-マルチスレッドレンダリング-off-フレームレート上限-120">VSync: OFF マルチスレッドレンダリング: OFF フレームレート上限: 120</h2>
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-vsyncoff_mtoff_120">
+
+
+  <a data-fancybox="" href="/post/check_input_latency_of_fortnite/vsyncoff_mtoff_120_hu577993647c8741ecb07125375c0cb93a_249296_2000x2000_fit_lanczos_2.png" data-caption="vsyncoff_mtoff_120">
+
+
+  <img data-src="/post/check_input_latency_of_fortnite/vsyncoff_mtoff_120_hu577993647c8741ecb07125375c0cb93a_249296_2000x2000_fit_lanczos_2.png" class="lazyload" alt="" width="70%" height="1071">
+</a>
+
+
+  
+  
+  <figcaption>
+    vsyncoff_mtoff_120
+  </figcaption>
+
+
+</figure>
+
+<p>次は、再びマルチスレッドレンダリングをOFFに戻しました。そして、フレームレート上限を120にしてみました。基本的な動作は一番初めの例と同じですが、フレームのペーシングが8.3msになったことで、120FPSのレンダリングになりました。そして、アイドリングのデューティ比が変わったことにより、動作クロックが引き上げられた関係で、入力遅延も短縮され、9.5ms程度になりました。</p>
+<h2 id="vsync-off-マルチスレッドレンダリング-on-フレームレート上限-120">VSync: OFF マルチスレッドレンダリング: ON フレームレート上限: 120</h2>
+<p>次は、上記の設定でマルチスレッドレンダリングをONにします。
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-vsyncoff_mton_120">
+
+
+  <a data-fancybox="" href="/post/check_input_latency_of_fortnite/vsyncoff_mton_120_hucb7e813ec08e0a34392eae9da6d7a916_251387_2000x2000_fit_lanczos_2.png" data-caption="vsyncoff_mton_120">
+
+
+  <img data-src="/post/check_input_latency_of_fortnite/vsyncoff_mton_120_hucb7e813ec08e0a34392eae9da6d7a916_251387_2000x2000_fit_lanczos_2.png" class="lazyload" alt="" width="70%" height="1018">
+</a>
+
+
+  
+  
+  <figcaption>
+    vsyncoff_mton_120
+  </figcaption>
+
+
+</figure>
+</p>
+<p>やはり、RenderスレッドとRHIスレッドが分かれました。今回のテスト対象になっているシーンは軽いので、マルチスレッドレンダリングの恩恵は少ないですが、もっと複雑なシーンでは、これらのスレッドが並列動作することにより、Renderスレッドの描画命令発行によるストールが軽減され、より顕著な差になると思われます。少なくとも遅くなることはなさそうなので、私はこの設定でプレイすることにします。</p>
+<h2 id="vsync-on-マルチスレッドレンダリング-off-フレームレート上限-制限なし">VSync: ON マルチスレッドレンダリング: OFF フレームレート上限: 制限なし</h2>
+<p>次は、いわゆる、VSyncを守って、画面のティアリングを起こさない描画になります。見た目は一番スムーズなのですが、入力遅延の観点からはあまりお勧めできない設定となりそうです。
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-vsyncon_mtoff_60">
+
+
+  <a data-fancybox="" href="/post/check_input_latency_of_fortnite/vsyncon_mtoff_60_hu1e8bb69aa4e2d9153699b0a96e4ee908_517763_2000x2000_fit_lanczos_2.png" data-caption="vsyncon_mtoff_60">
+
+
+  <img data-src="/post/check_input_latency_of_fortnite/vsyncon_mtoff_60_hu1e8bb69aa4e2d9153699b0a96e4ee908_517763_2000x2000_fit_lanczos_2.png" class="lazyload" alt="" width="70%" height="1619">
+</a>
+
+
+  
+  
+  <figcaption>
+    vsyncon_mtoff_60
+  </figcaption>
+
+
+</figure>
+</p>
+<p>まず、VSyncを取ると、メインスレッドの動作がかなり変わります。およそ2ms単位でスレッドをポーリングしながら、処理開始のタイミングを計っているようです。rhi.SyncSlackMSのデフォルト設定と思われる、VSyncの10ms前に、メインスレッドの処理を開始しています。Renderスレッドは、前の前のフレームのGPU描画処理が完了してから、RHIの呼び出しを開始しているようです。そして、RHIが呼び出すD3DAPIによって生成されたGPUタスクは、ドライバのGPUタスクキューに積み上げられます。そのフレームのGPU描画処理がGPU上で実行されるのは、Renderスレッドが動作したフレームの次の次のフレームです。そして、ディスプレイの出力対象になるFlipが行われるのは、VSyncに同期しているので、実際の表示はその次のフレームとなります。メインスレッドが動作を開始してから、ディスプレイの出力対象になるまでの入力遅延は60msほどとなります。</p>
+<h3 id="まとめ">まとめ</h3>
+<p>少なくとも私の環境では、VSyncをOFFにして、CPUのフレームペーシングがボトルネックになる状態（つまりGPUの処理時間には余裕がある状態）で、なるべく高いフレームレートが入力遅延が一番小さくなる状態だといえると思います。入力遅延を最短にするという目的ならば、私のPCでは、おそらく200フレーム以上の設定の方が短くなると思われます。しかし、使用しているディスプレイも60Hzですし、描画解像度など他の設定に妥協が必要になります。
+また、これらの状況は、個々のPCの、CPUとGPUの処理能力のバランスによって変動するので、皆さんに一概にこの設定がおすすめですとはなりません。しかし、VSyncはOff、なるべく早いCPU、なるべく早いGPU、なるべく軽い描画が、入力遅延低減につながると思われます。</p>
+
+    </div>
+
+    
+
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tag/dx11/">DX11</a>
+  
+  <a class="badge badge-light" href="/tag/gpuview/">GPUView</a>
+  
+  <a class="badge badge-light" href="/tag/ue4/">UE4</a>
+  
+  <a class="badge badge-light" href="/tag/fortnite/">Fortnite</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=https://shikihuiku.github.io/post/check_input_latency_of_fortnite/&amp;text=%e3%83%95%e3%82%a9%e3%83%bc%e3%83%88%e3%83%8a%e3%82%a4%e3%83%88%e3%81%ae%e5%85%a5%e5%8a%9b%e9%81%85%e5%bb%b6%e3%82%92%e8%a6%b3%e6%b8%ac%e3%81%97%e3%81%a6%e3%81%bf%e3%81%9f" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=https://shikihuiku.github.io/post/check_input_latency_of_fortnite/&amp;t=%e3%83%95%e3%82%a9%e3%83%bc%e3%83%88%e3%83%8a%e3%82%a4%e3%83%88%e3%81%ae%e5%85%a5%e5%8a%9b%e9%81%85%e5%bb%b6%e3%82%92%e8%a6%b3%e6%b8%ac%e3%81%97%e3%81%a6%e3%81%bf%e3%81%9f" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=%e3%83%95%e3%82%a9%e3%83%bc%e3%83%88%e3%83%8a%e3%82%a4%e3%83%88%e3%81%ae%e5%85%a5%e5%8a%9b%e9%81%85%e5%bb%b6%e3%82%92%e8%a6%b3%e6%b8%ac%e3%81%97%e3%81%a6%e3%81%bf%e3%81%9f&amp;body=https://shikihuiku.github.io/post/check_input_latency_of_fortnite/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=https://shikihuiku.github.io/post/check_input_latency_of_fortnite/&amp;title=%e3%83%95%e3%82%a9%e3%83%bc%e3%83%88%e3%83%8a%e3%82%a4%e3%83%88%e3%81%ae%e5%85%a5%e5%8a%9b%e9%81%85%e5%bb%b6%e3%82%92%e8%a6%b3%e6%b8%ac%e3%81%97%e3%81%a6%e3%81%bf%e3%81%9f" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="whatsapp://send?text=%e3%83%95%e3%82%a9%e3%83%bc%e3%83%88%e3%83%8a%e3%82%a4%e3%83%88%e3%81%ae%e5%85%a5%e5%8a%9b%e9%81%85%e5%bb%b6%e3%82%92%e8%a6%b3%e6%b8%ac%e3%81%97%e3%81%a6%e3%81%bf%e3%81%9f%20https://shikihuiku.github.io/post/check_input_latency_of_fortnite/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=https://shikihuiku.github.io/post/check_input_latency_of_fortnite/&amp;title=%e3%83%95%e3%82%a9%e3%83%bc%e3%83%88%e3%83%8a%e3%82%a4%e3%83%88%e3%81%ae%e5%85%a5%e5%8a%9b%e9%81%85%e5%bb%b6%e3%82%92%e8%a6%b3%e6%b8%ac%e3%81%97%e3%81%a6%e3%81%bf%e3%81%9f" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  
+    
+    
+    
+      
+    
+    
+    
+    <div class="media author-card content-widget-hr">
+      
+        
+        <img class="avatar mr-3 avatar-circle" src="/author/shikihuiku/avatar_hu83bef21d3d3e76bee62dd138e5083bbc_32201_270x270_fill_q90_lanczos_center.jpg" alt="shikihuiku">
+      
+
+      <div class="media-body">
+        <h5 class="card-title"><a href="https://shikihuiku.github.io/">shikihuiku</a></h5>
+        
+        <p class="card-text">リアルタイムレンダリングが好き</p>
+        <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/shikihuiku" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/shikihuiku" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+</ul>
+
+      </div>
+    </div>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js" integrity="sha256-EErZamuLefUnbMBQbsEqu1USa+btR2oIlCpBJbyD4/g=" crossorigin="anonymous"></script>
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    <script>const isSiteThemeDark = false;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks",
+        'slides' : "Slides"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.37431be2d92d7fb0160054761ab79602.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    
+  </p>
+
+  
+  
+
+
+
+
+
+
+  <p class="powered-by">
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

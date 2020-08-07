@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Publication_types | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
+    <link>https://shikihuiku.github.io/publication_types/</link>
+      <atom:link href="https://shikihuiku.github.io/publication_types/index.xml" rel="self" type="application/rss+xml" />
+    <description>Publication_types</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language>
+    <image>
+      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png</url>
+      <title>Publication_types</title>
+      <link>https://shikihuiku.github.io/publication_types/</link>
+    </image>
+    
+  </channel>
+</rss>

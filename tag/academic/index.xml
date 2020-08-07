@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Academic | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
+    <link>https://shikihuiku.github.io/tag/academic/</link>
+      <atom:link href="https://shikihuiku.github.io/tag/academic/index.xml" rel="self" type="application/rss+xml" />
+    <description>Academic</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Thu, 23 Jul 2020 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png</url>
+      <title>Academic</title>
+      <link>https://shikihuiku.github.io/tag/academic/</link>
+    </image>
+    
+    <item>
+      <title>Hugo&#43;Academicでブログを構築</title>
+      <link>https://shikihuiku.github.io/post/hello_hugo_and_academic/</link>
+      <pubDate>Thu, 23 Jul 2020 00:00:00 +0000</pubDate>
+      <guid>https://shikihuiku.github.io/post/hello_hugo_and_academic/</guid>
+      <description>&lt;h3 id=&#34;動機とか&#34;&gt;動機とか&lt;/h3&gt;
+&lt;p&gt;タイトルの画像は、今まで運用してきたWordpress上のサイトのスクリーンショットです。記念に撮ってきました。&lt;br&gt;
+別にWordpressがいやになったという訳ではないのですが、Github pagesに移行したほうが制約も少なく扱いやすい気がしたので引っ越しすることにしました。Wordpressに書いた記事は、簡単に移行するのは難しそうなので、そのままにしておきます。&lt;/p&gt;
+&lt;h3 id=&#34;hugoacademic&#34;&gt;Hugo＋Academic&lt;/h3&gt;
+&lt;p&gt;別に十分な検討をしてこの組み合わせに至ったわけでは無く、静的サイト生成ツール＋なんか都合の良いTheme程度の認識で選択しました。今後変えるかもしれません。
+ただ、コンテンツは多少特殊な要素があったとしても、基本的にMarkdownで記述できるので、今後もしサイトを移行しようと思っても、記事の移行をあきらめたくなるような事はないのではないでしょうか。&lt;/p&gt;
+&lt;h3 id=&#34;導入手順&#34;&gt;導入手順&lt;/h3&gt;
+&lt;p&gt;せかっくなので自分なりの導入手順を記しておきます。環境はWindows10を使用しています。Hugoは導入済です。&lt;/p&gt;
+&lt;h4 id=&#34;academicの導入&#34;&gt;Academicの導入&lt;/h4&gt;
+&lt;p&gt;まず、Hugoのテーマとして、Academicを導入しようとして、以下の様にファイルを配置しましたが、上手くいきませんでした。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;git submodule add https://github.com/gcushen/hugo-academic.git themes/academic
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://sourcethemes.com/academic/docs/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Academicのドキュメント&lt;/a&gt;を参照すると、Hugoの新規サイトの状態に加えて、いろいろなファイルが正しい位置に配置されている必要があるようで、
+&lt;a href=&#34;https://github.com/sourcethemes/academic-kickstart.git&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;academic-kickstart.git&lt;/a&gt;をクローンすることがおすすめのようです。
+初めはプライベートリポジトリとして扱いたいですし、リポジトリの名前も変えたいので、cloneしてmirrorします。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;git clone --bare https://github.com/sourcethemes/academic-kickstart.git
+cd academic-kickstart.git
+git push --mirror https://github.com/shikihuiku/blog.git
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;早速ローカルで初期状態を確認しようと思ったら、ビルドエラーが出ました。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt; hugo server
+Building sites … ERROR 2020/07/25 17:30:35 render of &amp;quot;term&amp;quot; failed: execute of template failed: template: authors/list.html:5:3: executing &amp;quot;authors/list.html&amp;quot; at &amp;lt;partial &amp;quot;site_head&amp;quot; .&amp;gt;: error calling partial: &amp;quot;T:\GitHub\hugotest\blog\themes\academic\layouts\partials\site_head.html:131:56&amp;quot;: execute of template failed: template: partials/site_head.html:131:56: executing &amp;quot;partials/site_head.html&amp;quot; at &amp;lt;resources.Concat&amp;gt;: error calling Concat: resources in Concat must be of the same Media Type, got &amp;quot;text/x-scss&amp;quot; and &amp;quot;text/css&amp;quot;
+ERROR 2020/07/25 17:30:35 render of &amp;quot;section&amp;quot; failed: execute of template failed: template: section/publication.html:5:3: executing &amp;quot;section/publication.html&amp;quot; at &amp;lt;partial &amp;quot;site_head&amp;quot; .&amp;gt;: error calling partial: &amp;quot;T:\GitHub\hugotest\blog\themes\academic\layouts\partials\site_head.html:131:56&amp;quot;: execute of template failed: template: partials/site_head.html:131:56: executing &amp;quot;partials/site_head.html&amp;quot; at &amp;lt;resources.Concat&amp;gt;: error calling Concat: resources in Concat must be of the same Media Type, got &amp;quot;text/x-scss&amp;quot; and &amp;quot;text/css&amp;quot;
+ERROR 2020/07/25 17:30:35 render of &amp;quot;home&amp;quot; failed: execute of template failed: template: index.html:5:3: executing &amp;quot;index.html&amp;quot; at &amp;lt;partial &amp;quot;site_head&amp;quot; .&amp;gt;: error calling partial: &amp;quot;T:\GitHub\hugotest\blog\themes\academic\layouts\partials\site_head.html:131:56&amp;quot;: execute of template failed: template: partials/site_head.html:131:56: executing &amp;quot;partials/site_head.html&amp;quot; at &amp;lt;resources.Concat&amp;gt;: error calling Concat: resources in Concat must be of the same Media Type, got &amp;quot;text/x-scss&amp;quot; and &amp;quot;text/css&amp;quot;
+ERROR 2020/07/25 17:30:35 render of &amp;quot;taxonomy&amp;quot; failed: execute of template failed: template: authors/terms.html:5:3: executing &amp;quot;authors/terms.html&amp;quot; at &amp;lt;partial &amp;quot;site_head&amp;quot; .&amp;gt;: error calling partial: &amp;quot;T:\GitHub\hugotest\blog\themes\academic\layouts\partials\site_head.html:131:56&amp;quot;: execute of template failed: template: partials/site_head.html:131:56: executing &amp;quot;partials/site_head.html&amp;quot; at &amp;lt;resources.Concat&amp;gt;: error calling Concat: resources in Concat must be of the same Media Type, got &amp;quot;text/x-scss&amp;quot; and &amp;quot;text/css&amp;quot;
+ERROR 2020/07/25 17:30:35 failed to render pages: render of &amp;quot;section&amp;quot; failed: execute of template failed: template: section/talk.html:5:3: executing &amp;quot;section/talk.html&amp;quot; at &amp;lt;partial &amp;quot;site_head&amp;quot; .&amp;gt;: error calling partial: &amp;quot;T:\GitHub\hugotest\blog\themes\academic\layouts\partials\site_head.html:131:56&amp;quot;: execute of template failed: template: partials/site_head.html:131:56: executing &amp;quot;partials/site_head.html&amp;quot; at &amp;lt;resources.Concat&amp;gt;: error calling Concat: resources in Concat must be of the same Media Type, got &amp;quot;text/x-scss&amp;quot; and &amp;quot;text/css&amp;quot;
+Built in 84 ms
+Error: Error building site: TOCSS: failed to transform &amp;quot;main_parsed.scss&amp;quot; (text/x-scss): resource &amp;quot;scss/scss/main.scss_76ac6956597c32fec7ddf60d408db3ab&amp;quot; not found in file cache
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;調べてみると、Academicには、hugo_extendedが必要だという事が分かりましたので、
+&lt;a href=&#34;https://github.com/gohugoio/hugo/releases&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Hugo_extendedのビルド済バイナリ&lt;/a&gt;をDLします。
+再びローカルサーバーを立ち上げると、今回は上手くビルドできました。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;hugo server
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;ローカルホストのポート1313にアクセスすると、おしゃれなサイトが表示されました。BiographyやProjectsやPublicationsなど、かなりハイスペック人材向けのテンプレートで尻込みしますが、どんどん削っていくことにします。&lt;/p&gt;
+&lt;h4 id=&#34;academicのカスタマイズ&#34;&gt;Academicのカスタマイズ&lt;/h4&gt;
+&lt;p&gt;ここで先人の知恵をお借りします&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Hugo + Academic テーマを使ったブログの作り方
+&lt;a href=&#34;https://qiita.com/harumaxy/items/58e7e4273c61e7e260b3&#34;&gt;https://qiita.com/harumaxy/items/58e7e4273c61e7e260b3&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;/config/_default/フォルダに格納されている以下のtomlファイルを編集していきます。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;config.toml&lt;/li&gt;
+&lt;li&gt;language.toml&lt;/li&gt;
+&lt;li&gt;menus.toml&lt;/li&gt;
+&lt;li&gt;params.toml&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;その他諸々の変更を行って、シンプルにBlogのポストができるページにしました。言語設定はenのまま使用する事にします。&lt;/p&gt;
+&lt;h4 id=&#34;フォントの設定&#34;&gt;フォントの設定&lt;/h4&gt;
+&lt;p&gt;デフォルトでは、GoogleのWebフォントがいろいろ指定されていますが、フォントの設定はシンプルな方が良いと思っています。
+フォントのプリセットにNativeという設定があり、こちらを使うとrootのfont-familyの設定を、殆どの要素で使うようになるようです。config/_default/params.tomlでこれを指定します。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;font=&amp;quot;Native&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;rootにある、フォントの設定はとりあえず変更せずに使ってみます。&lt;/p&gt;
+&lt;h4 id=&#34;customscssの設定&#34;&gt;custom.scssの設定&lt;/h4&gt;
+&lt;p&gt;デフォルトではブラウザの横幅に対してページの表示領域が酷く狭いです。&lt;br&gt;
+blog/assets/scss/custom.scssというファイルを配置することで、自身で記述したcssをページに読み込ませる事が出来るようです。生成されたHTMLの要素のクラス名を確認して適当に設定しました。なんだか横幅を変えるだけで泥臭い作業になりました。もっと簡単にスタイルを変更する方法があるかもしれません。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;/*width for top page*/
+.container {
+    max-width: 90%;
+}
+/*width for posts.*/
+.article-container{
+    max-width:90%
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;また、見出しのフォントのWeightが一定では無いので変更します。ついでにマージンも変更します。
+この辺りは素人なので、あまり参考になりませんが。
+しかし、CSSを書いて変更できると結局楽だなってなって思ってきました&amp;hellip;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.7rem;
+    margin-bottom: 0.3rem;
+    font-weight: 700;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;アイコンの設定&#34;&gt;アイコンの設定&lt;/h4&gt;
+&lt;p&gt;それから、Webサイトのアイコン、所謂ファビコンがデフォルトの設定では、Academicのアイコンになっているので変更します。&lt;br&gt;
+assets/images/フォルダに、解像度512x512のicon.pngを配置します。&lt;/p&gt;
+&lt;h4 id=&#34;github-pagesの設定&#34;&gt;Github Pagesの設定&lt;/h4&gt;
+&lt;p&gt;最後に、実際にビルドされたページをGithub Pagesでホスティングする方法ですが、一番簡単な方法はHugoの出力先をdocsフォルダにして、それをそのままリポジトリにPushして、GithubPagesで公開する方法だと思います。
+Hugoはデフォルトではpublicフォルダにファイルが生成されるので、これを変更します。&lt;/p&gt;
+&lt;p&gt;config/_default/config.tomlに以下の様に設定することで、docsフォルダにサイトが生成されるようになります。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;publishdir= &amp;quot;docs&amp;quot;  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;あとは、baseurlを設定しサイトを生成してエラーがでなければOKです。リポジトリにPushして、github pagesの設定をすれば公開されます。&lt;/p&gt;
+&lt;h4 id=&#34;github-pagesの設定---やっぱりprivateリポジトリで&#34;&gt;Github Pagesの設定 - やっぱりPrivateリポジトリで&lt;/h4&gt;
+&lt;p&gt;構築履歴が閲覧可能な状態なのは別に構わないですし、大抵の場合はDraft記事が閲覧可能な状態でも構わないのですが、一部のCEDECセッションの補間資料とかのDraftは会期以前に公開状態になるのはまずいので、
+publishしたべージのコンテンツのみを公開状態にする必要があります。結局Hugoのpublishdirのディレクトリ以下を別のリポジトリにして、こちらだけPublicに設定して、ビルド環境はPrivateリポジトリにすることにしました。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

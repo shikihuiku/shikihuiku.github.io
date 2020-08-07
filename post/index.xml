@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
+    <link>https://shikihuiku.github.io/post/</link>
+      <atom:link href="https://shikihuiku.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <description>Posts</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Thu, 23 Jul 2020 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png</url>
+      <title>Posts</title>
+      <link>https://shikihuiku.github.io/post/</link>
+    </image>
+    
+    <item>
+      <title>Hugo&#43;Academicでブログを構築</title>
+      <link>https://shikihuiku.github.io/post/hello_hugo_and_academic/</link>
+      <pubDate>Thu, 23 Jul 2020 00:00:00 +0000</pubDate>
+      <guid>https://shikihuiku.github.io/post/hello_hugo_and_academic/</guid>
+      <description>&lt;h3 id=&#34;動機とか&#34;&gt;動機とか&lt;/h3&gt;
+&lt;p&gt;タイトルの画像は、今まで運用してきたWordpress上のサイトのスクリーンショットです。記念に撮ってきました。&lt;br&gt;
+別にWordpressがいやになったという訳ではないのですが、Github pagesに移行したほうが制約も少なく扱いやすい気がしたので引っ越しすることにしました。Wordpressに書いた記事は、簡単に移行するのは難しそうなので、そのままにしておきます。&lt;/p&gt;
+&lt;h3 id=&#34;hugoacademic&#34;&gt;Hugo＋Academic&lt;/h3&gt;
+&lt;p&gt;別に十分な検討をしてこの組み合わせに至ったわけでは無く、静的サイト生成ツール＋なんか都合の良いTheme程度の認識で選択しました。今後変えるかもしれません。
+ただ、コンテンツは多少特殊な要素があったとしても、基本的にMarkdownで記述できるので、今後もしサイトを移行しようと思っても、記事の移行をあきらめたくなるような事はないのではないでしょうか。&lt;/p&gt;
+&lt;h3 id=&#34;導入手順&#34;&gt;導入手順&lt;/h3&gt;
+&lt;p&gt;せかっくなので自分なりの導入手順を記しておきます。環境はWindows10を使用しています。Hugoは導入済です。&lt;/p&gt;
+&lt;h4 id=&#34;academicの導入&#34;&gt;Academicの導入&lt;/h4&gt;
+&lt;p&gt;まず、Hugoのテーマとして、Academicを導入しようとして、以下の様にファイルを配置しましたが、上手くいきませんでした。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;git submodule add https://github.com/gcushen/hugo-academic.git themes/academic
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://sourcethemes.com/academic/docs/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Academicのドキュメント&lt;/a&gt;を参照すると、Hugoの新規サイトの状態に加えて、いろいろなファイルが正しい位置に配置されている必要があるようで、
+&lt;a href=&#34;https://github.com/sourcethemes/academic-kickstart.git&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;academic-kickstart.git&lt;/a&gt;をクローンすることがおすすめのようです。
+初めはプライベートリポジトリとして扱いたいですし、リポジトリの名前も変えたいので、cloneしてmirrorします。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;git clone --bare https://github.com/sourcethemes/academic-kickstart.git
+cd academic-kickstart.git
+git push --mirror https://github.com/shikihuiku/blog.git
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;早速ローカルで初期状態を確認しようと思ったら、ビルドエラーが出ました。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt; hugo server
+Building sites … ERROR 2020/07/25 17:30:35 render of &amp;quot;term&amp;quot; failed: execute of template failed: template: authors/list.html:5:3: executing &amp;quot;authors/list.html&amp;quot; at &amp;lt;partial &amp;quot;site_head&amp;quot; .&amp;gt;: error calling partial: &amp;quot;T:\GitHub\hugotest\blog\themes\academic\layouts\partials\site_head.html:131:56&amp;quot;: execute of template failed: template: partials/site_head.html:131:56: executing &amp;quot;partials/site_head.html&amp;quot; at &amp;lt;resources.Concat&amp;gt;: error calling Concat: resources in Concat must be of the same Media Type, got &amp;quot;text/x-scss&amp;quot; and &amp;quot;text/css&amp;quot;
+ERROR 2020/07/25 17:30:35 render of &amp;quot;section&amp;quot; failed: execute of template failed: template: section/publication.html:5:3: executing &amp;quot;section/publication.html&amp;quot; at &amp;lt;partial &amp;quot;site_head&amp;quot; .&amp;gt;: error calling partial: &amp;quot;T:\GitHub\hugotest\blog\themes\academic\layouts\partials\site_head.html:131:56&amp;quot;: execute of template failed: template: partials/site_head.html:131:56: executing &amp;quot;partials/site_head.html&amp;quot; at &amp;lt;resources.Concat&amp;gt;: error calling Concat: resources in Concat must be of the same Media Type, got &amp;quot;text/x-scss&amp;quot; and &amp;quot;text/css&amp;quot;
+ERROR 2020/07/25 17:30:35 render of &amp;quot;home&amp;quot; failed: execute of template failed: template: index.html:5:3: executing &amp;quot;index.html&amp;quot; at &amp;lt;partial &amp;quot;site_head&amp;quot; .&amp;gt;: error calling partial: &amp;quot;T:\GitHub\hugotest\blog\themes\academic\layouts\partials\site_head.html:131:56&amp;quot;: execute of template failed: template: partials/site_head.html:131:56: executing &amp;quot;partials/site_head.html&amp;quot; at &amp;lt;resources.Concat&amp;gt;: error calling Concat: resources in Concat must be of the same Media Type, got &amp;quot;text/x-scss&amp;quot; and &amp;quot;text/css&amp;quot;
+ERROR 2020/07/25 17:30:35 render of &amp;quot;taxonomy&amp;quot; failed: execute of template failed: template: authors/terms.html:5:3: executing &amp;quot;authors/terms.html&amp;quot; at &amp;lt;partial &amp;quot;site_head&amp;quot; .&amp;gt;: error calling partial: &amp;quot;T:\GitHub\hugotest\blog\themes\academic\layouts\partials\site_head.html:131:56&amp;quot;: execute of template failed: template: partials/site_head.html:131:56: executing &amp;quot;partials/site_head.html&amp;quot; at &amp;lt;resources.Concat&amp;gt;: error calling Concat: resources in Concat must be of the same Media Type, got &amp;quot;text/x-scss&amp;quot; and &amp;quot;text/css&amp;quot;
+ERROR 2020/07/25 17:30:35 failed to render pages: render of &amp;quot;section&amp;quot; failed: execute of template failed: template: section/talk.html:5:3: executing &amp;quot;section/talk.html&amp;quot; at &amp;lt;partial &amp;quot;site_head&amp;quot; .&amp;gt;: error calling partial: &amp;quot;T:\GitHub\hugotest\blog\themes\academic\layouts\partials\site_head.html:131:56&amp;quot;: execute of template failed: template: partials/site_head.html:131:56: executing &amp;quot;partials/site_head.html&amp;quot; at &amp;lt;resources.Concat&amp;gt;: error calling Concat: resources in Concat must be of the same Media Type, got &amp;quot;text/x-scss&amp;quot; and &amp;quot;text/css&amp;quot;
+Built in 84 ms
+Error: Error building site: TOCSS: failed to transform &amp;quot;main_parsed.scss&amp;quot; (text/x-scss): resource &amp;quot;scss/scss/main.scss_76ac6956597c32fec7ddf60d408db3ab&amp;quot; not found in file cache
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;調べてみると、Academicには、hugo_extendedが必要だという事が分かりましたので、
+&lt;a href=&#34;https://github.com/gohugoio/hugo/releases&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Hugo_extendedのビルド済バイナリ&lt;/a&gt;をDLします。
+再びローカルサーバーを立ち上げると、今回は上手くビルドできました。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;hugo server
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;ローカルホストのポート1313にアクセスすると、おしゃれなサイトが表示されました。BiographyやProjectsやPublicationsなど、かなりハイスペック人材向けのテンプレートで尻込みしますが、どんどん削っていくことにします。&lt;/p&gt;
+&lt;h4 id=&#34;academicのカスタマイズ&#34;&gt;Academicのカスタマイズ&lt;/h4&gt;
+&lt;p&gt;ここで先人の知恵をお借りします&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Hugo + Academic テーマを使ったブログの作り方
+&lt;a href=&#34;https://qiita.com/harumaxy/items/58e7e4273c61e7e260b3&#34;&gt;https://qiita.com/harumaxy/items/58e7e4273c61e7e260b3&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;/config/_default/フォルダに格納されている以下のtomlファイルを編集していきます。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;config.toml&lt;/li&gt;
+&lt;li&gt;language.toml&lt;/li&gt;
+&lt;li&gt;menus.toml&lt;/li&gt;
+&lt;li&gt;params.toml&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;その他諸々の変更を行って、シンプルにBlogのポストができるページにしました。言語設定はenのまま使用する事にします。&lt;/p&gt;
+&lt;h4 id=&#34;フォントの設定&#34;&gt;フォントの設定&lt;/h4&gt;
+&lt;p&gt;デフォルトでは、GoogleのWebフォントがいろいろ指定されていますが、フォントの設定はシンプルな方が良いと思っています。
+フォントのプリセットにNativeという設定があり、こちらを使うとrootのfont-familyの設定を、殆どの要素で使うようになるようです。config/_default/params.tomlでこれを指定します。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;font=&amp;quot;Native&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;rootにある、フォントの設定はとりあえず変更せずに使ってみます。&lt;/p&gt;
+&lt;h4 id=&#34;customscssの設定&#34;&gt;custom.scssの設定&lt;/h4&gt;
+&lt;p&gt;デフォルトではブラウザの横幅に対してページの表示領域が酷く狭いです。&lt;br&gt;
+blog/assets/scss/custom.scssというファイルを配置することで、自身で記述したcssをページに読み込ませる事が出来るようです。生成されたHTMLの要素のクラス名を確認して適当に設定しました。なんだか横幅を変えるだけで泥臭い作業になりました。もっと簡単にスタイルを変更する方法があるかもしれません。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;/*width for top page*/
+.container {
+    max-width: 90%;
+}
+/*width for posts.*/
+.article-container{
+    max-width:90%
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;また、見出しのフォントのWeightが一定では無いので変更します。ついでにマージンも変更します。
+この辺りは素人なので、あまり参考になりませんが。
+しかし、CSSを書いて変更できると結局楽だなってなって思ってきました&amp;hellip;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.7rem;
+    margin-bottom: 0.3rem;
+    font-weight: 700;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;アイコンの設定&#34;&gt;アイコンの設定&lt;/h4&gt;
+&lt;p&gt;それから、Webサイトのアイコン、所謂ファビコンがデフォルトの設定では、Academicのアイコンになっているので変更します。&lt;br&gt;
+assets/images/フォルダに、解像度512x512のicon.pngを配置します。&lt;/p&gt;
+&lt;h4 id=&#34;github-pagesの設定&#34;&gt;Github Pagesの設定&lt;/h4&gt;
+&lt;p&gt;最後に、実際にビルドされたページをGithub Pagesでホスティングする方法ですが、一番簡単な方法はHugoの出力先をdocsフォルダにして、それをそのままリポジトリにPushして、GithubPagesで公開する方法だと思います。
+Hugoはデフォルトではpublicフォルダにファイルが生成されるので、これを変更します。&lt;/p&gt;
+&lt;p&gt;config/_default/config.tomlに以下の様に設定することで、docsフォルダにサイトが生成されるようになります。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;publishdir= &amp;quot;docs&amp;quot;  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;あとは、baseurlを設定しサイトを生成してエラーがでなければOKです。リポジトリにPushして、github pagesの設定をすれば公開されます。&lt;/p&gt;
+&lt;h4 id=&#34;github-pagesの設定---やっぱりprivateリポジトリで&#34;&gt;Github Pagesの設定 - やっぱりPrivateリポジトリで&lt;/h4&gt;
+&lt;p&gt;構築履歴が閲覧可能な状態なのは別に構わないですし、大抵の場合はDraft記事が閲覧可能な状態でも構わないのですが、一部のCEDECセッションの補間資料とかのDraftは会期以前に公開状態になるのはまずいので、
+publishしたべージのコンテンツのみを公開状態にする必要があります。結局Hugoのpublishdirのディレクトリ以下を別のリポジトリにして、こちらだけPublicに設定して、ビルド環境はPrivateリポジトリにすることにしました。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>フォートナイトの入力遅延を観測してみた</title>
+      <link>https://shikihuiku.github.io/post/check_input_latency_of_fortnite/</link>
+      <pubDate>Tue, 16 Jun 2020 01:33:02 +0900</pubDate>
+      <guid>https://shikihuiku.github.io/post/check_input_latency_of_fortnite/</guid>
+      <description>&lt;pre&gt;&lt;code&gt;この記事は、旧サイトからテスト用に移植しました。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;入力遅延の問題はゲーム開発において悩ましい問題の一つです。特にPCでは、他のプロセスが勝手な都合で動作しますし、リソースの競合も発生します。また、PC本体のCPU/GPUパフォーマンスの違いも大きいです。ここでは一般的なデスクトップPC上で、フォートナイトの描画がどのように実行されているかをソフトウェアの見地から、GPUViewを用いて観測してみます。ここで言う入力遅延は、Windows上のゲームのプロセスがキーやマウスのステートを取得すると思われるタイミングから、描画された画面が、ディスプレイへの出力対象になるまでを指します。実際には、マウスやキーボードのハードウェアとドライバにも遅延がありますし、ディスプレイにも実際に輝点として可視化されるまでに遅延がありますが、これらは今回は考慮しません。またゲームのプロセスが正確にいつ入力デバイスの情報を取得しているかは考慮しません。あるフレームのCPU処理の開始を入力取得時間として考えます。&lt;br&gt;
+ちなみに今回使用したデスクトップPCは、Core-i7 7700KとGeForce RTX2080Tiが搭載されています。モニタは一般的な60Hzの4Kディスプレイです。&lt;br&gt;
+テストに使ったシーンは、クリエイティブの島です。描画としては極めて軽い状態がテスト対象です。&lt;/p&gt;
+&lt;p&gt;UE4の開発者の方は、すでにご存じかと思いますが、以下の資料に入力遅延に関する詳しい解説がご覧いただけると思います。&lt;/p&gt;
+&lt;p align=&#34;center&#34; style=&#34;text-align:center&#34;&gt;
+&lt;iframe src=&#34;//www.slideshare.net/slideshow/embed_code/key/k13Vz8lkoluqKW&#34; width=&#34;595&#34; height=&#34;485&#34; frameborder=&#34;0&#34; marginwidth=&#34;0&#34; marginheight=&#34;0&#34; scrolling=&#34;no&#34; style=&#34;border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;&#34; allowfullscreen&gt; &lt;/iframe&gt;&lt;br&gt;
+&lt;strong&gt; &lt;a href=&#34;//www.slideshare.net/EpicGamesJapan/ue4input-latency&#34; title=&#34;UE4のスレッドの流れと Input Latency改善の仕組み&#34; target=&#34;_blank&#34;&gt;UE4のスレッドの流れと Input Latency改善の仕組み&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href=&#34;https://www.slideshare.net/EpicGamesJapan&#34; target=&#34;_blank&#34;&gt;エピック・ゲームズ・ジャパン Epic Games Japan&lt;/a&gt;&lt;/strong&gt;
+&lt;/p&gt;
+&lt;p&gt;今回は、フォートナイトをプレイする上でどのような設定が一番自分にとって好ましいかを調べる過程で分かったことを説明していきます。フォートナイトの描画設定で、入力遅延に関係のある設定は、フレームレートの上限値、VSync、それから、マルチスレッドレンダリングです。描画APIはD3D11と12に対応していますが、D3D12にすることによる利点があまり感じられなかったため、今回はD3D11のみをテストしています。&lt;/p&gt;
+&lt;h2 id=&#34;vsync-off-マルチスレッドレンダリング-off-フレームレート上限-60&#34;&gt;VSync: OFF マルチスレッドレンダリング: OFF フレームレート上限: 60&lt;/h2&gt;
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-vsyncoff_mtoff_60&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_60_hu33bc11a1f895fdcc3ac8673383111945_278989_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncoff_mtoff_60&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_60_hu33bc11a1f895fdcc3ac8673383111945_278989_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1435&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    vsyncoff_mtoff_60
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;おなじみのGPUViewのログです。詳しく見たい方はクリックして拡大してください。まずは、スレッドのアクティビティを理解するために一番簡単な例を示します。VSyncがOffなので、青い縦線で示されたVSyncのタイミングとは全く関係なく描画されています。描画スレッドが、D3D11の描画APIを呼び出して、Present()を呼び出し、GPUが描画を完了するのとほぼ同時にフロントバッファへのFlipが行われ、ディスプレイへの表示対象になります。ドライバのスレッドに描画命令を発行しているスレッドが、UE4のRHIスレッドと思われますが、マルチスレッドレンダリングをOffにしているので、Renderのスレッドが、直接RHIを呼び出しているのではないかと思われます。それに先立ち動作しているスレッドがゲームのメインスレッドと思われます。ゲームのメインスレッドは、Render/RHIスレッドに渡す描画情報を構築するタイミングと思われるところで、フレームレートのペーシングを行っていると思われます。計測された入力遅延は、12.8msですが、CPUもGPUもアイドル時間が長いので、処理クロックを落としていると思われます。実際の場合も何も小細工しなければ、ユーザーの知らないところでクロックが下がるので、今回はこの設定の入力遅延は12ms前後と考えます。&lt;/p&gt;
+&lt;h2 id=&#34;vsync-off-マルチスレッドレンダリング-on-フレームレート上限-60&#34;&gt;VSync: OFF マルチスレッドレンダリング: ON フレームレート上限: 60&lt;/h2&gt;
+&lt;p&gt;次は、先ほどの設定から、マルチスレッドレンダリングを有効にしてみます。他の設定は同じです。&lt;/p&gt;
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-vsyncoff_mton_60&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_60_hu1169490fbcbadeadc14156a6fb3266a4_276171_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncoff_mton_60&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_60_hu1169490fbcbadeadc14156a6fb3266a4_276171_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1640&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    vsyncoff_mton_60
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;見た目ががらりと変わっていますが、アイドリングしているWorkerスレッドにRenderと思われるスレッドが埋もれてしまったため、このような見た目になっています。実際は、どの設定でも多数のWorkerスレッドやサウンドのスレッドが立ち上げられていますが、描画に関係ないものは省略しています。先ほどの例と異なり、RHIのスレッドと思われるスレッドと、Renderと思われるスレッドが別になりました。基本的な仕組みや、遅延の状況はほぼ同じです。こちらもおそらく動作クロックが下がっているので、本来の描画パフォーマンスと比べると処理時間がかかっています。&lt;/p&gt;
+&lt;h2 id=&#34;vsync-off-マルチスレッドレンダリング-off-フレームレート上限-120&#34;&gt;VSync: OFF マルチスレッドレンダリング: OFF フレームレート上限: 120&lt;/h2&gt;
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-vsyncoff_mtoff_120&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_120_hu577993647c8741ecb07125375c0cb93a_249296_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncoff_mtoff_120&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_120_hu577993647c8741ecb07125375c0cb93a_249296_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1071&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    vsyncoff_mtoff_120
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;次は、再びマルチスレッドレンダリングをOFFに戻しました。そして、フレームレート上限を120にしてみました。基本的な動作は一番初めの例と同じですが、フレームのペーシングが8.3msになったことで、120FPSのレンダリングになりました。そして、アイドリングのデューティ比が変わったことにより、動作クロックが引き上げられた関係で、入力遅延も短縮され、9.5ms程度になりました。&lt;/p&gt;
+&lt;h2 id=&#34;vsync-off-マルチスレッドレンダリング-on-フレームレート上限-120&#34;&gt;VSync: OFF マルチスレッドレンダリング: ON フレームレート上限: 120&lt;/h2&gt;
+&lt;p&gt;次は、上記の設定でマルチスレッドレンダリングをONにします。
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-vsyncoff_mton_120&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_120_hucb7e813ec08e0a34392eae9da6d7a916_251387_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncoff_mton_120&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_120_hucb7e813ec08e0a34392eae9da6d7a916_251387_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1018&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    vsyncoff_mton_120
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;やはり、RenderスレッドとRHIスレッドが分かれました。今回のテスト対象になっているシーンは軽いので、マルチスレッドレンダリングの恩恵は少ないですが、もっと複雑なシーンでは、これらのスレッドが並列動作することにより、Renderスレッドの描画命令発行によるストールが軽減され、より顕著な差になると思われます。少なくとも遅くなることはなさそうなので、私はこの設定でプレイすることにします。&lt;/p&gt;
+&lt;h2 id=&#34;vsync-on-マルチスレッドレンダリング-off-フレームレート上限-制限なし&#34;&gt;VSync: ON マルチスレッドレンダリング: OFF フレームレート上限: 制限なし&lt;/h2&gt;
+&lt;p&gt;次は、いわゆる、VSyncを守って、画面のティアリングを起こさない描画になります。見た目は一番スムーズなのですが、入力遅延の観点からはあまりお勧めできない設定となりそうです。
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-vsyncon_mtoff_60&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncon_mtoff_60_hu1e8bb69aa4e2d9153699b0a96e4ee908_517763_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncon_mtoff_60&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncon_mtoff_60_hu1e8bb69aa4e2d9153699b0a96e4ee908_517763_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1619&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    vsyncon_mtoff_60
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;まず、VSyncを取ると、メインスレッドの動作がかなり変わります。およそ2ms単位でスレッドをポーリングしながら、処理開始のタイミングを計っているようです。rhi.SyncSlackMSのデフォルト設定と思われる、VSyncの10ms前に、メインスレッドの処理を開始しています。Renderスレッドは、前の前のフレームのGPU描画処理が完了してから、RHIの呼び出しを開始しているようです。そして、RHIが呼び出すD3DAPIによって生成されたGPUタスクは、ドライバのGPUタスクキューに積み上げられます。そのフレームのGPU描画処理がGPU上で実行されるのは、Renderスレッドが動作したフレームの次の次のフレームです。そして、ディスプレイの出力対象になるFlipが行われるのは、VSyncに同期しているので、実際の表示はその次のフレームとなります。メインスレッドが動作を開始してから、ディスプレイの出力対象になるまでの入力遅延は60msほどとなります。&lt;/p&gt;
+&lt;h3 id=&#34;まとめ&#34;&gt;まとめ&lt;/h3&gt;
+&lt;p&gt;少なくとも私の環境では、VSyncをOFFにして、CPUのフレームペーシングがボトルネックになる状態（つまりGPUの処理時間には余裕がある状態）で、なるべく高いフレームレートが入力遅延が一番小さくなる状態だといえると思います。入力遅延を最短にするという目的ならば、私のPCでは、おそらく200フレーム以上の設定の方が短くなると思われます。しかし、使用しているディスプレイも60Hzですし、描画解像度など他の設定に妥協が必要になります。
+また、これらの状況は、個々のPCの、CPUとGPUの処理能力のバランスによって変動するので、皆さんに一概にこの設定がおすすめですとはなりません。しかし、VSyncはOff、なるべく早いCPU、なるべく早いGPU、なるべく軽い描画が、入力遅延低減につながると思われます。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
