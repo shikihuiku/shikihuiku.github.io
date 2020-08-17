@@ -1444,8 +1444,8 @@ Quadを動作対象とした、変数値の取得</li>
 
 <h3 id="quad-wide-shuffle-operations">Quad-wide Shuffle operations</h3>
 <p>Pixel Shaderでのみ使用可能なWave Intrinsicsです。
-(これについては、ドキュメントの表記があいまいです。実際はCompute Shaderでも使用可能と表記されており、その場合、Lane Indexの0より4 Laneごとに区切ったLaneがQuadとして扱われるとされています。)
-Quad間のデータの交換を行います。</p>
+(これについては、2020/08現在ドキュメントの表記と実装に食い違いがあります。ドキュメントにはCompute Shaderでも使用可能と表記されており、その場合、Lane Indexの0より4 Laneごとに区切ったLaneがQuadとして扱われるとされています。
+しかし実際には、Quad系を使用したCompute Shaderのコンパイル時に<code>opcode 'QuadReadAcross' should only be used in 'Pixel Shader'</code>というメッセージが出力されます。そして、シェーダーの生成にも失敗します。)</p>
 <h4 id="quadreadlaneat"><code>QuadReadLaneAt</code></h4>
 <p>引数に、Quad内のローカルのLane Indexと、読み取り対象となる変数を指定します。Quad内で同じ値が返されます。
 読み取り対象LaneがInactive Laneだった場合の読み取り結果は未定義なので注意が必要です。
