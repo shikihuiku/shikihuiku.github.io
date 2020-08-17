@@ -5,12 +5,1013 @@
     <link>https://shikihuiku.github.io/post/</link>
       <atom:link href="https://shikihuiku.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Thu, 23 Jul 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sun, 16 Aug 2020 20:00:32 +0900</lastBuildDate>
     <image>
       <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png</url>
       <title>Posts</title>
       <link>https://shikihuiku.github.io/post/</link>
     </image>
+    
+    <item>
+      <title>HLSLのWave Intrinsicsについて</title>
+      <link>https://shikihuiku.github.io/post/wave_intrinsics1/</link>
+      <pubDate>Sun, 16 Aug 2020 20:00:32 +0900</pubDate>
+      <guid>https://shikihuiku.github.io/post/wave_intrinsics1/</guid>
+      <description>&lt;h2 id=&#34;hlslのwave-intrinsicsについて&#34;&gt;HLSLのWave Intrinsicsについて&lt;/h2&gt;
+&lt;p&gt;Wave Intrinsicsは、HLSLのShader Model6.0から導入された新しい組み込み関数群です。
+従来の他のHLSL組み込み関数が、単一スレッド内での変数のみを動作の対象するのに対して、
+Wave Intrinsicsは、Waveと呼ばれる複数のスレッド間でのデータの交換や演算を行うための組み込み関数となります。
+従来は、Compute Shaderなどで、他のスレッドの変数（演算用のレジスタ）が保持する値を参照するには、groupsharedで宣言された変数やUAVなどで宣言されたバッファーに情報を一旦ストアする必要があったうえ、スレッド間の同期命令が必要でした。
+Wave Intrinsicsは、Wave内のスレッド間に限定されますが、他のスレッドの変数（演算用のレジスタ）の値を参照したり演算することが出来ます。
+これにより、スレッド間のレジスタ空間の共有が可能になり、複数のスレッドで協調的に動作するシェーダーコードが、より記述しやすくなりました。
+また、Wave内は命令実行のタイミングが同じであることが（論理上において）保証されていることから、スレッド間同期命令を必要としないのも大きな利点です。
+一点注意が必要なのは、Wave IntrinsicsはShader Model 6.0以上に存在する組み込み関数ですが、実際に使用できるかどうかは、&lt;code&gt;ID3D12Device::CheckFeatureSupport()&lt;/code&gt;で、&lt;code&gt;D3D12_FEATURE_D3D12_OPTIONS1&lt;/code&gt;を調べる必要があります。&lt;/p&gt;
+&lt;h2 id=&#34;用語&#34;&gt;用語&lt;/h2&gt;
+&lt;p&gt;ここではWave Intrinsicsに関連する用語を説明します。&lt;/p&gt;
+&lt;h4 id=&#34;wave&#34;&gt;Wave&lt;/h4&gt;
+&lt;p&gt;NVIDIAの用語で&amp;quot;warp&amp;quot;とよばれ、AMDの用語では、&amp;ldquo;wavefront&amp;quot;と呼ばれてきたものです。命令発行が、同時に行われれるスレッドのグループのことです。&lt;/p&gt;
+&lt;h4 id=&#34;lane&#34;&gt;Lane&lt;/h4&gt;
+&lt;p&gt;Waveを構成する個々のスレッドを指します。&lt;/p&gt;
+&lt;p&gt;以下の図は、一つのWaveの中に32Lane分のスレッドが存在する場合の図になります。この図式を使って様々なWave Intrinsicsについて説明していきたいと思います。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-waveとlane&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wave_hu550fc97d8560033e52f050ac0d549368_13159_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;WaveとLane&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wave_hu550fc97d8560033e52f050ac0d549368_13159_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;441&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    WaveとLane
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h4 id=&#34;inactive-lane&#34;&gt;Inactive Lane&lt;/h4&gt;
+&lt;p&gt;Waveを構成する個々のスレッドのうち、命令を実行しないスレッドを指します。&lt;/p&gt;
+&lt;h4 id=&#34;active-lane&#34;&gt;Active Lane&lt;/h4&gt;
+&lt;p&gt;Waveを構成する個々のスレッドのうち、命令を実行するスレッドを指します。&lt;/p&gt;
+&lt;p&gt;以下の図は、左側のシェーダーコードの実行に伴って変化する、Active LaneとInactive Laneの変化の例を表した図です。右側の3 Laneは、スレッド起動数等の初期条件によるInactive Laneです。
+Pixel ShaderやCompute Shaderで必要とされるスレッド数が、Waveの倍数でなかった場合は、Inactive Laneの存在するWaveが起動されます。このようなInactive Laneは、状態が動的に変更されることは無く、終始Inactive Laneのままです。
+3行目のIf()による分岐の条件を満たさなかったLaneは、If()ステートで囲まれたコードブロックが終了するまでInactive Laneとなります。Wave内では命令実行は暗黙的に同期する決まりになっているので、Inactive Laneはその間なにも実行せず、他のLaneが該当コードブロックの実行を完了するまで待ちます。
+図にはありませんが、If()ステートのコードブロックの実行が終了すれば、条件分岐によってInactive Laneとなったスレッドは、再びActive Laneへと復帰します。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-active-laneとinactive-lane&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/active_inactive_hu6f4caf7822c3e8aa1ace8fd32f3899a3_110070_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;Active LaneとInactive Lane&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/active_inactive_hu6f4caf7822c3e8aa1ace8fd32f3899a3_110070_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;965&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Active LaneとInactive Lane
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;quad&#34;&gt;Quad&lt;/h4&gt;
+&lt;p&gt;先頭から連続する4Lane分づつのスレッドのグループを指します。特にPixel Shaderでは、RenderTargetにおける2x2ピクセルブロックが一つのQuadにアサインされます。
+Pixel Shaderにおけるddx/ddyなどのGradient命令や、テクスチャーのLoDの計算は、Quad内の変数の差分によって実現されており、Gradientの計算のみに寄与してPixelを塗らないLane（スレッド）をHelper Laneと呼びます。&lt;/p&gt;
+&lt;p&gt;以下の図は、とあるプリミティブをレンダリングする際の、QuadとHelper LaneのRenderTarget上での表現とWaveとしての表現の対応図です。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-quadとhelper-lane&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;QuadとHelper Lane&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    QuadとHelper Lane
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;h2 id=&#34;waveのサイズについて&#34;&gt;Waveのサイズについて&lt;/h2&gt;
+&lt;p&gt;Wave Intrinsicsを使う上で、Waveのサイズというは非常に重要なファクターで、これを理解すること無しに、効率的な処理をデザインすることは難しいと思います。
+NVIDIAのWarpは、伝統的に32 Lane/Waveです。対して、AMDのGCNアーキテクチャは64 Lane/Waveで動作しています。
+同じくAMDのRDNAアーキテクチャは、Wave32とWave64の二つの動作モードを持ち、それぞれが、32, 64 Lane/Waveで動作しています。
+どちらのモードでシェーダーが実行されるかは、ドライバーが決定するようなので、シェーダーは両モードで正しく動く必要があります。結局のところ、32 Lane/Wave、64 Lane/Waveの両方をサポートすることができれば、NVIDIA, AMDの両GPUに対応したアプリケーションとなるはずです。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-32-lanewaveと64-lanewave&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/32_64_lane_hu55f4de2178e3ca0a112fe7c34fbabb49_24264_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;32 Lane/Waveと64 Lane/Wave&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/32_64_lane_hu55f4de2178e3ca0a112fe7c34fbabb49_24264_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;630&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    32 Lane/Waveと64 Lane/Wave
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;&lt;code&gt;ID3D12Device::CheckFeatureSupport()&lt;/code&gt;の&lt;code&gt;D3D12_FEATURE_D3D12_OPTIONS1&lt;/code&gt;では、Wave Intrinsicsの使用の可否についてとともに、使用される可能性のあるWaveのサイズの上限値と下限値が返されます。
+したがって先のRDNAの様に、単一のアーキテクチャでも、Waveのサイズは可変であると考える必要があるのかもしれません。しかし、WaveのサイズのAPI仕様としての上限値と下限値である 4 と 128 はあまりにもかけ離れているため、Waveのサイズに依存するコードを記述する際に、すべてのWaveのサイズをサポートすることは非現実的です。また、実際には使用されないWaveのサイズのためにコードを書くのも無駄だと思います。したがって、現実的な実装方法としては&lt;code&gt;D3D12_FEATURE_D3D12_OPTIONS1&lt;/code&gt;でWaveのサイズの上限値と下限値をチェックし、32と64の範囲ならば、Wave Intrinsicsを使ったシェーダーコードを使用し、そうでない場合はWave Intrinsicsを使用していないフォールバックのシェーダーコードを実行するか、エラーを出力して動作を終了するべきだと思います。&lt;/p&gt;
+&lt;p&gt;Waveのサイズは、&lt;code&gt;WaveGetLaneCount&lt;/code&gt;というWave Intrinsicsを使って取得できます。しかし、これは裏を返せば、&lt;code&gt;D3D12_FEATURE_D3D12_OPTIONS1&lt;/code&gt;のWaveの上限値と下限値に幅がある場合は、HLSLのシェーダーコードを実行するまで、Waveのサイズが分からないという事になります。（これはAPIのデザインの問題だと思います。）&lt;/p&gt;
+&lt;h2 id=&#34;waveのサイズとthread-groupのサイズについて&#34;&gt;WaveのサイズとThread Groupのサイズについて&lt;/h2&gt;
+&lt;p&gt;Wave Intrinsicsは、あくまでWaveのサイズを基準とした動作になっていて、Compute Shaderのnumthreadsの大きさは、Waveのサイズとは関係ありません。ただし、Wave Intrinsicsを使う場合は、numthreadsの大きさはWaveのサイズを意識したものが良いと思います。
+WaveのThread Group内でのマッピングは、Row Oriented　(X軸優先）です。（ただし、これを明記しているドキュメントが見当たらなかったので注意が必要です。）numthreadsの大きさが、Waveのサイズの倍数でなかった場合は、シェーダーが実行される前からInactive Laneが存在するWaveが起動されます。この場合、Waveのサイズ分のスレッドがすべて動作していることを前提として記述されたシェーダーは、動作が破綻するので注意が必要です。
+現状では、&lt;code&gt;ID3D12Device::CheckFeatureSupport()&lt;/code&gt;の&lt;code&gt;D3D12_FEATURE_D3D12_OPTIONS1&lt;/code&gt;の返すWaveのサイズの上限値の倍数をnumthreadsの大きさとすることで、このような事態を回避する事ができると思います。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-numthreadとwave&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/numthread_wave_hu87309c82afe6bdb07430f9b22f94f645_45303_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;numthreadとWave&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/numthread_wave_hu87309c82afe6bdb07430f9b22f94f645_45303_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    numthreadとWave
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;h3 id=&#34;pixelshaderとwave-intrinsicsについて&#34;&gt;PixelShaderとWave Intrinsicsについて&lt;/h3&gt;
+&lt;p&gt;（これも明記しているドキュメントが見当たらなかったので注意してください）&lt;br&gt;
+Pixel Shaderでは、すべてのWave Intrinsicsの使用が許されています。しかし、Pixel Shaderにおける描画ピクセルとWaveやLaneの対応は、描画されるプリミティブの位置と、GPUとドライバー、そしてPixel Shaderのソースコードによって決まると考えられます。
+シンプルな例では、ピクセルシェーダーのスレッドは描画されるプリミティブのピクセルと一対一の関係で起動されると思います。ただし、ピクセルシェーダー内で、Gradinet命令（ddx/ddy）を使用したり、テクスチャーのサンプリングにおいて、LoDを明示的に指定しなかった場合は、スレッド間の値（テクスチャサンプリングにおいてはUV値）の差分を計算する必要があるため、起動されるスレッドは2x2ピクセル単位となります。そして、プリミティブとして描画されるピクセルを担当しているスレッドのみがRenderTargetへの出力を行います。残りのスレッドは、Helper Laneとなり、スレッドとして動作しますがRenderTargetへの出力を行いません。
+プリミティブの描画においては、必要なスレッド数は必ずしもWaveのサイズの倍数とならないので、シェーダー内で条件分岐を行っていない状態でも、Inactive Laneが存在しているWaveが起動される可能性があります。また、複数のプリミティブが同一のWaveにパッキングされる可能性もあります。Pixel Shader内でWave Intrinsicsを使う場合は、これらの点について考慮する必要があると思います。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-quadとhelper-lane&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;QuadとHelper Lane&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    QuadとHelper Lane
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;h2 id=&#34;shader-model-60のwave-intrinsicsについて&#34;&gt;Shader Model 6.0のWave Intrinsicsについて&lt;/h2&gt;
+&lt;p&gt;Shader Model 6.0のWave Intrinsicsは以下のカテゴリに分類することができます。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Wave Query&lt;br&gt;
+WaveやLaneの状態取得&lt;/li&gt;
+&lt;li&gt;Wave Vote&lt;br&gt;
+Wave内でのbooleanステート確認&lt;/li&gt;
+&lt;li&gt;Wave Broadcast&lt;br&gt;
+Wave内で特定のLaneの変数値の取得&lt;/li&gt;
+&lt;li&gt;Wave Reduction&lt;br&gt;
+Wave内での変数の演算&lt;/li&gt;
+&lt;li&gt;Wave Scan and Prefix&lt;br&gt;
+Wave内での変数の演算(自身より小さいLane Indexに限る)&lt;/li&gt;
+&lt;li&gt;Quad-wide Shuffle operations&lt;br&gt;
+Quadを動作対象とした、変数値の取得&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;wave-query&#34;&gt;Wave Query&lt;/h3&gt;
+&lt;p&gt;WaveのLane数と、Lane Indexを調べるためのIntrinsicsです。&lt;br&gt;
+加えて、Wave内で自身が先頭のActive Laneかどうかを返す、&lt;code&gt;WaveIsFirstLane&lt;/code&gt;が含まれます。&lt;/p&gt;
+&lt;h4 id=&#34;wavegetlanecount&#34;&gt;&lt;code&gt;WaveGetLaneCount&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;WaveのLaneの数を返します。全てのLaneで同じ値を受け取ります。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetcount_hu017ff3431e51e38ea7691ac81e49e3c2_14763_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetcount_hu017ff3431e51e38ea7691ac81e49e3c2_14763_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;382&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h4 id=&#34;wavegetlaneindex&#34;&gt;&lt;code&gt;WaveGetLaneIndex&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;Wave内での該当LaneのIndexを返します。個々のLaneで異なる値を受け取ります。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetlaneindex_hue63fa13725fdb66d601d5d878c1d0ae3_26912_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetlaneindex_hue63fa13725fdb66d601d5d878c1d0ae3_26912_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;520&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h4 id=&#34;waveisfirstlane&#34;&gt;&lt;code&gt;WaveIsFirstLane&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;bool値を返します。ActiveLaneの中で最小のLane IndexのLaneのみ&lt;code&gt;true&lt;/code&gt;が返されます。残りのLaneは&lt;code&gt;false&lt;/code&gt;が返されます。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveisfirstlane_huafbbbf3a8be6235948052771404a6e1b_51220_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveisfirstlane_huafbbbf3a8be6235948052771404a6e1b_51220_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;571&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h3 id=&#34;wave-vote&#34;&gt;Wave Vote&lt;/h3&gt;
+&lt;p&gt;Wave内の他のActive Laneのboolのステータスを確認するためのIntrinsicsです。&lt;/p&gt;
+&lt;h4 id=&#34;waveactiveanytrue&#34;&gt;&lt;code&gt;WaveActiveAnyTrue&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数にbool値を指定します。そして、いずれかのActive Laneが&lt;code&gt;true&lt;/code&gt;を渡せば、全てのActive Laneに&lt;code&gt;true&lt;/code&gt;が返されます。そうでない場合は、全てのActive Laneに&lt;code&gt;false&lt;/code&gt;が返されます。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveanytrue_hue78662cc8f443afcaa688bcef7c43ea2_59746_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveanytrue_hue78662cc8f443afcaa688bcef7c43ea2_59746_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;697&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;waveactivealltrue&#34;&gt;&lt;code&gt;WaveActiveAllTrue&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数にbool値を指定します。全てのActive Laneが&lt;code&gt;true&lt;/code&gt;を渡せば、全てのActive Laneに&lt;code&gt;true&lt;/code&gt;が返されます。そうでない場合は、全てのActive Laneに&lt;code&gt;false&lt;/code&gt;が返されます。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivealltrue_hu3ee6171c79406bc5f05b75ba065dfffc_59680_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivealltrue_hu3ee6171c79406bc5f05b75ba065dfffc_59680_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;708&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;waveactiveballot&#34;&gt;&lt;code&gt;WaveActiveBallot&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数にbool値を指定します。戻り値にuint4を返します。戻り値のuint4は、128bit-wideのビットマスクとなっており、各Active Laneが渡したbool値をビットマスクとして返します。Inacive Laneは暗黙的に0が設定されます。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveballot_hu441b454dd67f6c112671144c7a7d1adc_61292_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveballot_hu441b454dd67f6c112671144c7a7d1adc_61292_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;769&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h3 id=&#34;wave-broadcast&#34;&gt;Wave Broadcast&lt;/h3&gt;
+&lt;p&gt;Wave内で、特定のLaneの変数の値を、すべてのActive Laneで取得するためのIntrinsicsです。&lt;/p&gt;
+&lt;h4 id=&#34;wavereadlaneat&#34;&gt;&lt;code&gt;WaveReadLaneAt&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取りの対象となる変数とLane Indexを指定します。Lane Indexで指定されたLaneの、引数で指定された変数の値を、全てのActive Laneに返します。引数で指定した変数の型と同じ型が返されます。&lt;br&gt;
+他にも、引数に指定した変数の型と同じ変数型を返すタイプのWave Intrinsicsがありますが、これらはベクトル型を含め、組み込み型の整数型と浮動小数点型の殆どがサポートされています。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlaneat_hu2ce763e09dbd4548c9ca84ea0f16840b_96939_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlaneat_hu2ce763e09dbd4548c9ca84ea0f16840b_96939_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1120&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;wavereadlanefirst&#34;&gt;&lt;code&gt;WaveReadLaneFirst&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取りの対象となる変数を指定します。Active Laneの中で、最小のLane IndexのLaneの、引数で指定された変数の値を、すべてのActive Laneに返します。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlanefirst_hu6d9eb6b7bdb5af52098e10c274550961_77137_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlanefirst_hu6d9eb6b7bdb5af52098e10c274550961_77137_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;930&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h3 id=&#34;wave-reduction&#34;&gt;Wave Reduction&lt;/h3&gt;
+&lt;p&gt;Wave内でのActive Laneの変数の値を用いて演算するためのIntrinsicsです。一つの演算結果がすべてのActive Laneに返されます。&lt;/p&gt;
+&lt;h4 id=&#34;waveactiveallequal&#34;&gt;&lt;code&gt;WaveActiveAllEqual&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取りの対象となる変数を指定します。すべてのActive Laneの変数の値が等しい場合のみTrueを返します。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveallequal_hub0d81e969a1494ea62407696e116d131_41919_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveallequal_hub0d81e969a1494ea62407696e116d131_41919_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;886&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;waveactivebitand&#34;&gt;&lt;code&gt;WaveActiveBitAnd&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取りの対象となる整数型の変数を指定します。すべてのActive Laneの変数の値のBitwise AND(論理積)を演算した結果を返します。&lt;/p&gt;
+&lt;h4 id=&#34;waveactivebitor&#34;&gt;&lt;code&gt;WaveActiveBitOr&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取りの対象となる整数型の変数を指定します。すべてのActive Laneの変数の値のBitwise OR(論理和)を演算した結果を返します。&lt;/p&gt;
+&lt;h4 id=&#34;waveactivebitxor&#34;&gt;&lt;code&gt;WaveActiveBitXor&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取りの対象となる整数型の変数を指定します。すべてのActive Laneの変数の値のBitwise XOR(排他的論理和)を演算した結果を返します。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivebitop_hu8c00d785c0bd006675ed4159e86102d6_54165_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivebitop_hu8c00d785c0bd006675ed4159e86102d6_54165_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1045&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;waveactivecountbits&#34;&gt;&lt;code&gt;WaveActiveCountBits&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、boolを指定します。引数に&lt;code&gt;true&lt;/code&gt;を指定したLaneの数を、すべてのActive Laneに返します。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivecountbits_hu45ba85d97c3b69abe8f3e4ff68f45109_54517_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivecountbits_hu45ba85d97c3b69abe8f3e4ff68f45109_54517_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;756&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;waveactivemax&#34;&gt;&lt;code&gt;WaveActiveMax&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取りの対象となる変数を指定します。すべてのActive Laneの変数の値の中で、最大値を、全てのActive Laneに返します。&lt;/p&gt;
+&lt;h4 id=&#34;waveactivemin&#34;&gt;&lt;code&gt;WaveActiveMin&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取りの対象となる変数を指定します。すべてのActive Laneの変数の値の中で、最小値を、全てのActive Laneに返します。&lt;/p&gt;
+&lt;h4 id=&#34;waveactiveproduct&#34;&gt;&lt;code&gt;WaveActiveProduct&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取りの対象となる変数を指定します。すべてのActive Laneの変数をの値を乗算した結果を、全てのActive Laneに返します。
+演算の順序については、API仕様としての明確な定義が無いので、扱う変数の型や、値の範囲について注意が必要です。&lt;/p&gt;
+&lt;h4 id=&#34;waveactivesum&#34;&gt;&lt;code&gt;WaveActiveSum&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取りの対象となる変数を指定します。すべてのActive Laneの変数の値を加算した結果を、全てのActive Laneに返します。
+演算の順序については、API仕様としての明確な定義が無いので、扱う変数の型や、値の範囲について注意が必要です。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveminmaxop_huc07e0fb502a11709116c047263e24c8f_56203_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveminmaxop_huc07e0fb502a11709116c047263e24c8f_56203_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1097&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h3 id=&#34;wave-scan-and-prefix&#34;&gt;Wave Scan and Prefix&lt;/h3&gt;
+&lt;p&gt;Wave Reduction系に似ていますが、演算の対象が自身のLane Index未満のActive Laneのみです。自身のLaneは演算の対象に含みません。
+演算の結果は、基本的にはLaneごとに異なる値が返されることになります。&lt;/p&gt;
+&lt;h4 id=&#34;waveprefixcountbits&#34;&gt;&lt;code&gt;WavePrefixCountBits&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数にboolを指定します。自身のLane Index未満のActive Laneで、引数に&lt;code&gt;true&lt;/code&gt;を指定した個数を返します。&lt;/p&gt;
+&lt;h4 id=&#34;waveprefixsum&#34;&gt;&lt;code&gt;WavePrefixSum&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取りの対象となる変数を指定します。自身のLane Index未満のActive Laneの、変数の値を加算した結果を返します。
+演算の順序については、API仕様としての明確な定義が無いので、扱う変数の型や、値の範囲について注意が必要です。&lt;code&gt;[precise]&lt;/code&gt;フラグは無視されます。&lt;/p&gt;
+&lt;h4 id=&#34;waveprefixproduct&#34;&gt;&lt;code&gt;WavePrefixProduct&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取りの対象となる変数を指定します。自身のLane Index未満のActive Laneの、変数の値を乗算した結果を返します。
+演算の順序については、API仕様としての明確な定義が無いので、扱う変数の型や、値の範囲について注意が必要です。&lt;code&gt;[precise]&lt;/code&gt;フラグは無視されます。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveprefixop_hu36665e6520788b3009382913080bbf2c_71179_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveprefixop_hu36665e6520788b3009382913080bbf2c_71179_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;742&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h3 id=&#34;quad-wide-shuffle-operations&#34;&gt;Quad-wide Shuffle operations&lt;/h3&gt;
+&lt;p&gt;Pixel Shaderでのみ使用可能なWave Intrinsicsです。
+(これについては、ドキュメントの表記があいまいです。実際はCompute Shaderでも使用可能と表記されており、その場合、Lane Indexの0より4 Laneごとに区切ったLaneがQuadとして扱われるとされています。)
+Quad間のデータの交換を行います。&lt;/p&gt;
+&lt;h4 id=&#34;quadreadlaneat&#34;&gt;&lt;code&gt;QuadReadLaneAt&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、Quad内のローカルのLane Indexと、読み取り対象となる変数を指定します。Quad内で同じ値が返されます。
+読み取り対象LaneがInactive Laneだった場合の読み取り結果は未定義なので注意が必要です。
+Pixel ShaderにおけるQuad内のローカルのLane Indexは、下図に示した通りRow Orientedとなっています。&lt;/p&gt;
+&lt;h4 id=&#34;quadreadacrossdiagonal&#34;&gt;&lt;code&gt;QuadReadAcrossDiagonal&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取り対象となる変数を指定します。Quad内で互いに対角の位置にあるLaneの値を読み取ります。(例えば、Lane:0はLane:3の値を受け取ります。)
+(APIドキュメントに明記がありませんが、読み取り対象LaneがInactive Laneだった場合の読み取り結果は未定義なので注意が必要です。)&lt;/p&gt;
+&lt;h4 id=&#34;quadreadacrossx&#34;&gt;&lt;code&gt;QuadReadAcrossX&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取り対象となる変数を指定します。Quad内で互いに水平の位置にあるLaneの値を読み取ります。(例えば、Lane:0はLane:1の値を受け取ります。)
+(APIドキュメントに明記がありませんが、読み取り対象LaneがInactive Laneだった場合の読み取り結果は未定義なので注意が必要です。)&lt;/p&gt;
+&lt;h4 id=&#34;quadreadacrossy&#34;&gt;&lt;code&gt;QuadReadAcrossY&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取り対象となる変数を指定します。Quad内で互いに垂直の位置にあるLaneの値を読み取ります。(例えば、Lane:0はLane:3の値を受け取ります。)
+(APIドキュメントに明記がありませんが、読み取り対象LaneがInactive Laneだった場合の読み取り結果は未定義なので注意が必要です。)&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavequadop_hudda5976e667c4f4ea513984d01905e77_110927_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavequadop_hudda5976e667c4f4ea513984d01905e77_110927_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;916&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h2 id=&#34;shader-model-65のwave-intrinsicsについて&#34;&gt;Shader Model 6.5のWave Intrinsicsについて&lt;/h2&gt;
+&lt;p&gt;Model 6.5で、いくつかの新しいWaveIntrinsicsが導入されています。&lt;/p&gt;
+&lt;h4 id=&#34;wavematch&#34;&gt;&lt;code&gt;WaveMatch&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取り対象となる変数を指定します。&lt;br&gt;
+戻り値にuint4を返します。戻り値のuint4は、128bit-wideのビットマスクとなっており、各Active Laneの引数で指定された変数の値が、自身のLaneの変数の値と等しい場合に、ビットがセットされます。Inacive Laneは暗黙的に0が設定されます。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavematch_hu0c1f58aae92c4965302c5d4274ad6622_58909_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavematch_hu0c1f58aae92c4965302c5d4274ad6622_58909_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;707&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;wavemultiprefixsum&#34;&gt;&lt;code&gt;WaveMultiPrefixSum&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取り対象となる変数を指定します。また、引数に128bit-wideのビットマスクとなるuint4を指定します。&lt;br&gt;
+&lt;code&gt;WaveActiveSum&lt;/code&gt;と動作は似ていますが、加算の対象となるLaneがビットマスクで指定されたLaneに限定される点が異なります。
+ビットマスクは、Laneごとに設定を変更出来ますが、一つのLaneは1種類のビットマスクにしか所属する事ができません。
+つまり、ビットマスクによって、Laneをパーティショニングしてサブセット化する事が出来ますが、各々のLaneが完全に自由にビットマスクを指定できるわけではありません。一つのLaneが複数の種類のビットマスクに所属した場合の動作は未定義です。&lt;br&gt;
+Waveのサイズを超えるBitやInactive Laneのビットは無視されます。(ビットがゼロとして扱います。)
+このビットマスクの仕様は他のWaveMultiPrefix系と共通です。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavemultiprefixsum_hue9d268744f4c6ffd484f30d798dfb5fc_135719_2000x2000_fit_lanczos_2.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavemultiprefixsum_hue9d268744f4c6ffd484f30d798dfb5fc_135719_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1182&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;wavemultiprefixproduct&#34;&gt;&lt;code&gt;WaveMultiPrefixProduct&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取り対象となる変数を指定します。また、引数に128bit-wideのビットマスクとなるuint4を指定します。&lt;br&gt;
+&lt;code&gt;WaveActiveProduct&lt;/code&gt;と動作は似ていますが、乗算の対象となるLaneがビットマスクで指定されたLaneに限定される点が異なります。&lt;/p&gt;
+&lt;h4 id=&#34;wavemultiprefixcountbit&#34;&gt;&lt;code&gt;WaveMultiPrefixCountBit&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、bool値を指定します。また、引数に128bit-wideのビットマスクとなるuint4を指定します。&lt;br&gt;
+&lt;code&gt;WaveActiveCountBit&lt;/code&gt;と動作は似ていますが、乗算の対象となるLaneがビットマスクで指定されたLaneに限定される点が異なります。&lt;/p&gt;
+&lt;h4 id=&#34;wavemultiprefixand&#34;&gt;&lt;code&gt;WaveMultiPrefixAnd&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取り対象となる整数型の変数を指定します。また、引数に128bit-wideのビットマスクとなるuint4を指定します。&lt;br&gt;
+&lt;code&gt;WaveActiveBitAnd&lt;/code&gt;と動作は似ていますが、乗算の対象となるLaneがビットマスクで指定されたLaneに限定される点が異なります。&lt;/p&gt;
+&lt;h4 id=&#34;wavemultiprefixor&#34;&gt;&lt;code&gt;WaveMultiPrefixOr&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取り対象となる整数型の変数を指定します。また、引数に128bit-wideのビットマスクとなるuint4を指定します。&lt;br&gt;
+&lt;code&gt;WaveActiveBitOr&lt;/code&gt;と動作は似ていますが、乗算の対象となるLaneがビットマスクで指定されたLaneに限定される点が異なります。&lt;/p&gt;
+&lt;h4 id=&#34;wavemultiprefixxor&#34;&gt;&lt;code&gt;WaveMultiPrefixXor&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;引数に、読み取り対象となる整数型の変数を指定します。また、引数に128bit-wideのビットマスクとなるuint4を指定します。&lt;br&gt;
+&lt;code&gt;WaveActiveBitXor&lt;/code&gt;と動作は似ていますが、乗算の対象となるLaneがビットマスクで指定されたLaneに限定される点が異なります。&lt;/p&gt;
+&lt;h2 id=&#34;終わりに&#34;&gt;終わりに&lt;/h2&gt;
+&lt;p&gt;今回は、Wawve Intrinsicsの動作を理解するための基本的な内容となっているので、実際の使用ケースについては言及しませんでした。
+次回は、もう少し実際の利用ケースについて触れたいと思います。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Hugo&#43;Academicでブログを構築</title>
