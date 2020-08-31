@@ -950,7 +950,7 @@ Pixel ShaderにおけるQuad内のローカルのLane Indexは、下図に示し
 &lt;/figure&gt;
 
 &lt;h4 id=&#34;wavemultiprefixsum&#34;&gt;&lt;code&gt;WaveMultiPrefixSum&lt;/code&gt;&lt;/h4&gt;
-&lt;p&gt;引数に、読み取り対象となる変数を指定します。また、引数に128bit-wideのビットマスクとなるuint4を指定します。&lt;br&gt;
+&lt;p&gt;引数に、読み取り対象となる変数を指定します。また、引数に128bit-wideのビットマスクとなる uint4 を指定します。&lt;br&gt;
 &lt;code&gt;WaveActiveSum&lt;/code&gt;と動作は似ていますが、加算の対象となるLaneがビットマスクで指定されたLaneに限定される点が異なります。
 ビットマスクは、Laneごとに設定を変更出来ますが、一つのLaneは1種類のビットマスクにしか所属する事ができません。
 つまり、ビットマスクによって、Laneをパーティショニングしてサブセット化する事が出来ますが、各々のLaneが完全に自由にビットマスクを指定できるわけではありません。一つのLaneが複数の種類のビットマスクに所属した場合の動作は未定義です。&lt;br&gt;
