@@ -3,22 +3,27 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://shikihuiku.github.io/post/</loc>
+    <lastmod>2020-09-01T19:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://shikihuiku.github.io/</loc>
+    <lastmod>2020-09-01T19:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://shikihuiku.github.io/post/timer_test/</loc>
+    <lastmod>2020-09-01T19:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://shikihuiku.github.io/tag/d3d12/</loc>
     <lastmod>2020-08-16T20:00:32+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://shikihuiku.github.io/post/wave_intrinsics1/</loc>
-    <lastmod>2020-08-16T20:00:32+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://shikihuiku.github.io/post/</loc>
-    <lastmod>2020-08-16T20:00:32+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://shikihuiku.github.io/</loc>
     <lastmod>2020-08-16T20:00:32+09:00</lastmod>
   </url>
   
