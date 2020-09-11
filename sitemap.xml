@@ -3,6 +3,21 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://shikihuiku.github.io/memo/restir/</loc>
+    <lastmod>2020-09-11T11:59:35+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://shikihuiku.github.io/memo/</loc>
+    <lastmod>2020-09-11T11:59:35+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://shikihuiku.github.io/</loc>
+    <lastmod>2020-09-11T11:59:35+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://shikihuiku.github.io/tag/debug-layer/</loc>
     <lastmod>2020-09-04T18:00:00+09:00</lastmod>
   </url>
@@ -29,11 +44,6 @@
   
   <url>
     <loc>https://shikihuiku.github.io/post/</loc>
-    <lastmod>2020-09-04T18:00:00+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://shikihuiku.github.io/</loc>
     <lastmod>2020-09-04T18:00:00+09:00</lastmod>
   </url>
   
