@@ -1658,7 +1658,7 @@ Error: Error building site: TOCSS: failed to transform &amp;quot;main_parsed.scs
 &lt;p&gt;デフォルトでは、GoogleのWebフォントがいろいろ指定されていますが、フォントの設定はシンプルな方が良いと思っています。
 フォントのプリセットにNativeという設定があり、こちらを使うとrootのfont-familyの設定を、殆どの要素で使うようになるようです。config/_default/params.tomlでこれを指定します。&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;font=&amp;quot;Native&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;font=&amp;ldquo;Native&amp;rdquo;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;rootにある、フォントの設定はとりあえず変更せずに使ってみます。&lt;/p&gt;
 &lt;h4 id=&#34;customscssの設定&#34;&gt;custom.scssの設定&lt;/h4&gt;

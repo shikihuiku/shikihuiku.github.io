@@ -209,7 +209,7 @@
   
   
   
-  <link rel="stylesheet" href="/css/academic.min.081b4c7fccbd03c601ab1c3cccacd4f9.css">
+  <link rel="stylesheet" href="/css/academic.min.be960b2e93ff6af7c473902c1708e00c.css">
 
   
 
@@ -245,7 +245,7 @@
   
   <meta property="og:site_name" content="shikihuiku – 色不異空 – Real-time rendering topics in Japanese.">
   <meta property="og:url" content="https://shikihuiku.github.io/memo/restir/">
-  <meta property="og:title" content="Importance Resampling For Global Illumination | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.">
+  <meta property="og:title" content="Importance Resampling 関連 | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.">
   <meta property="og:description" content="ReSTIRのためのメモ書き"><meta property="og:image" content="https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png">
   <meta property="twitter:image" content="https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png"><meta property="og:locale" content="en-us">
   
@@ -271,7 +271,7 @@
 
 
 
-  <title>Importance Resampling For Global Illumination | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
+  <title>Importance Resampling 関連 | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
 
 </head>
 
@@ -519,7 +519,7 @@
   
   
 <div class="article-container pt-3">
-  <h1>Importance Resampling For Global Illumination</h1>
+  <h1>Importance Resampling 関連</h1>
 
   
 
@@ -590,7 +590,7 @@
 </li>
 </ul>
 <h1 id="resampled-importance-sampling">Resampled Importance Sampling</h1>
-<h2 id="resampled-importance-samplingの手法">Resampled Importance Samplingの手法</h2>
+<h2 id="importance-resamplingの概要">Importance Resamplingの概要</h2>
 <ol>
 <li>確率分布$p$に基づいたM個($(M \ge 1$)のサンプル、$(X = \langle X_1, X_2, &hellip; , X_M \rangle $を生成する</li>
 <li>各サンプルのウエイト$ｗ_j$を計算する</li>
@@ -599,29 +599,143 @@
 <p>もし、$w_j = \frac{g(X_j)}{p(X_j)}$としたならば、サンプル$Y$は、おおよそ$g$に基づいて分布する。
 上記のリサンプリングの効果とは、密度$p$のソースのから、サンプルを取り出し、&ldquo;filter&quot;することで、
 結果として、サンプル$Y$がおおよそ$g$の分布になるようにすることである。</p>
+<p>これを図解した下記の例は、8個のサンプルを生成して、それぞれのウエイトを計算した場合のイメージになる。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" >
+
+
+  <a data-fancybox="" href="/memo/restir/RIS_01_huc2b7e299a054b0e62f25ef75ba296b6a_42113_2000x2000_fit_lanczos_2.PNG" >
+
+
+  <img data-src="/memo/restir/RIS_01_huc2b7e299a054b0e62f25ef75ba296b6a_42113_2000x2000_fit_lanczos_2.PNG" class="lazyload" alt="" width="50%" height="603">
+</a>
+
+
+
+</figure>
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" >
+
+
+  <a data-fancybox="" href="/memo/restir/RIS_02_hu6161093dfe7af2499131def0ae96c035_41116_2000x2000_fit_lanczos_2.PNG" >
+
+
+  <img data-src="/memo/restir/RIS_02_hu6161093dfe7af2499131def0ae96c035_41116_2000x2000_fit_lanczos_2.PNG" class="lazyload" alt="" width="50%" height="690">
+</a>
+
+
+
+</figure>
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" >
+
+
+  <a data-fancybox="" href="/memo/restir/RIS_03_hu2c51de8f2302371bf0bcff8fcc4d9e76_68621_2000x2000_fit_lanczos_2.PNG" >
+
+
+  <img data-src="/memo/restir/RIS_03_hu2c51de8f2302371bf0bcff8fcc4d9e76_68621_2000x2000_fit_lanczos_2.PNG" class="lazyload" alt="" width="50%" height="862">
+</a>
+
+
+
+</figure>
+</p>
 <p>サンプル数である$M$を分布の補間変数としてとらえることができる。
 $M=1$のとき、$Y$は$p$に従って分布する。$M\rightarrow\infty$とすると、$Y$の分布は$g$に近づく。
 一般的には、$M$が有限個である事によって導入されるバイアスを無視できる程度に小さくするためには、$M$は非常に大きくなけれならない。</p>
+<p>注釈：サンプル列$X$から、あるサンプル$Y$が選択される確率は $w_i / w_{sum}$で計算できるが、積分の範囲に対して、そのサンプルが選択される確率を考えると、
+これに$M \cdot p(X_i)$を乗算する必要がある。したがって、そのサンプルが選択される確率は$M \cdot g(X_i) / w_{sum} $となる。これはそのまま次項でのImportance Samplingの確率となっている。また、$M / w_{sum} $は、サンプル列$X$において一定なので、$g(X_i)$に比例する関数で、選択が行われている事になる。</p>
 <h2 id="resampled-importance-samplingの概要">Resampled Importance Samplingの概要</h2>
-<p>下記の積分を求めたいとする。
+<p>Importance Resamplingの考え方をImporntace Samplingに導入したものをResampled Importance Sampling（RIS)と呼ぶ。<br>
+下記の積分を求めたいとする。
 $$ I = \int_{\Omega} f(x) d\mu(x) $$</p>
 <p>二つの確率密度関数$p$と、確率に即した値を返す関数$g$を導入する。
 $p$は、比較的簡単に計算でき、正規化することができるが、上記積分をImportance Samplingするのにあまり良い分布となっていないとする。
 $g$は、良い分布特性を持っているが、計算が複雑で正規化されていない、またはするのが困難だとする。
 通常のImportance Samplingでは、$p$を使う事しかできないが、RISを使うことで、$g$の分布特性をunbiasedな条件下で使うことができる。
-RISのEstimatorは以下の通りとなる。</p>
+$X$(Resamplingによって生成されたサンプル列)および$Y$(Xからウエイトに基づいて乱択されたサンプル)がImporntace Resamplingを用いて導出された場合の、RISのEstimatorは以下の通りとなる。</p>
 <p>$$ \hat I_{ris} = \frac{1}{N} \sum^{N}_{i=1} w(X_i, Y_i) \frac{f(Y_i)}{g(Y_i)} $$</p>
 <p>ウエイト関数$w$は、$g$が正規化されていないことと、$Y$の分布が$g$を近似するようにする必要があることの二つを考慮して選択されなければならない。
 そのための適切なウエイト関数$w$は実は非常に単純で、リサンプリングステップで計算された重みの平均である。</p>
 <p>$$ w(X_i, Y_i) = \frac{1}{M} \sum^{M}_ {j=1} w_ {ij} = \frac{1}{M} \sum^{M}_ {j=1} \frac{g(X_{ij})}{p(X_{ij})}$$</p>
-<p>注釈：$X_i$, $Y_i$はそれぞれが、Importance Samplingの$i$番目の試行の時に作られた、M個のサンプル集合$X_i$と、そこから選択された一つのサンプル$Y_i$を指す。
+<p>注釈：$X_i$, $Y_i$はそれぞれが、Importance Samplingの$i$番目の試行の時に作られた、M個のサンプル列$X_i$と、そこから選択された一つのサンプル$Y_i$を指す。
 $w_{ij}$は、Importance Samplingの$i$番目の試行の時に作られた、M個のサンプル集合の、$j$番目のサンプルのウエイトを指す。</p>
+<p>注釈２：ウエイトは、結局のところ、二つの関数$p(x)$と$g(x)$のプロファイル（関数の形状および大きさ）の比になる。(例えば、$g(x)$が$p(x)$に対して、平均で2倍の値を持つ場合は、
+$g(Y_i)$で除算すると、推定値が期待値の$1/2$に収束してしまう。$w$はその補正として2倍の補正を掛ける役割を担う。)</p>
 <p>上記の2式を合わせると下記の通りになる。
 $$ \hat I_{ris} = \frac{1}{N} \sum^{N}_ {i=1} \left( \frac{f(Y_i)}{g(Y_i)} \cdot \frac{1}{M} \sum^{M}_ {j=1} \frac{g(X_{ij})}{p(X_{ij})} \right) $$</p>
 <p>$M=1$のときは、RISは$p$によるImportance Samplingになる。RISがunbiasedである条件は、$f$が非ゼロの領域では、$p, q$共に非ゼロである必要があるのと、$M,N$共にゼロより大きい必要がある。
 RISがunbiasとすると、誤差は分散に起因するもののみとなる。ターゲット分布関数$g$と共に、パラメーター$M,N$を適切に選ぶことが分散の低減につながる。</p>
-<p>レンダリングにおいて、ライティングの関数を$f=F_s GVL_e$とするとき、ターゲット分布関数$g$を、$g=F_s GL_e$とすることができる。レイのトラバースが必要な$V$項を取り除いたものである。正規化されている必要がないのでそのまま使用できる。
-次は、適切な$M,N$の設定である。</p>
+<p>レンダリングにおいて、ライティングの関数を$f=F_s GVL_e$とするとき、ターゲット分布関数$g$を、$g=F_s GL_e$とすることができる。レイのトラバースが必要な$V$項を取り除いたものである。正規化されている必要がないのでそのまま使用できる。</p>
+<p>次は、適切な$M,N$の設定である。</p>
 <h2 id="robust-approximations-of-m-and-n">Robust Approximations of M and N</h2>
 <p>詳細は割愛するが、最適なM,Nを選ぶための計算には、実際のモンテカルロ法の試行が必要になる。しかし実際にはモンテカルロ法の試行の前に知りたい。
 ここではサンプルの生成や実際の推定値の計算にかかる時間を基にして、$M,N$の導出を行う。
@@ -636,7 +750,8 @@ $$M=\frac{T_y}{T_x} $$</p>
 <p>注釈：$N$は上式から求まらないが、総計算時間の関数として計算することができる。$M$は、$T_y$($V$項を含んだシェーディングの評価)が、他の項の計算に比べてどのくらい時間がかかるかによって
 決定されるといえると思う。時間がかかればかかるほど$M$を大きくした方が良いという事になる。</p>
 <p>レンダリングするシーンの複雑度が均一であれば、この値は事前計算することができる。$T_x, T_y$を得るために数千のPrimaryRayをキャストして計算する。</p>
-<p>参照論文のレンダリングの例では、二つのポリゴンライトと環境マップを用いてライティングしている。この場合RISは同じ計算量で分散を70%低減できた。しかし、ライティングから環境マップを取り除くと、分散を10%しか低減出来なかった。
+<p>
+<a href="https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.70.139&amp;rep=rep1&amp;type=pdf" target="_blank" rel="noopener"> 参照論文 </a> のレンダリングの例では、二つのポリゴンライトと環境マップを用いてライティングしている。この場合RISは同じ計算量で分散を70%低減できた。しかし、ライティングから環境マップを取り除くと、分散を10%しか低減出来なかった。
 これは、$L_e$の成分にあった環境マップが分散を導入していたからで、これはターゲット分布関数$g$のウエイトとして計算されていた。(つまり$L_e$が導入した分散に効果的に作用した。)
 しかし、これが取り除かれると、$V$項による分散が支配的となり、通常のImportance Samplingとの差が得られなくなった。</p>
 <h1 id="weighted-reservoir-sampling">Weighted Reservoir Sampling</h1>
@@ -673,14 +788,10 @@ WRSではサンプルストリームに値を追加するたびにDraw（分布�
 </code></pre>
 <h2 id="combine-multiple-reservoirs">Combine Multiple Reservoirs</h2>
 <p>WRSの特長として、個々のストリームにアクセスすることなく、生成された複数のストリームを結合することができることが挙げられる。結合の方法は以下の通りで新しいReservoirに、結合するReservoirを入力することで行う。
-s.update()の第二引数のウエイトは、結合する際のReservoirのターゲット分布関数$g$が同じ場合は、r.wsumと等価である。しかし、結合する際のReservoirのターゲット分布関数が異なる場合、 $g(y)/g&rsquo;(y)$をr.wsumに乗算する必要がある。
+s.update()の第二引数のウエイトは、結合する際のReservoirのターゲット分布関数$g$が同じ場合は、r.wsumと等価である。しかし、結合する際のReservoirのターゲット分布関数が異なる場合、 $g(y)/g'(y)$をr.wsumに乗算する必要がある。
 これはそのための計算である。</p>
-<p>注釈：実際には、結合先と結合元で、確率密度関数や、ターゲット分布関数が異なれば、算術的には正しい結合にならないはずである。ただ、これによってBiasが導入されるかは別である。
-実際は、結合後に選択されたサンプルが、結合元の確率密度関数でゼロになる場合にBiasが導入されることになる。この場合は、無効なウエイト値が計算に入るので、実際の値より小さくなる方向にBiasがかかるはずである。
-それ以外では、結果的に分散を大きくするかもしれないが、biasが導入されることはない。</p>
 <pre><code>function combineReservoirs(g, r1, r2, . . . , rk)
   Reservoir s // a new reservor
-  s.g ← g // set a new target distribution
 
   foreach r ∈ {r1, . . . , rk } do
     s.update(r.y, g(r.y) · r.w · r.M, r.M)
@@ -688,9 +799,23 @@ s.update()の第二引数のウエイトは、結合する際のReservoirのタ�
   w ← (1 / g(s.y))(s.wsum / s.M)
   return s.y, w
 </code></pre>
-<h2 id="unbiased-combine">Unbiased combine</h2>
+<p>注釈１：ウエイトのスケーリング(g(r.y) · r.w · r.M)について。<br>
+結合元の$w$は、
+$$\frac{1}{g'(y')} \frac{1}{M'} \sum^{M'}_ {i=1} \frac{g'(X_i)}{p'(X_i)} $$
+なのだが、これは通常のImportance Samplingにおける確率密度関数の逆数に相当するものでなくてはならない。（通常1/p(x)で表すが本式のpとは意味が異なる。）
+したがって、これに$g(y')$ を乗算すると、以下の様になり、これは、通常のRISの一つのウエイトである、$g / p$と同義になる。（ただし、この場合のベースの確率密度関数（先ほどpと呼んでいたものに相当するもの）が実際にどんなプロファイルかは知らない）
+$$\frac{g(y')}{g'(y')} \frac{1}{M'} \sum^{M'}_{i=1} \frac{g'(X_i)}{p'(X_i)} $$
+そして、この$y'$は、$M'$個のサンプルの中から選択されたサンプルなので、加重平均で確率計算するために、その分のウエイトに相当する$M'$を乗算する。
+$$\frac{g(y')}{g'(y')} \sum^{1}_{M'} \frac{g'(X_i)}{p'(X_i)} $$
+このように、ウエイトのスケーリングを解釈する事ができる。<br>
+また、結合後のウエイトの計算部分((1 / g(s.y))(s.wsum / s.M))は、まず、(s.wsum / s.M)の部分は、全てのサンプルのg/pの平均値になり、関数pとgのプロファイルの比と考える事ができる。
+また、この値は、全てのサンプルのg/pの平均値なので、候補となった全サンプルにおいて一定の値と解釈でき、最終的な確率密度の逆数は、1/gに比例していると考える事ができる。</p>
+<p>注釈２：バイアスについて。<br>
+実際には、結合先と結合元で、確率密度関数や、ターゲット分布関数が異なれば、もとから一つのサンプル集合だった場合とは異なる演算になる。ただ、これによってBiasが導入されるかは別である。
+実際は、結合結果として選択されたサンプルが、結合元の確率密度関数でゼロになる場合にBiasが導入されることになる。この場合は、無効なウエイト値が計算に入るので、実際の値より小さくなる方向にBiasがかかるはずである。
+それ以外では、結果的に分散を大きくするかもしれないが、biasが導入されることはない。</p>
+<h2 id="naive-unbiased-combine">Naive Unbiased combine</h2>
 <p>UnbiasedなWRSの結合をするためには、結合前のターゲット分布関数もしくは、確率密度関数が必要になる。（あるサンプルに対して正の値を返すかどうかチェックするだけなので、実際の関数のプロファイルは関係ない）
-ただし、PDFがゼロに近い領域では、結合したRISのウエイトが不安定な値になるので、ターゲット分布関数を用いる方が良い。（これについては長い説明が論文中でなされている）
 Reservoirを結合してサンプルの選択をするところまでは同じだが、最後に、選択されたサンプルが、結合前のターゲット分布関数で有効であるかどうかを確認して、無効であればウエイトから除外するようにしている。</p>
 <pre><code>function combineReservoirsUnbiased(g, r1, r2, . . . , rk, g1, g2, . . . , gk)
   Reservoir s // a new reservor
@@ -703,6 +828,101 @@ Reservoirを結合してサンプルの選択をするところまでは同じ�
     Z ← Z + ri.M
 
   w ← (1 / g(s.y))(s.wsum / Z)
+  return s.y, w
+</code></pre>
+<p>注釈３：安定性について。
+上記のMの代わりにｚで割るのは、単純に有効なサンプルの平均を取っているからで、Unbiasedにすること自体は安定性に対して問題がない。
+それよりも、結合元のベース確率密度関数とターゲット分布関数の比が大きい（$g/p$が大きい）サンプルが生成される、Resampleの過程で選択される確率が高く、wsumの値が大きくなる傾向がある。</p>
+<h3 id="閑話休題-restirhttpsdeveloperdownloadnvidiacomdevblogsrestirpdf-のfig7について">閑話休題 
+<a href="https://developer.download.nvidia.com/devblogs/ReSTIR.pdf" target="_blank" rel="noopener">ReSTIR</a> のFig7について</h3>
+<h4 id="まずはグラフabについて">まずは、グラフ(a)(b)について。</h4>
+<p>被積分関数については言及がないが$ f(x) = 2-2x$と仮定する。</p>
+<ul>
+<li>$ g(x) = 2 -2x$, $ p_1(x) = 1$</li>
+<li>$ g(x) = 2 -2x$, $ p_2(x) = 2H(1/2 -x) $(p2(x)=0 if x &gt; 0.5 otherwise =2)</li>
+</ul>
+<p>としている。<br>
+$1/p(y)$をVisualizeしているといってるが、この$1/p(y)$はRISのEffectivePDFの逆数、つまり、$\frac{1}{g(y)} \frac{1}{M} \sum^{M}_ {i=1} \frac{g(X_i)}{p(X_i)} $を指していると思われる。</p>
+<ul>
+<li>
+<p>一つは、サンプルのヒストグラムの逆数をプロットしたもの<br>
+Importance Samplingを、$f(x)$に沿って行えたとするならば、生成されたサンプルのヒストグラムは、$f(x)$に比例しなくてはならない。
+したがって、サンプルのヒストグラムを正規化して逆数をとれば、$1/f(x)$に沿うと考えられる。このグラフは、サンプル数に基づいて、ヒストグラムを正規化して逆数にしたグラフと思われる。
+$p_2$が0.5以上のサンプルを生成しないので、そこに大きな境界が出来ている。（実際の運用なら単純によろしくない。)　0.5以上は、$p_1$の方で生成されるが、こちらのサンプル確率は単純に$g(x)$(つまりf(x))に比例しているため、
+1に近づくにつれてサンプルの生成される確率が低下している。それに伴ってヒストグラムの乱れが顕著に見られる様になっていると思われる。また、0.5以下ではサンプル数が多い傾向があり、0.5以上ではサンプル数が少ない傾向があるが、これは$p_2$が偏った範囲でサンプルを生成することによる影響と思われる。</p>
+</li>
+<li>
+<p>もう一つは、RISのウエイトの平均値<br>
+こちらは単純に先のRISのウエイト（実質的なサンプルの確率としてのウエイト。Effective PDF）の逆数の平均だから解釈は簡単。サンプルの出現確率と、RISのウエイト値は、統計的に一致していない場合は、真値からのBiasが生じる事になる。
+グラフ(a)は、0.5以上で、明らかな乖離が見られる。サンプルを発生させない$p_2$のウエイトを算入しているためBiasが発生しているのが分かる。</p>
+</li>
+</ul>
+<h4 id="次にグラフcdについて">次に、グラフ(c)(d)について。</h4>
+<p>$ p_2(x) = max(1.9&hellip;H(1/2 -x), 10^{-4}) $ (p2(x)=10^{-4} if x &gt; 0.5 otherwise =1.9&hellip;)<br>
+に変更し、$p_2$で非常に低確率で0.5以上のサンプルが生成されるように変更したもの。</p>
+<ul>
+<li>
+<p>0.5以上のサンプルが生成されるとき、$p_2=10^{-4}$なので、$\frac{g(X_i)}{p(X_i)} $の部分は値が非常に大きくなると思われる。すると、$p_2$内でのResamplingで選択される可能性が高く、
+また、$p_2$の$w_{sum}$も大きくなることから、$p_1,p_2$を結合する時に選択される可能性が高くなる。
+また結合後の$w_{sum}$への影響も大きいので、選択の可否に関わらず、$p_2$側で、0.5以上のサンプルが生成されることにより、最終的なウエイト値に大きな乱れを導入する原因になっている。(c)</p>
+</li>
+<li>
+<p>MIS（バランスヒューリスティック）で結合する場合、各サンプリング戦略（この場合は、結合対象の各RISのこと。いわゆる$p_1,p_2$）におけるサンプルの確率が計算出来なくてはならない。しかし、RISでは、自身のサンプル戦略の結果として出たサンプルのウエイト値（サンプルの確率）は計算されるるが、任意のサンプルの確率を計算する術がない。しかしここでは何らかのサンプルの確率に相当するものが計算できるものとして話を進める。<br>
+$p_2$で非常に低確率な0.5以上のサンプルが出た場合は、RISのウエイトは極大化して、その逆数であるサンプル出現確率は極小化するはずである。そして、例えば、バランスヒューリスティックで結合すれば、極小化した出現確率による除算は相殺されて、代わりに、各サンプル戦略のサンプル確率の加重平均による除算になるので、$p_2$側のサンプル戦略で極大化したRISウエイトを保持する事による影響は軽微となるはずである。(d)</p>
+</li>
+</ul>
+<h2 id="restirのsupplementary-filesの方に記載があるmisに関する議論">ReSTIRのSupplementary Filesの方に記載があるMISに関する議論</h2>
+<p>
+<a href="https://research.nvidia.com/publication/2020-07_Spatiotemporal-reservoir-resampling" target="_blank" rel="noopener">こちら</a> のSupplementary Documentでは、RISを結合する際のMISのウエイトの計算方法について
+言及している。この手法にとってとても重要な部分なのだが、とにかくこちらに記載がある。<br>
+二つの手法が紹介され、一つはTalbot et alの手法と、本論文の提案手法である、Benedikt et alの手法を比較している。MISを計算するには、任意のサンプルの、個々のサンプル戦略に於けるPDFが計算できる必要があるが、RISは、自身が選出したサンプルのウエイト値を計算することしかできない。そこで、PDFの代替となる値を計算する必要がある。重要なのは、この値はMISのウエイトを計算するためのもので、各サンプリング戦略(各RIS)におけるPDFと必ずしも一致する必要がない。
+ただ、unbiasedなウエイトを算出するだけなら、</p>
+<ol>
+<li>あるサンプルに於ける各サンプリング戦略のウエイトの合計値が1</li>
+<li>ある戦略で、あるサンプルのPDFがゼロならば、そのウエイトはゼロ
+の二つを守れば良い。</li>
+</ol>
+<p>Talbot et alの方法は、各RISを結合の際に、結合対象サンプルを、全てのRISのターゲット分布関数:$g$で評価してウエイト$g_i / g_{sum}$を計算し、正規化（$m$の平均が1.0になるように）して、これをサンプルのウエイト値に乗算して結合している。直感的で分かりやすいが、ターゲット分布関数:$g$の評価回数が2次的に増大するのがこの方法の大きな欠点である。</p>
+<pre><code>function combineReservoirsTalbotMIS(g, r1, r2, . . . , rk, g1, g2, . . . , gk)
+  Reservoir s // a new reservor
+
+  foreach r_i ∈ {r1, . . . , rk } do
+
+    // calculate normalized MIS weight using g()
+    g_sum ← 0
+    foreach g_j ∈ {g1, . . . , gk } do
+      g_sum ← g_sum + g_j(r.y)
+    m ← g_i(r.y) / (g_sum / k)
+
+    s.update(r.y, g(r.y) · r.w · r.M · m, r.M)
+
+  w ← (1 / g(s.y))(s.wsum / s.M)
+  return s.y, w
+</code></pre>
+<p>本論文の提案手法であるBenedikt et alの手法では、結合して、最終的に選択されたサンプルが使っていた戦略のMISウエイトを計算している。
+最終的に$1/M$の代わりにこれを乗算している。この手法では、ターゲット分布関数の評価回数はサンプリング戦略数（結合するRISの数）なので、
+Talbot et alの方法に比べたら、明らかに計算量が少ない。</p>
+<p>注釈：この式はまだ理解できてない。例えば一つの戦略で、Mに非常に大きな数を使った場合、s.wsumはそれに準じて大きな数になる。
+一方でmは、ターゲット分布関数に変化が無い場合、サンプリング戦略数が増えればそれに準じて小さな値になっていくはずである。
+これら両者は直交したパラメーターで、直接の関係がない。しかし、s.wsum · mは、1/gを正規化するために作用する必要があるが、これでは正規化できないはずだ。</p>
+<p>もし、全てのサンプリング戦略でMが1であると仮定すると、g(r.y) · r.wの部分はg/pに相当して、s.wsumは、サンプリング戦略数分の$\sum{g/p}$で、サンプリング戦略数で割ればg/pの平均値として解釈できる。
+一方でmは、各サンプリング戦略のターゲット分布関数が同じものだった場合は、サンプリング戦略数の逆数となる。選択されたサンプルのターゲット分布関数が、
+他の戦略に対して相対的に大きければ、ウエイトが大きくなり、逆ならば小さくなるようなMISウエイトとして解釈できる。</p>
+<pre><code>function combineReservoirsMIS(g, r1, r2, . . . , rk, g1, g2, . . . , gk)
+  Reservoir s // a new reservor
+
+  foreach r ∈ {r1, . . . , rk } do
+    s.update(r.y, g(r.y) · r.w · r.M, r.M)
+
+
+  // calculate normalized MIS weight using g()
+  g_sum ← 0
+  foreach g_j ∈ {g1, . . . , gk } do
+    g_sum ← g_sum + g_j(r.y)
+
+  m ← g_*(r.y) / g_sum // g_* : target distribution that contributed s.y
+
+  w ← (1 / g(s.y))(s.wsum · m)
   return s.y, w
 </code></pre>
 
@@ -728,7 +948,7 @@ Reservoirを結合してサンプルの選択をするところまでは同じ�
       
       
       <li>
-        <a href="https://twitter.com/intent/tweet?url=https://shikihuiku.github.io/memo/restir/&amp;text=Importance%20Resampling%20For%20Global%20Illumination" target="_blank" rel="noopener" class="share-btn-twitter">
+        <a href="https://twitter.com/intent/tweet?url=https://shikihuiku.github.io/memo/restir/&amp;text=Importance%20Resampling%20%e9%96%a2%e9%80%a3" target="_blank" rel="noopener" class="share-btn-twitter">
           <i class="fab fa-twitter"></i>
         </a>
       </li>
@@ -741,7 +961,7 @@ Reservoirを結合してサンプルの選択をするところまでは同じ�
       
       
       <li>
-        <a href="https://www.facebook.com/sharer.php?u=https://shikihuiku.github.io/memo/restir/&amp;t=Importance%20Resampling%20For%20Global%20Illumination" target="_blank" rel="noopener" class="share-btn-facebook">
+        <a href="https://www.facebook.com/sharer.php?u=https://shikihuiku.github.io/memo/restir/&amp;t=Importance%20Resampling%20%e9%96%a2%e9%80%a3" target="_blank" rel="noopener" class="share-btn-facebook">
           <i class="fab fa-facebook"></i>
         </a>
       </li>
@@ -754,7 +974,7 @@ Reservoirを結合してサンプルの選択をするところまでは同じ�
       
       
       <li>
-        <a href="mailto:?subject=Importance%20Resampling%20For%20Global%20Illumination&amp;body=https://shikihuiku.github.io/memo/restir/" target="_blank" rel="noopener" class="share-btn-email">
+        <a href="mailto:?subject=Importance%20Resampling%20%e9%96%a2%e9%80%a3&amp;body=https://shikihuiku.github.io/memo/restir/" target="_blank" rel="noopener" class="share-btn-email">
           <i class="fas fa-envelope"></i>
         </a>
       </li>
@@ -767,7 +987,7 @@ Reservoirを結合してサンプルの選択をするところまでは同じ�
       
       
       <li>
-        <a href="https://www.linkedin.com/shareArticle?url=https://shikihuiku.github.io/memo/restir/&amp;title=Importance%20Resampling%20For%20Global%20Illumination" target="_blank" rel="noopener" class="share-btn-linkedin">
+        <a href="https://www.linkedin.com/shareArticle?url=https://shikihuiku.github.io/memo/restir/&amp;title=Importance%20Resampling%20%e9%96%a2%e9%80%a3" target="_blank" rel="noopener" class="share-btn-linkedin">
           <i class="fab fa-linkedin-in"></i>
         </a>
       </li>
@@ -780,7 +1000,7 @@ Reservoirを結合してサンプルの選択をするところまでは同じ�
       
       
       <li>
-        <a href="whatsapp://send?text=Importance%20Resampling%20For%20Global%20Illumination%20https://shikihuiku.github.io/memo/restir/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+        <a href="whatsapp://send?text=Importance%20Resampling%20%e9%96%a2%e9%80%a3%20https://shikihuiku.github.io/memo/restir/" target="_blank" rel="noopener" class="share-btn-whatsapp">
           <i class="fab fa-whatsapp"></i>
         </a>
       </li>
@@ -793,7 +1013,7 @@ Reservoirを結合してサンプルの選択をするところまでは同じ�
       
       
       <li>
-        <a href="https://service.weibo.com/share/share.php?url=https://shikihuiku.github.io/memo/restir/&amp;title=Importance%20Resampling%20For%20Global%20Illumination" target="_blank" rel="noopener" class="share-btn-weibo">
+        <a href="https://service.weibo.com/share/share.php?url=https://shikihuiku.github.io/memo/restir/&amp;title=Importance%20Resampling%20%e9%96%a2%e9%80%a3" target="_blank" rel="noopener" class="share-btn-weibo">
           <i class="fab fa-weibo"></i>
         </a>
       </li>
