@@ -5,12 +5,609 @@
     <link>https://shikihuiku.github.io/tag/dx12/</link>
       <atom:link href="https://shikihuiku.github.io/tag/dx12/index.xml" rel="self" type="application/rss+xml" />
     <description>DX12</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Fri, 04 Sep 2020 18:00:00 +0900</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sun, 08 Nov 2020 11:12:51 +0900</lastBuildDate>
     <image>
       <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png</url>
       <title>DX12</title>
       <link>https://shikihuiku.github.io/tag/dx12/</link>
     </image>
+    
+    <item>
+      <title>NVIDIA Falcor を使ってみる</title>
+      <link>https://shikihuiku.github.io/post/falcor_getting_started/</link>
+      <pubDate>Sun, 08 Nov 2020 11:12:51 +0900</pubDate>
+      <guid>https://shikihuiku.github.io/post/falcor_getting_started/</guid>
+      <description>&lt;h2 id=&#34;nvidia-falcor-とは&#34;&gt;NVIDIA Falcor とは&lt;/h2&gt;
+&lt;p&gt;D3D12 をバックエンドとした、リアルタイムレンダリングのフレームワークです。
+昨今のゲームエンジンほどの手厚い機能はありませんが、レンダリングAPIの抽象化レイヤーが軽量なのでカスタマイズが容易です。
+抽象化レイヤーは、ラスタライズのみならず DXR をサポートしているのが大きな特長で、DXR を使って何か試してみたいときには特に有用なフレームワークになります。
+また、DepthPre パスや、GBuffer パス、SVGF パスなどが初めから用意されているので、Raster と RT のハイブリッドレンダリングをテストしたい場合や、RT のデノイザー開発にも対応できます。
+また、今回は紹介しませんが、CUDA を使った処理もサポートされているので、必要に応じてこちらも使ってみると面白いかもしれません。&lt;/p&gt;
+&lt;h2 id=&#34;getting-started&#34;&gt;Getting Started&lt;/h2&gt;
+&lt;p&gt;早速ですが、環境をセットアップします。とはいっても、基本的には GitHub のリポジトリを Clone してビルドするだけです。&lt;br&gt;
+&lt;a href=&#34;https://github.com/nvidiagameworks/falcor&#34;&gt;https://github.com/nvidiagameworks/falcor&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;2020/11現在の推奨されるビルド環境は以下の通りです&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows 10 version 1809 or newer&lt;/li&gt;
+&lt;li&gt;Visual Studio 2019&lt;/li&gt;
+&lt;li&gt;Microsoft Windows SDK version 1903 (10.0.18362.1)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;また、必須ではありませんが以下のパッケージや機材を準備することをおすすめします&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;GeForce RTXシリーズ (もしくはDXRをサポートしたGPU)&lt;/li&gt;
+&lt;li&gt;Windows 10 Graphics Tools (WindowsのOptional Featureからインストールするパッケージ。DebugLayerのために必要)&lt;/li&gt;
+&lt;li&gt;NVAPI (NVAPIによる拡張機能を使用したい場合)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;gitのリポジトリをclone&#34;&gt;GitのリポジトリをClone&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;git clone --recursive -b master git@github.com:NVIDIAGameWorks/Falcor.git
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;nvapiのインストール&#34;&gt;NVAPIのインストール&lt;/h4&gt;
+&lt;p&gt;NVAPIを使用する方は、
+&lt;a href=&#34;https://developer.nvidia.com/nvapi&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ここ&lt;/a&gt;より NVAPI の最新パッケージをダウンロードして、Externals/.packman/nvapi に配置します。
+ダウンロードの際にNVIDIAの開発者登録アカウントが必要になります。
+次にFalcorConfig.hを開き、_ENABLE_NVAPI を1に設定します。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#define _ENABLE_NVAPI 1 // Set this to 1 to enable NVIDIA specific DX extensions. Make sure you have the NVAPI package in your &#39;Externals&#39; directory. View the readme for more information.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;falcortest-プロジェクトをビルド&#34;&gt;FalcorTest プロジェクトをビルド&lt;/h4&gt;
+&lt;p&gt;Tools/FalcorTest をビルドすると、Falcor (Falcor本体。レンダリングのバックエンドになるDLL) と、FalcorTest（各種単機能テストのレンダリングが書かれたアプリ）がビルドされます。
+実行すると、各種機能がテストされて結果がコンソールに表示されます。詳細なテストではありませんが、まずここで自分の使いたい機能が正しく動作しているかチェックしておきましょう。
+幾つかの機能は無条件にスキップされるようになっているので、適宜ソースを書き換えてテストしましょう。&lt;/p&gt;
+&lt;p&gt;たとえば、ShaderModel6.5 のサポートを確認したければ、このように書き換えます。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#if 0
+    GPU_TEST(ShaderModel6_4, &amp;quot;Requires shader model 6.4&amp;quot;) { test(ctx, &amp;quot;6_4&amp;quot;); }
+    GPU_TEST(ShaderModel6_5, &amp;quot;Requires shader model 6.5&amp;quot;) { test(ctx, &amp;quot;6_5&amp;quot;); }
+#else
+    GPU_TEST(ShaderModel6_4) { test(ctx, &amp;quot;6_4&amp;quot;); }
+    GPU_TEST(ShaderModel6_5) { test(ctx, &amp;quot;6_5&amp;quot;); }
+#endif
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;TraceRayInline は、2020/11現在は、Falcor内にはシェーダーのコンパイルが通るかのテストコードしかありませんが、とりあえずテストすることが出来ます。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#if 0
+    GPU_TEST(testTraceRayInlineAPI, &amp;quot;Requires shader model 6.5&amp;quot;)
+#else
+    GPU_TEST(testTraceRayInlineAPI)
+#endif
+    {
+        // We don&#39;t actually run the program, just make sure it compiles.
+        ctx.createProgram(&amp;quot;Tests/Slang/TraceRayInline.cs.slang&amp;quot;, &amp;quot;testTraceRayInlineAPI&amp;quot;, Program::DefineList(), Shader::CompilerFlags::None, &amp;quot;6_5&amp;quot;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;サンプルコードに目を通す&#34;&gt;サンプルコードに目を通す&lt;/h2&gt;
+&lt;h3 id=&#34;projecttemplate&#34;&gt;ProjectTemplate&lt;/h3&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-project-template&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ProjectTemplate_hu17968daff6882fcdd0a6eccf1134604b_25340_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Project Template&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ProjectTemplate_hu17968daff6882fcdd0a6eccf1134604b_25340_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Project Template
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;Samples/ProjectTemplate をビルドして実行すると、ウィンドウが開き、緑の画面とGUIが表示されます。チュートリアルではよくあるお約束の RenderTarget をクリアしているだけのプログラムになります。
+プログラム本体はほんの数行で、Guiにボタンを追加するのと画面を緑色でクリアするコードが記述されているだけです。D3D12のAPIは抽象化されており、Render Target のクリアはこの一行で行われます。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;    pRenderContext-&amp;gt;clearFbo(pTargetFbo.get(), clearColor, 1.0f, 0, FboAttachmentType::All);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;RenderingContext は、メンバーに LowLevelContextData クラスを保持しており、これが D3D12 の CommandAllocator / CommandList / CommandQueue などを保持しています。
+D3D12Device はグローバル変数としてアクセス可能で、一通りのAPIの抽象化レイヤーが提供されていますが、ネイティブ API へのアクセスも簡単なものになっています。
+一方で、Guiのクラスを覗くと、Dear ImGui がGUIのバックエンドとして使われているのが分かります。&lt;/p&gt;
+&lt;h3 id=&#34;shadertoy&#34;&gt;ShaderToy&lt;/h3&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-shadertoy&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ShaderToy_hu2b3746a333fae861e5f641d80618c199_316717_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ShaderToy&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ShaderToy_hu2b3746a333fae861e5f641d80618c199_316717_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;759&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    ShaderToy
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;Samples/ShaderToy プロジェクトをビルドすると、フルスクリーンの PixelShader のパスで、シェーダー Samples/ShaderToy/Toy.ps.slang が実行されます。
+初期化処理の OnLoad で幾つかのステートを作成していますが全部不要な処理です。初期化処理で実際に必要とされる処理は下記の一行のみです。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;// Load shaders
+mpMainPass = FullScreenPass::create(&amp;quot;Samples/ShaderToy/Toy.ps.slang&amp;quot;);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;描画時の onFrameRender では、初期化した mpMainPass のConstant Buffer の値を設定して execute を呼び出して描画しているだけです。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mpMainPass[&amp;quot;ToyCB&amp;quot;][&amp;quot;iResolution&amp;quot;] = float2(width, height);
+mpMainPass[&amp;quot;ToyCB&amp;quot;][&amp;quot;iGlobalTime&amp;quot;] = (float)gpFramework-&amp;gt;getGlobalClock().getTime();
+mpMainPass-&amp;gt;execute(pRenderContext, pTargetFbo);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;このように FullScreenPass クラスを使うと、ポストプロセス処理などで使うフルスクリーンのPixelShaderパスを簡単に構築することができます。Falcor には、FullScreenPass 以外にも極めて基本的な Dispatch や Draw を呼び出す機能がクラスとして標準で用意されています。これらは、Falcor プロジェクトの RenderGraph/BasePasses にあるので、興味があれば参照してください。&lt;/p&gt;
+&lt;h3 id=&#34;modelviewer&#34;&gt;ModelViewer&lt;/h3&gt;
+&lt;p&gt;Samples/ModelViewerをビルドして実行します。Gui の Load Model をクリックして、Falcor/Media/teapot.obj を読みます。（他にも、Media/Arcade/Arcade.fbxも読み込むことができます）
+Falcor のアセット読み込みのバックエンドは、
+&lt;a href=&#34;https://github.com/assimp/assimp&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;assimp&lt;/a&gt; を使用しています。ライトとカメラの設定が無いので、初期状態ではカメラはteapotの中にありますし、レンダリングが真っ黒ですが、ASWDでカメラを動かせば、とりあえずジオメトリが読み込まれていることが分かります。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-modelviewer&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer01_hua46a1c90710a4eb0b2f7280e44c59e65_49694_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ModelViewer&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer01_hua46a1c90710a4eb0b2f7280e44c59e65_49694_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    ModelViewer
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;ModelViewer.ps.slang をチェックすると、単純にシーン上のライトをイテレーションして、マテリアルを評価しています。したがって、ライトさえ配置されていれば正しくレンダリングされるように書かれています。なので、ModelViewer.cpp の、SceneBuilder がファイルを読み終わった後の箇所で、以下の様にライトの数を確認してライトが無ければ DirectionalLight を追加するように処理を書き加えて実行します。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;if (pBuilder-&amp;gt;getLightCount() == 0) {
+    // no lights.
+    pBuilder-&amp;gt;addLight(DirectionalLight::create());
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;これで、シーン上にライトが無い場合はデフォルトのDirectionalLightが追加されるので、ライティングの様子が見れるようになりました。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-modelviewer-with-a-light&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer02_hu4af4f192b6c567b25173183ebc184c2f_101873_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ModelViewer with a light&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer02_hu4af4f192b6c567b25173183ebc184c2f_101873_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    ModelViewer with a light
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;次に、Media/Arcade/Arcade.fscene を読み込んでみます。fscene は、Json で記述された Falcorのシーン格納形式で、ライトとカメラの定義が含まれているので、特にソースコードを変更することなくライティングの様子を見ることができます。Arcade.fscene はリファレンスとして Arcade.fbx と Light.fbx を参照して、内部にライトとカメラの定義を保持しています。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-modelviewer-fscene&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer03_hu0f84b7f164f683e83adc36f3959be573_2780056_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ModelViewer fscene&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer03_hu0f84b7f164f683e83adc36f3959be573_2780056_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    ModelViewer fscene
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;ModelViewer のプログラムを見てみると、初期化時に WireFrame描画用の RasterStateと、幾つかのCullModeの RasterStatreを作っています。DepthStencilStateも幾つか作っています。これらはGui上で選択して使用する事ができます。
+シェーダープログラムは、アプリケーション側は PixelShader のみ指定して、頂点シェーダーと DrawCall の呼び出しは、Falcor 側の mpScene-&amp;gt;render() に任されています。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-modelviewer-wire-frame&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer04_hucc614a67c5fbad2ebf671b0c2d57c68c_121887_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ModelViewer wire frame&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer04_hucc614a67c5fbad2ebf671b0c2d57c68c_121887_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    ModelViewer wire frame
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h4 id=&#34;hellodxr&#34;&gt;HelloDXR&lt;/h4&gt;
+&lt;p&gt;Samples/HelloDXRをビルドして実行します。先ほどの Arcade/Arcade.fscene が起動時から読み込まれています。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-hello-dxr-rtx-on&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR01_hu0dad088326deb0b53f9918ad0c5ed738_3254139_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Hello DXR (RTX ON)&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR01_hu0dad088326deb0b53f9918ad0c5ed738_3254139_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Hello DXR (RTX ON)
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-hello-dxr-rtx-off&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR02_hu3ace97392dbdea1ff721805c3675d6a4_2669467_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Hello DXR (RTX OFF)&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR02_hu3ace97392dbdea1ff721805c3675d6a4_2669467_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Hello DXR (RTX OFF)
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;Ray Traceのチェックボックスで、DXRの有効/無効を切り替える事ができ、影と反射の効果の有無が違いとして見て取れます。
+ソースコードを見ると、DXRが無効な時のレンダリングは、Falcorの組み込みレンダリングパスのRasterScenePassが使用されています。設定されているピクセルシェーダーは、ModelViewerとほぼ同じで、Falcorの組み込みシェーディング関数を使用しています。つまり、先の ModelViewer のサンプルプログラムは、RasterState の変更をしないのであれば、RasterScenePassを使って一行で記述できるという事です。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;    mpRasterPass = RasterScenePass::create(mpScene, &amp;quot;Samples/HelloDXR/HelloDXR.ps.slang&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;main&amp;quot;);
+    .
+    .
+    .
+    mpRasterPass-&amp;gt;renderScene(pRenderContext, pTargetFbo);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;DXR側は、HelloDXR.rt.slangに記述されている各シェーダーをShaderLibraryとしてコンパイルして、RtProgram::Descを使ってHitGroupの定義を行っています。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;    RtProgram::Desc rtProgDesc;
+    rtProgDesc.addShaderLibrary(&amp;quot;Samples/HelloDXR/HelloDXR.rt.slang&amp;quot;).setRayGen(&amp;quot;rayGen&amp;quot;);
+    rtProgDesc.addHitGroup(0, &amp;quot;primaryClosestHit&amp;quot;, &amp;quot;primaryAnyHit&amp;quot;).addMiss(0, &amp;quot;primaryMiss&amp;quot;);
+    rtProgDesc.addHitGroup(1, &amp;quot;&amp;quot;, &amp;quot;shadowAnyHit&amp;quot;).addMiss(1, &amp;quot;shadowMiss&amp;quot;);
+    rtProgDesc.addDefines(mpScene-&amp;gt;getSceneDefines());
+    rtProgDesc.setMaxTraceRecursionDepth(3); // 1 for calling TraceRay from RayGen, 1 for calling it from the primary-ray ClosestHitShader for reflections, 1 for reflection ray tracing a shadow ray
+
+    mpRaytraceProgram = RtProgram::create(rtProgDesc);
+    mpRtVars = RtProgramVars::create(mpRaytraceProgram, mpScene);
+    mpRaytraceProgram-&amp;gt;setScene(mpScene);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Closest Hitのシェーディングの関数は、Rasterで使用しているものと同一で、prepareShadigData()でサーフェースの情報を取得して、envalMaterial()でシェーディングを行っています。
+いる。ただし、ライトの評価の際に checkLightHit() で ShadowRay を飛ばして遮蔽のチェックをしています。また、リフレクションの Ray を飛ばしており、GGXのアルファ値（Roughness相当のパラメーター）で適当にブレンディングしています。（PBRではない） そのため、DXRを有効にした場合は、影と反射が追加されたレンダリングになります。&lt;/p&gt;
+&lt;h2 id=&#34;mogwaiに目を通す&#34;&gt;Mogwaiに目を通す&lt;/h2&gt;
+&lt;h4 id=&#34;注意&#34;&gt;注意&lt;/h4&gt;
+&lt;p&gt;ビルドの際にコンパイルエラー等は発生しませんでしたが、実行時にPythonのBindingを設定している個所で例外が発生しました。この問題は、VisualStudioをアップデートすることで解決しました。動作確認は Microsoft Visual Studio Professional 2019 - Version 16.7.7 を用いて行いました。同様の問題が発生した場合は、VSのバージョンをチェックすると良いかもしれません。&lt;/p&gt;
+&lt;h4 id=&#34;mogwai&#34;&gt;Mogwai&lt;/h4&gt;
+&lt;p&gt;Falcorは Pybind11を使って、RenderGraph を Python で記述するための機構を持っています。Mogwaiはその機構を使ったフレームワークと呼べると思います。
+ビルドすると、Pythonで記述されたいくつかの RenderGraph が、実行ファイルの出力先の Data フォルダに用意されます。
+起動後に File-&amp;gt;Load Scriptで Data/FowardRenderer.py を読み込みます。これで Foward Rendering の RenderGraph が読み込まれて、使用できるようになります。
+次にFile-&amp;gt;Load Sceneで、Falcor/Media/Arcade/Arcade.fsceneを読み込みます。
+すると、サンプルの Model Viewerと同様にレンダリングが確認できると思います。しかし、ModelViewerとは異なり、先ほど読み込んだ Pythonのスクリプトに記述された RenderGraph によってレンダリングの動作が定義されています。&lt;/p&gt;
+&lt;p&gt;ここで、File-&amp;gt;LoadScript で、MinimalPathTracer.py を読み込むことで、パストレーシングのRenderGraphを、追加で読み込むことができます。
+HUD上でRenderGraphを切り替えると、MinimalPathTracerにレンダリングパスを切り替えることができます。このように、Mogwaiを使うと、python で記述された複数の RenderGraph を動的に切り替える事ができます。これはレンダリングの比較評価等を行う際に有用だと言えると思います。&lt;/p&gt;
+&lt;p&gt;RenderGraph を ForwardRenderer に戻してEditボタンを押すと、RenderGraph の編集ができます。
+基本的には FowardRenderer.py に書かれている内容そのままですが、RenderGraph を視覚的に確認してエディットすることもできます。ただ、オマケ的な要素が強く、実際の RenderGraph の構築では、Pythonスクリプトを直接編集したほうが早いです。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-mogwai-render-graph&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai01_hucf237075bdd7b9e9afe14ce554f09d70_147063_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Mogwai Render Graph&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai01_hucf237075bdd7b9e9afe14ce554f09d70_147063_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Mogwai Render Graph
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;h4 id=&#34;rendergraphのノード&#34;&gt;RenderGraphのノード&lt;/h4&gt;
+&lt;p&gt;RenderGraph の個々のノードは、Falcor の RenderPass クラスを継承したクラスです。
+たとえば DepthPrePass ノードは DepthPass.dll として事前にビルドされており、これが ForwardRenderer.py の中でインポートされて、他のノードと接続されることでレンダリングパスが構築されています。他にも、GBuffer描画や、CascadedShadowMap, SSAO, Antialias, Tonemapping, SkyBox, それからレイトレーシング用に、MinimalPathTracer, AccumulatePass, SVGFPassなど、他にも幾つかの有用なノードが用意されています。これら RenderGraph のノードは個々のDLLとしてコンパイルされています。そのためのプロジェクトは、Falcor ソリューション内の RenderPasses フォルダに配置されているので確認してみてください。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-mogwai-render-graph&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai02_hu6c2dd509207f4d3927ccb0a42e7f7735_35792_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Mogwai Render Graph&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai02_hu6c2dd509207f4d3927ccb0a42e7f7735_35792_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;592&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Mogwai Render Graph
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;depthpassに目を通す&#34;&gt;DepthPassに目を通す&lt;/h4&gt;
+&lt;p&gt;RenderGraph の一つのノードの例として、DepthPass ノードを見てみます。DepthPass ノードは RenderPass クラスを継承して実装され、DepthPass.dllとして配置され、Falcor のレンダリングに使用されます。
+ヘッダーファイルを見ると、Gui の描画やリフレクションをサポートする関数、シーン情報にアクセスをするための setScene があります。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;    static SharedPtr create(RenderContext* pRenderContext = nullptr, const Dictionary&amp;amp; dict = {});
+
+    virtual RenderPassReflection reflect(const CompileData&amp;amp; compileData) override;
+    virtual void execute(RenderContext* pContext, const RenderData&amp;amp; renderData) override;
+    virtual void setScene(RenderContext* pRenderContext, const Scene::SharedPtr&amp;amp; pScene) override;
+    virtual void renderUI(Gui::Widgets&amp;amp; widget) override;
+    virtual Dictionary getScriptingDictionary() override;
+    virtual std::string getDesc() override { return kDesc; }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;reflect()を見ると、レンダリングの出力として、2DのDepthStencilを出力することが分かります。入力は無いので、setSceneで設定されたシーンから取得できるカメラとジオメトリを用いてレンダリングすることが想像できます。
+DepthBuffer のフォーマットはクラス内部に保持されて、Guiによる設定を介して変更できるようです。その結果がリフレクションの出力ピンに反映されます。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;RenderPassReflection DepthPass::reflect(const CompileData&amp;amp; compileData)
+{
+    RenderPassReflection reflector;
+    reflector.addOutput(kDepth, &amp;quot;Depth-buffer&amp;quot;).bindFlags(Resource::BindFlags::DepthStencil).format(mDepthFormat).texture2D(0, 0, 0);
+    return reflector;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;描画解像度の設定は無く、DLLの外部で用意されたDepthStencilバッファをBindしてレンダリングする仕組みになっています。シェーダーは、Slangで記述されたピクセルシェーダーが一つだけあります。
+中を確認すると、prepareShadingDataを呼び出しています。これは、アルファが完全に透明だった場合に、この関数のなかでDiscardが呼ばれるためです。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;void main(VSOut vOut, uint triangleIndex : SV_PrimitiveID) : SV_TARGET
+{
+    // Calling prepareShadingData() to discard pixels that fail alpha test. The pixel shader has no other side effects.
+    float3 viewDir = normalize(gScene.camera.getPosition() - vOut.posW);
+    prepareShadingData(vOut, triangleIndex, viewDir);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;ちなみに、描画解像度の設定は、Falcor の RenderGraph 側にあります。RenderGraphCompiler::allocateResources() が RenderGraph の変更や描画解像度変更をトリガーとして、使用されている出力ピンのリソースを ResourceCache に登録します。その時に、各種 RnederTarget の解像度の設定が行われます。&lt;/p&gt;
+&lt;p&gt;実際に RenderGraph のノードを実装するならば、ぜひ Docs/
+&lt;a href=&#34;https://github.com/NVIDIAGameWorks/Falcor/blob/master/Docs/Tutorials/02-Implementing-a-Render-Pass.md&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Tutorials&lt;/a&gt; をご一読する事をお勧めします。&lt;/p&gt;
+&lt;h2 id=&#34;最後に&#34;&gt;最後に&lt;/h2&gt;
+&lt;p&gt;ビルドして実行するだけではいまいち概要がつかみにくい Falcor ですが、リポジトリの
+&lt;a href=&#34;https://github.com/NVIDIAGameWorks/Falcor/blob/master/Docs/index.md&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ドキュメント&lt;/a&gt;を読めば、この記事に書いてあることを含めて記載があります。ソースコードの規模もあまり大きくないので、全体の把握も比較的容易だと思います。アセットもFBX形式が読み込めるので、手元のアセットでテストしたい場合なども比較的短時間でセットアップできるのではないでしょうか。今回は紹介していませんが、
+&lt;a href=&#34;https://developer.nvidia.com/orca&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ORCA&lt;/a&gt;をはじめ、CC-BY等のオープンライセンスの元で公開されているアセットなどもあるので、これらを活用してレンダリングのテストを行う事も可能だと思います。&lt;/p&gt;
+&lt;p&gt;今回は、簡単にですが Falcor を触ってみました。この手の軽量なレンダリングフレームワークというのは、自作含めて多数あると思いますが、RasterとDXRをシームレスにサポートしている軽量フレームワークはあまり見かけません。
+そういう意味ではユニークな存在かもしれません。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Device Removalの処方箋 - 補足資料</title>
