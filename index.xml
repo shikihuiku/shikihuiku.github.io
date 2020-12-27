@@ -30,10 +30,10 @@ $$&lt;/p&gt;
 &lt;p&gt;\begin{pmatrix} a_1 &amp;amp; a_5 &amp;amp; a_9    &amp;amp; a_{13} \\ a_2 &amp;amp; a_6 &amp;amp; a_{10} &amp;amp; a_{14} \\ a_3 &amp;amp; a_7 &amp;amp; a_{11} &amp;amp; a_{15} \\ a_4 &amp;amp; a_8 &amp;amp; a_{12} &amp;amp; a_{16} \end{pmatrix}&lt;/p&gt;
 &lt;p&gt;また、行列の積は可換ではない。たとえば、4次元ベクトルを行列の右から掛けるか左から掛けるかによって演算が変わるので、これには2通りの演算が存在する。&lt;br&gt;
 $$
-\begin{pmatrix} x^{\prime} \\ y^{\prime} \\ z^{\prime} \\ w^{\prime} \end{pmatrix} = \begin{pmatrix} a_{11} &amp;amp; a_{12} &amp;amp; a_{13} &amp;amp; a_{14} \\ a_{21} &amp;amp; a_{22} &amp;amp; a_{23} &amp;amp; a_{24} \\ a_{31} &amp;amp; a_{32} &amp;amp; a_{33} &amp;amp; a_{34} \\ a_{41} &amp;amp; a_{42} &amp;amp; a_{34} &amp;amp; a_{44} \end{pmatrix} \begin{pmatrix} x \\ y \\ z \\ w \end{pmatrix}
+\begin{pmatrix} x^{\prime} \\ y^{\prime} \\ z^{\prime} \\ w^{\prime} \end{pmatrix} = \begin{pmatrix} a_{11} &amp;amp; a_{12} &amp;amp; a_{13} &amp;amp; a_{14} \\ a_{21} &amp;amp; a_{22} &amp;amp; a_{23} &amp;amp; a_{24} \\ a_{31} &amp;amp; a_{32} &amp;amp; a_{33} &amp;amp; a_{34} \\ a_{41} &amp;amp; a_{42} &amp;amp; a_{43} &amp;amp; a_{44} \end{pmatrix} \begin{pmatrix} x \\ y \\ z \\ w \end{pmatrix}
 $$&lt;/p&gt;
 &lt;p&gt;$$
-\begin{pmatrix} x^{\prime} &amp;amp; y^{\prime} &amp;amp; z^{\prime} &amp;amp; w^{\prime} \end{pmatrix} = \begin{pmatrix} x &amp;amp; y &amp;amp; z &amp;amp; w \end{pmatrix} \begin{pmatrix} a_{11} &amp;amp; a_{12} &amp;amp; a_{13} &amp;amp; a_{14} \\ a_{21} &amp;amp; a_{22} &amp;amp; a_{23} &amp;amp; a_{24} \\ a_{31} &amp;amp; a_{32} &amp;amp; a_{33} &amp;amp; a_{34} \\ a_{41} &amp;amp; a_{42} &amp;amp; a_{34} &amp;amp; a_{44} \end{pmatrix}
+\begin{pmatrix} x^{\prime} &amp;amp; y^{\prime} &amp;amp; z^{\prime} &amp;amp; w^{\prime} \end{pmatrix} = \begin{pmatrix} x &amp;amp; y &amp;amp; z &amp;amp; w \end{pmatrix} \begin{pmatrix} a_{11} &amp;amp; a_{12} &amp;amp; a_{13} &amp;amp; a_{14} \\ a_{21} &amp;amp; a_{22} &amp;amp; a_{23} &amp;amp; a_{24} \\ a_{31} &amp;amp; a_{32} &amp;amp; a_{33} &amp;amp; a_{34} \\ a_{41} &amp;amp; a_{42} &amp;amp; a_{43} &amp;amp; a_{44} \end{pmatrix}
 $$&lt;/p&gt;
 &lt;p&gt;シェーダーを記述する場合は、これらの解釈は実装者に委ねられる。一方で、グラフィックスAPIがこれらの演算を提供する場合もある。
 OpenGLのCompatibility Profileでは、Column-Majorでマトリクスをメモリに格納し、Projection Matrixとの乗算はベクトルに対して左側からである。
