@@ -3,27 +3,47 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://shikihuiku.github.io/tag/direct3d/</loc>
+    <lastmod>2020-12-27T00:09:34+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://shikihuiku.github.io/tag/opengl/</loc>
+    <lastmod>2020-12-27T00:09:34+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://shikihuiku.github.io/post/</loc>
+    <lastmod>2020-12-27T00:09:34+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://shikihuiku.github.io/post/projection_matrix/</loc>
+    <lastmod>2020-12-27T00:09:34+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://shikihuiku.github.io/</loc>
+    <lastmod>2020-12-27T00:09:34+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://shikihuiku.github.io/tags/</loc>
+    <lastmod>2020-12-27T00:09:34+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://shikihuiku.github.io/tag/vulkan/</loc>
+    <lastmod>2020-12-27T00:09:34+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://shikihuiku.github.io/tag/dx12/</loc>
     <lastmod>2020-11-08T11:12:51+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://shikihuiku.github.io/post/falcor_getting_started/</loc>
-    <lastmod>2020-11-08T11:12:51+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://shikihuiku.github.io/post/</loc>
-    <lastmod>2020-11-08T11:12:51+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://shikihuiku.github.io/</loc>
-    <lastmod>2020-11-08T11:12:51+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://shikihuiku.github.io/tags/</loc>
     <lastmod>2020-11-08T11:12:51+09:00</lastmod>
   </url>
   
