@@ -1,16 +1,112 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Memos | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
+    <title>Memoes | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
     <link>https://shikihuiku.github.io/memo/</link>
       <atom:link href="https://shikihuiku.github.io/memo/index.xml" rel="self" type="application/rss+xml" />
-    <description>Memos</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Fri, 11 Sep 2020 11:59:35 +0900</lastBuildDate>
+    <description>Memoes</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 07 Sep 2021 21:48:09 +0900</lastBuildDate>
     <image>
-      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png</url>
-      <title>Memos</title>
+      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png</url>
+      <title>Memoes</title>
       <link>https://shikihuiku.github.io/memo/</link>
     </image>
+    
+    <item>
+      <title>ClearUnorderedAccessViewの使い方</title>
+      <link>https://shikihuiku.github.io/memo/clearunorderedaccessview/</link>
+      <pubDate>Tue, 07 Sep 2021 21:48:09 +0900</pubDate>
+      <guid>https://shikihuiku.github.io/memo/clearunorderedaccessview/</guid>
+      <description>
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/clearunorderedaccessview/Title_hu3abdfca4b9a62c4bb7e1e50724b1ec47_35598_2000x2000_fit_lanczos_3.PNG&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/clearunorderedaccessview/Title_hu3abdfca4b9a62c4bb7e1e50724b1ec47_35598_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;60%&#34; height=&#34;338&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h3 id=&#34;参考資料&#34;&gt;参考資料&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;ID3D12GraphicsCommandList::ClearUnorderedAccessViewUint method (d3d12.h)&lt;br&gt;
+
+&lt;a href=&#34;https://docs.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist-clearunorderedaccessviewuint&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://docs.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist-clearunorderedaccessviewuint&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ID3D12GraphicsCommandList::ClearUnorderedAccessViewFloat method (d3d12.h)&lt;br&gt;
+
+&lt;a href=&#34;https://docs.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist-clearunorderedaccessviewfloat&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://docs.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist-clearunorderedaccessviewfloat&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;なにをするためのものか&#34;&gt;なにをするためのものか&lt;/h1&gt;
+&lt;p&gt;Texture(RenderTarget)のクリアはRTVを通じて、ClearRenderTargetView()を使う方が効率的です。DepthBufferはDSVを通じてClearDepthStencilView()でクリアする事が強く推奨されます。
+では、ClearUnorderedAccessView*メソッドが使われる場合ですが、一般的にはCreateCommittedResource()やCreatePlacedResource()で作成したBuffer(VertexBufferやIndexBuffer、またUAVを通じてアクセスする汎用的なBuffer)をクリアするためのメソッドです。&lt;/p&gt;
+&lt;h1 id=&#34;syntax&#34;&gt;Syntax&lt;/h1&gt;
+&lt;p&gt;APIインターフェースは以下の様になっています。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;void ClearUnorderedAccessViewUint(
+  D3D12_GPU_DESCRIPTOR_HANDLE ViewGPUHandleInCurrentHeap,
+  D3D12_CPU_DESCRIPTOR_HANDLE ViewCPUHandle,
+  ID3D12Resource              *pResource,
+  const UINT [4]              Values,
+  UINT                        NumRects,
+  const D3D12_RECT            *pRects
+);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;大変手間のかかることに、GPU_DESCRIPTOR_HANDLEとCPU_DESCRIPTOR_HANDLEを指定しなければなりません。当然ながらこれらにはクリア対象リソースの全部又は一部の領域を設定したUAVが正しく記述されている必要があります。
+また、このメソッドでクリアしなくてはならないリソースの99.99%は、いわゆる1DBufferで、2次元の概念を保持していませんが、クリアの範囲をRECTで指定する必要があります。また、クリアの際に書き込む値はUINT[4]となっています。
+初見では疑問しか沸かないこのAPIインターフェースについて少し考えてみたいと思います。&lt;/p&gt;
+&lt;h3 id=&#34;なんでuavが二つもいるの&#34;&gt;なんでUAVが二つもいるの？&lt;/h3&gt;
+&lt;p&gt;このメソッド最大の面倒な点は、CPU側のUAVとGPU側のUAV二つを用意しなくてはならないところです。ちなみにGPU側のDescriptorHeap(つまりShader Visible Descriptor Heap)にも有効なCPU_DESCRIPTOR_HANDLEはありますが、
+これをこのメソッドの引数で渡すことはできません。CPU側のDescriptorHeap(つまりShader VisibleではないDescriptor Heap)を用意してUAVを設定して、そのCPU_DESCRIPTOR_HANDLEを引数で渡す必要があります。&lt;/p&gt;
+&lt;p&gt;では、なぜこの二つのUAVが必要なのかというと、このクリア作業のコマンド構築をどのように行うかを考えると少しだけ理解できます。
+まず、GPUへのコマンド構築を、対象リソースのアドレス解決を含めて行う場合は、CPU側のDescriptor Heapに設定されたUAVを参照することで、キャッシュの効いた高速なメモリから情報を取得出来ます。
+一方で、GPU側にはUAVのアドレスとRECTのみを伝えるシンプルな形でのコマンド構築を行う場合は、GPU側から参照可能なUAVが必要となります。この二つのうちどちらが行われるかは、GPUの実装依存となります。&lt;/p&gt;
+&lt;p&gt;しかし、ClearRenderTargetView()やClearDepthStencilView()はGPU側のDescriptorを必要としませんが、クリア作業はGPU側で行われます。
+つまり、コマンド構築時にUAVに相当する情報をコマンドバッファに書き込んでいるわけです。ClearUnorderedAccessView*()も同様の作りで問題なかったのではないかと思います。&lt;/p&gt;
+&lt;h3 id=&#34;rectでクリア範囲を指定しかも4要素&#34;&gt;RECTでクリア範囲を指定？しかも4要素？&lt;/h3&gt;
+&lt;p&gt;UAV全域をクリアする場合は、RECTによる範囲指定は必要ありませんが、UAVの領域の一部をクリアする場合はRECTを指定する必要があります。RECTは(left, top, right, bottom)を指定する形式になっています。
+クリア対象はテクスチャでない場合が多いにも関わらず、RECT指定なのは、単純にClearRenderTargetView()やClearDepthStencilView()のAPIに引きずられたためと思われます。また、RECTの範囲は(left, top)
+で指定した位置は含みますが、(right, bottom)で指定した位置を含みません。&lt;br&gt;
+例えば、R32UINTの16Byte(つまりR32UINT x 4)のUAVがあるとします。このUAVの先頭8Byteをクリアする場合は、RECTの指定は、(0, 0, 2, 1)となります。また、後半の8Byteをクリアする場合は、(2, 0, 4, 1)となります。
+RGBA32UINTの64Byte(つまりRGBA32UINT x 4)のUAVの場合は、同じRECTでそれぞれ先頭32Byte、後半32Byteをクリアする事ができます。
+また、クリアに使われる値ですが、R32UINTのリソースにはValue[4]の先頭の要素(Value[0])が繰り返し書き込まれます。RGBA32UINTには、Value[4]の要素が全て書き込まれます。
+ほとんどのケースでゼロを書き込むと思いますが、思い通りの値でBufferを埋めたい場合はUAVのFormatとValue[4]に工夫が必要です。&lt;/p&gt;
+&lt;h3 id=&#34;一体いくつのrectを指定可能なのでしょうか&#34;&gt;一体いくつのRECTを指定可能なのでしょうか？&lt;/h3&gt;
+&lt;p&gt;さて、今回これを書こうかなと思った直接の原因についてです。このAPIではRECTの数に上限が無いので、理論上はUINTの上限の個数までRECTが指定可能となっています。しかし実際は、クリア対象のリソースがそこまで大きいものを作成できないでしょう。
+また、GPUへのコマンド構築時に何らかの形でRECTの情報を含めないといけませんが、UINTの上限はサイズ的に無理でしょう。今回私は256KByteのリソースにカウンタ記録用の16ByteのUAVを動的に確保するプログラムを作成し、
+必要に応じてUAVの提供と、ゼロクリアを行うプログラムを記述しました。1フレームに2000個ほどのカウンタが確保されてクリアが行われました。クリア用にリソース全域を指定したUAVを使ってRECTを2000個設定したところ、
+プログラムはこそでクラッシュしました。まぁ、2000は無理かと思いましたので、1023, 511, 255とコマンドを分割しましたがまだクラッシュします。127でクラッシュしなくなりました。私のシステムではこの値が上限値の様です。
+さて、私が今書いているプログラムでは一体いくつを上限にするべきなのでしょうか。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Importance Resampling 関連</title>
@@ -21,11 +117,13 @@
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;Importance Resampling for Global Illumination&lt;br&gt;
-&lt;a href=&#34;https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=1662&amp;amp;context=etd&#34;&gt;https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=1662&amp;amp;context=etd&lt;/a&gt;&lt;/p&gt;
+
+&lt;a href=&#34;https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=1662&amp;amp;context=etd&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=1662&amp;context=etd&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Rendering Millions of Dynamic Lights in Real-Time&lt;br&gt;
-&lt;a href=&#34;https://news.developer.nvidia.com/rendering-millions-of-dynamics-lights-in-realtime/&#34;&gt;https://news.developer.nvidia.com/rendering-millions-of-dynamics-lights-in-realtime/&lt;/a&gt;&lt;/p&gt;
+
+&lt;a href=&#34;https://news.developer.nvidia.com/rendering-millions-of-dynamics-lights-in-realtime/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://news.developer.nvidia.com/rendering-millions-of-dynamics-lights-in-realtime/&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;h1 id=&#34;resampled-importance-sampling&#34;&gt;Resampled Importance Sampling&lt;/h1&gt;
@@ -65,10 +163,10 @@
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_01_huc2b7e299a054b0e62f25ef75ba296b6a_42113_2000x2000_fit_lanczos_2.PNG&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_01_huc2b7e299a054b0e62f25ef75ba296b6a_42113_2000x2000_fit_lanczos_3.PNG&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_01_huc2b7e299a054b0e62f25ef75ba296b6a_42113_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;603&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_01_huc2b7e299a054b0e62f25ef75ba296b6a_42113_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;603&#34;&gt;
 &lt;/a&gt;
 
 
@@ -101,10 +199,10 @@
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_02_hu6161093dfe7af2499131def0ae96c035_41116_2000x2000_fit_lanczos_2.PNG&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_02_hu6161093dfe7af2499131def0ae96c035_41116_2000x2000_fit_lanczos_3.PNG&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_02_hu6161093dfe7af2499131def0ae96c035_41116_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;690&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_02_hu6161093dfe7af2499131def0ae96c035_41116_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;690&#34;&gt;
 &lt;/a&gt;
 
 
@@ -137,10 +235,10 @@
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_03_hu2c51de8f2302371bf0bcff8fcc4d9e76_68621_2000x2000_fit_lanczos_2.PNG&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_03_hu2c51de8f2302371bf0bcff8fcc4d9e76_68621_2000x2000_fit_lanczos_3.PNG&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_03_hu2c51de8f2302371bf0bcff8fcc4d9e76_68621_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;862&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_03_hu2c51de8f2302371bf0bcff8fcc4d9e76_68621_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;862&#34;&gt;
 &lt;/a&gt;
 
 

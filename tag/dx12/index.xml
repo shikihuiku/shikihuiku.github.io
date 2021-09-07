@@ -7,7 +7,7 @@
     <description>DX12</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sun, 08 Nov 2020 11:12:51 +0900</lastBuildDate>
     <image>
-      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png</url>
+      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png</url>
       <title>DX12</title>
       <link>https://shikihuiku.github.io/tag/dx12/</link>
     </image>
@@ -25,7 +25,8 @@
 また、今回は紹介しませんが、CUDA を使った処理もサポートされているので、必要に応じてこちらも使ってみると面白いかもしれません。&lt;/p&gt;
 &lt;h2 id=&#34;getting-started&#34;&gt;Getting Started&lt;/h2&gt;
 &lt;p&gt;早速ですが、環境をセットアップします。とはいっても、基本的には GitHub のリポジトリを Clone してビルドするだけです。&lt;br&gt;
-&lt;a href=&#34;https://github.com/nvidiagameworks/falcor&#34;&gt;https://github.com/nvidiagameworks/falcor&lt;/a&gt;&lt;/p&gt;
+
+&lt;a href=&#34;https://github.com/nvidiagameworks/falcor&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://github.com/nvidiagameworks/falcor&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;2020/11現在の推奨されるビルド環境は以下の通りです&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Windows 10 version 1809 or newer&lt;/li&gt;
@@ -100,10 +101,10 @@
 &lt;figure class=&#34;center&#34; id=&#34;figure-project-template&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ProjectTemplate_hu17968daff6882fcdd0a6eccf1134604b_25340_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Project Template&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ProjectTemplate_hu17968daff6882fcdd0a6eccf1134604b_25340_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;Project Template&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ProjectTemplate_hu17968daff6882fcdd0a6eccf1134604b_25340_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ProjectTemplate_hu17968daff6882fcdd0a6eccf1134604b_25340_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -150,10 +151,10 @@ D3D12Device はグローバル変数としてアクセス可能で、一通り�
 &lt;figure class=&#34;center&#34; id=&#34;figure-shadertoy&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ShaderToy_hu2b3746a333fae861e5f641d80618c199_316717_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ShaderToy&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ShaderToy_hu2b3746a333fae861e5f641d80618c199_316717_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;ShaderToy&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ShaderToy_hu2b3746a333fae861e5f641d80618c199_316717_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;759&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ShaderToy_hu2b3746a333fae861e5f641d80618c199_316717_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;759&#34;&gt;
 &lt;/a&gt;
 
 
@@ -207,10 +208,10 @@ Falcor のアセット読み込みのバックエンドは、
 &lt;figure class=&#34;center&#34; id=&#34;figure-modelviewer&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer01_hua46a1c90710a4eb0b2f7280e44c59e65_49694_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ModelViewer&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer01_hua46a1c90710a4eb0b2f7280e44c59e65_49694_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;ModelViewer&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer01_hua46a1c90710a4eb0b2f7280e44c59e65_49694_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer01_hua46a1c90710a4eb0b2f7280e44c59e65_49694_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -256,10 +257,10 @@ Falcor のアセット読み込みのバックエンドは、
 &lt;figure class=&#34;center&#34; id=&#34;figure-modelviewer-with-a-light&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer02_hu4af4f192b6c567b25173183ebc184c2f_101873_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ModelViewer with a light&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer02_hu4af4f192b6c567b25173183ebc184c2f_101873_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;ModelViewer with a light&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer02_hu4af4f192b6c567b25173183ebc184c2f_101873_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer02_hu4af4f192b6c567b25173183ebc184c2f_101873_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -299,10 +300,10 @@ Falcor のアセット読み込みのバックエンドは、
 &lt;figure class=&#34;center&#34; id=&#34;figure-modelviewer-fscene&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer03_hu0f84b7f164f683e83adc36f3959be573_2780056_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ModelViewer fscene&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer03_hu0f84b7f164f683e83adc36f3959be573_2780056_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;ModelViewer fscene&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer03_hu0f84b7f164f683e83adc36f3959be573_2780056_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer03_hu0f84b7f164f683e83adc36f3959be573_2780056_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -343,10 +344,10 @@ Falcor のアセット読み込みのバックエンドは、
 &lt;figure class=&#34;center&#34; id=&#34;figure-modelviewer-wire-frame&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer04_hucc614a67c5fbad2ebf671b0c2d57c68c_121887_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ModelViewer wire frame&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer04_hucc614a67c5fbad2ebf671b0c2d57c68c_121887_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;ModelViewer wire frame&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer04_hucc614a67c5fbad2ebf671b0c2d57c68c_121887_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer04_hucc614a67c5fbad2ebf671b0c2d57c68c_121887_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -387,10 +388,10 @@ Falcor のアセット読み込みのバックエンドは、
 &lt;figure class=&#34;center&#34; id=&#34;figure-hello-dxr-rtx-on&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR01_hu0dad088326deb0b53f9918ad0c5ed738_3254139_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Hello DXR (RTX ON)&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR01_hu0dad088326deb0b53f9918ad0c5ed738_3254139_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;Hello DXR (RTX ON)&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR01_hu0dad088326deb0b53f9918ad0c5ed738_3254139_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR01_hu0dad088326deb0b53f9918ad0c5ed738_3254139_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -429,10 +430,10 @@ Falcor のアセット読み込みのバックエンドは、
 &lt;figure class=&#34;center&#34; id=&#34;figure-hello-dxr-rtx-off&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR02_hu3ace97392dbdea1ff721805c3675d6a4_2669467_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Hello DXR (RTX OFF)&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR02_hu3ace97392dbdea1ff721805c3675d6a4_2669467_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;Hello DXR (RTX OFF)&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR02_hu3ace97392dbdea1ff721805c3675d6a4_2669467_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR02_hu3ace97392dbdea1ff721805c3675d6a4_2669467_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -506,10 +507,10 @@ HUD上でRenderGraphを切り替えると、MinimalPathTracerにレンダリン�
 &lt;figure class=&#34;center&#34; id=&#34;figure-mogwai-render-graph&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai01_hucf237075bdd7b9e9afe14ce554f09d70_147063_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Mogwai Render Graph&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai01_hucf237075bdd7b9e9afe14ce554f09d70_147063_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;Mogwai Render Graph&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai01_hucf237075bdd7b9e9afe14ce554f09d70_147063_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai01_hucf237075bdd7b9e9afe14ce554f09d70_147063_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -551,10 +552,10 @@ HUD上でRenderGraphを切り替えると、MinimalPathTracerにレンダリン�
 &lt;figure class=&#34;center&#34; id=&#34;figure-mogwai-render-graph&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai02_hu6c2dd509207f4d3927ccb0a42e7f7735_35792_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Mogwai Render Graph&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai02_hu6c2dd509207f4d3927ccb0a42e7f7735_35792_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;Mogwai Render Graph&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai02_hu6c2dd509207f4d3927ccb0a42e7f7735_35792_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;592&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai02_hu6c2dd509207f4d3927ccb0a42e7f7735_35792_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;592&#34;&gt;
 &lt;/a&gt;
 
 
@@ -704,10 +705,10 @@ CPUの実行コードは、デバッガがアタッチされている状況下�
 &lt;figure class=&#34;center&#34; id=&#34;figure-gpuとcpuの処理時間のずれ&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/GPUView_Framelatency_clipped_hu8d16dffa687010e8cb8fe6da31428ef9_85614_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;GPUとCPUの処理時間のずれ&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/GPUView_Framelatency_clipped_hu8d16dffa687010e8cb8fe6da31428ef9_85614_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;GPUとCPUの処理時間のずれ&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/GPUView_Framelatency_clipped_hu8d16dffa687010e8cb8fe6da31428ef9_85614_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;870&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/GPUView_Framelatency_clipped_hu8d16dffa687010e8cb8fe6da31428ef9_85614_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;870&#34;&gt;
 &lt;/a&gt;
 
 
@@ -765,10 +766,10 @@ DEVICE_REMOVEDが発生する前に出力されるDebug Layerのメッセージ�
 &lt;figure class=&#34;center&#34; id=&#34;figure-dxcplのインストール&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Graphics_tools_hud17edd7f0016c7970e8d79671c2245cb_50866_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;dxcplのインストール&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Graphics_tools_hud17edd7f0016c7970e8d79671c2245cb_50866_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;dxcplのインストール&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Graphics_tools_hud17edd7f0016c7970e8d79671c2245cb_50866_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;930&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Graphics_tools_hud17edd7f0016c7970e8d79671c2245cb_50866_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;930&#34;&gt;
 &lt;/a&gt;
 
 
@@ -808,10 +809,10 @@ DEVICE_REMOVEDが発生する前に出力されるDebug Layerのメッセージ�
 &lt;figure class=&#34;center&#34; id=&#34;figure-デバッグ対象アプリケーションを登録する&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Dxcpl_addname_hucbdb74109a3fd183c1975591731fc9c0_227302_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;デバッグ対象アプリケーションを登録する&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Dxcpl_addname_hucbdb74109a3fd183c1975591731fc9c0_227302_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;デバッグ対象アプリケーションを登録する&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Dxcpl_addname_hucbdb74109a3fd183c1975591731fc9c0_227302_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;902&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Dxcpl_addname_hucbdb74109a3fd183c1975591731fc9c0_227302_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;902&#34;&gt;
 &lt;/a&gt;
 
 
@@ -850,10 +851,10 @@ DEVICE_REMOVEDが発生する前に出力されるDebug Layerのメッセージ�
 &lt;figure class=&#34;center&#34; id=&#34;figure-デバッグ対象アプリケーションを登録する&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/D3dConfg_hu66e5d0a7c318d4262e1366fb00f0e524_17980_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;デバッグ対象アプリケーションを登録する&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/D3dConfg_hu66e5d0a7c318d4262e1366fb00f0e524_17980_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;デバッグ対象アプリケーションを登録する&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/D3dConfg_hu66e5d0a7c318d4262e1366fb00f0e524_17980_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;466&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/D3dConfg_hu66e5d0a7c318d4262e1366fb00f0e524_17980_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;466&#34;&gt;
 &lt;/a&gt;
 
 
@@ -1174,10 +1175,10 @@ windbg.exeはWindows10のSDKに同梱されている。通常は、&amp;ldquo;C:
 &lt;figure class=&#34;center&#34; id=&#34;figure-windbg上でdred12の情報を確認する&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/WinDbg_hu91d4c8ada4e4ee2168dbdfb94cdee135_75072_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Windbg上で、DRED1.2の情報を確認する&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/WinDbg_hu91d4c8ada4e4ee2168dbdfb94cdee135_75072_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;Windbg上で、DRED1.2の情報を確認する&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/WinDbg_hu91d4c8ada4e4ee2168dbdfb94cdee135_75072_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1011&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/WinDbg_hu91d4c8ada4e4ee2168dbdfb94cdee135_75072_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1011&#34;&gt;
 &lt;/a&gt;
 
 

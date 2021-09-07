@@ -5,12 +5,108 @@
     <link>https://shikihuiku.github.io/</link>
       <atom:link href="https://shikihuiku.github.io/index.xml" rel="self" type="application/rss+xml" />
     <description>shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sun, 27 Dec 2020 00:09:34 +0900</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 07 Sep 2021 21:48:09 +0900</lastBuildDate>
     <image>
-      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png</url>
+      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png</url>
       <title>shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
       <link>https://shikihuiku.github.io/</link>
     </image>
+    
+    <item>
+      <title>ClearUnorderedAccessViewの使い方</title>
+      <link>https://shikihuiku.github.io/memo/clearunorderedaccessview/</link>
+      <pubDate>Tue, 07 Sep 2021 21:48:09 +0900</pubDate>
+      <guid>https://shikihuiku.github.io/memo/clearunorderedaccessview/</guid>
+      <description>
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/clearunorderedaccessview/Title_hu3abdfca4b9a62c4bb7e1e50724b1ec47_35598_2000x2000_fit_lanczos_3.PNG&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/clearunorderedaccessview/Title_hu3abdfca4b9a62c4bb7e1e50724b1ec47_35598_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;60%&#34; height=&#34;338&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+
+&lt;h3 id=&#34;参考資料&#34;&gt;参考資料&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;ID3D12GraphicsCommandList::ClearUnorderedAccessViewUint method (d3d12.h)&lt;br&gt;
+
+&lt;a href=&#34;https://docs.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist-clearunorderedaccessviewuint&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://docs.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist-clearunorderedaccessviewuint&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ID3D12GraphicsCommandList::ClearUnorderedAccessViewFloat method (d3d12.h)&lt;br&gt;
+
+&lt;a href=&#34;https://docs.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist-clearunorderedaccessviewfloat&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://docs.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist-clearunorderedaccessviewfloat&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;なにをするためのものか&#34;&gt;なにをするためのものか&lt;/h1&gt;
+&lt;p&gt;Texture(RenderTarget)のクリアはRTVを通じて、ClearRenderTargetView()を使う方が効率的です。DepthBufferはDSVを通じてClearDepthStencilView()でクリアする事が強く推奨されます。
+では、ClearUnorderedAccessView*メソッドが使われる場合ですが、一般的にはCreateCommittedResource()やCreatePlacedResource()で作成したBuffer(VertexBufferやIndexBuffer、またUAVを通じてアクセスする汎用的なBuffer)をクリアするためのメソッドです。&lt;/p&gt;
+&lt;h1 id=&#34;syntax&#34;&gt;Syntax&lt;/h1&gt;
+&lt;p&gt;APIインターフェースは以下の様になっています。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;void ClearUnorderedAccessViewUint(
+  D3D12_GPU_DESCRIPTOR_HANDLE ViewGPUHandleInCurrentHeap,
+  D3D12_CPU_DESCRIPTOR_HANDLE ViewCPUHandle,
+  ID3D12Resource              *pResource,
+  const UINT [4]              Values,
+  UINT                        NumRects,
+  const D3D12_RECT            *pRects
+);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;大変手間のかかることに、GPU_DESCRIPTOR_HANDLEとCPU_DESCRIPTOR_HANDLEを指定しなければなりません。当然ながらこれらにはクリア対象リソースの全部又は一部の領域を設定したUAVが正しく記述されている必要があります。
+また、このメソッドでクリアしなくてはならないリソースの99.99%は、いわゆる1DBufferで、2次元の概念を保持していませんが、クリアの範囲をRECTで指定する必要があります。また、クリアの際に書き込む値はUINT[4]となっています。
+初見では疑問しか沸かないこのAPIインターフェースについて少し考えてみたいと思います。&lt;/p&gt;
+&lt;h3 id=&#34;なんでuavが二つもいるの&#34;&gt;なんでUAVが二つもいるの？&lt;/h3&gt;
+&lt;p&gt;このメソッド最大の面倒な点は、CPU側のUAVとGPU側のUAV二つを用意しなくてはならないところです。ちなみにGPU側のDescriptorHeap(つまりShader Visible Descriptor Heap)にも有効なCPU_DESCRIPTOR_HANDLEはありますが、
+これをこのメソッドの引数で渡すことはできません。CPU側のDescriptorHeap(つまりShader VisibleではないDescriptor Heap)を用意してUAVを設定して、そのCPU_DESCRIPTOR_HANDLEを引数で渡す必要があります。&lt;/p&gt;
+&lt;p&gt;では、なぜこの二つのUAVが必要なのかというと、このクリア作業のコマンド構築をどのように行うかを考えると少しだけ理解できます。
+まず、GPUへのコマンド構築を、対象リソースのアドレス解決を含めて行う場合は、CPU側のDescriptor Heapに設定されたUAVを参照することで、キャッシュの効いた高速なメモリから情報を取得出来ます。
+一方で、GPU側にはUAVのアドレスとRECTのみを伝えるシンプルな形でのコマンド構築を行う場合は、GPU側から参照可能なUAVが必要となります。この二つのうちどちらが行われるかは、GPUの実装依存となります。&lt;/p&gt;
+&lt;p&gt;しかし、ClearRenderTargetView()やClearDepthStencilView()はGPU側のDescriptorを必要としませんが、クリア作業はGPU側で行われます。
+つまり、コマンド構築時にUAVに相当する情報をコマンドバッファに書き込んでいるわけです。ClearUnorderedAccessView*()も同様の作りで問題なかったのではないかと思います。&lt;/p&gt;
+&lt;h3 id=&#34;rectでクリア範囲を指定しかも4要素&#34;&gt;RECTでクリア範囲を指定？しかも4要素？&lt;/h3&gt;
+&lt;p&gt;UAV全域をクリアする場合は、RECTによる範囲指定は必要ありませんが、UAVの領域の一部をクリアする場合はRECTを指定する必要があります。RECTは(left, top, right, bottom)を指定する形式になっています。
+クリア対象はテクスチャでない場合が多いにも関わらず、RECT指定なのは、単純にClearRenderTargetView()やClearDepthStencilView()のAPIに引きずられたためと思われます。また、RECTの範囲は(left, top)
+で指定した位置は含みますが、(right, bottom)で指定した位置を含みません。&lt;br&gt;
+例えば、R32UINTの16Byte(つまりR32UINT x 4)のUAVがあるとします。このUAVの先頭8Byteをクリアする場合は、RECTの指定は、(0, 0, 2, 1)となります。また、後半の8Byteをクリアする場合は、(2, 0, 4, 1)となります。
+RGBA32UINTの64Byte(つまりRGBA32UINT x 4)のUAVの場合は、同じRECTでそれぞれ先頭32Byte、後半32Byteをクリアする事ができます。
+また、クリアに使われる値ですが、R32UINTのリソースにはValue[4]の先頭の要素(Value[0])が繰り返し書き込まれます。RGBA32UINTには、Value[4]の要素が全て書き込まれます。
+ほとんどのケースでゼロを書き込むと思いますが、思い通りの値でBufferを埋めたい場合はUAVのFormatとValue[4]に工夫が必要です。&lt;/p&gt;
+&lt;h3 id=&#34;一体いくつのrectを指定可能なのでしょうか&#34;&gt;一体いくつのRECTを指定可能なのでしょうか？&lt;/h3&gt;
+&lt;p&gt;さて、今回これを書こうかなと思った直接の原因についてです。このAPIではRECTの数に上限が無いので、理論上はUINTの上限の個数までRECTが指定可能となっています。しかし実際は、クリア対象のリソースがそこまで大きいものを作成できないでしょう。
+また、GPUへのコマンド構築時に何らかの形でRECTの情報を含めないといけませんが、UINTの上限はサイズ的に無理でしょう。今回私は256KByteのリソースにカウンタ記録用の16ByteのUAVを動的に確保するプログラムを作成し、
+必要に応じてUAVの提供と、ゼロクリアを行うプログラムを記述しました。1フレームに2000個ほどのカウンタが確保されてクリアが行われました。クリア用にリソース全域を指定したUAVを使ってRECTを2000個設定したところ、
+プログラムはこそでクラッシュしました。まぁ、2000は無理かと思いましたので、1023, 511, 255とコマンドを分割しましたがまだクラッシュします。127でクラッシュしなくなりました。私のシステムではこの値が上限値の様です。
+さて、私が今書いているプログラムでは一体いくつを上限にするべきなのでしょうか。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Projection Matrixについて</title>
@@ -100,10 +196,10 @@ $Z$は[-1, 1]あるいは[0,1]と決まっている。この座標系は、$X,Y$
 &lt;figure class=&#34;center&#34; id=&#34;figure-ndc&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/NDC_hu4fd7cebfd46de71214c033fa7c48caa4_34850_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;NDC&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/NDC_hu4fd7cebfd46de71214c033fa7c48caa4_34850_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;NDC&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/NDC_hu4fd7cebfd46de71214c033fa7c48caa4_34850_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;631&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/NDC_hu4fd7cebfd46de71214c033fa7c48caa4_34850_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;631&#34;&gt;
 &lt;/a&gt;
 
 
@@ -146,10 +242,10 @@ $Z$は[-1, 1]あるいは[0,1]と決まっている。この座標系は、$X,Y$
 &lt;figure class=&#34;center&#34; id=&#34;figure-viewport変換&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_XY_hua2bbf105df949899b049bc3dd40aae94_68866_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;Viewport変換&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_XY_hua2bbf105df949899b049bc3dd40aae94_68866_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;Viewport変換&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_XY_hua2bbf105df949899b049bc3dd40aae94_68866_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1207&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_XY_hua2bbf105df949899b049bc3dd40aae94_68866_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1207&#34;&gt;
 &lt;/a&gt;
 
 
@@ -191,10 +287,10 @@ OpenGLは、NDCのZの範囲を[-1, 1]としているときは、必ずViewport�
 &lt;figure class=&#34;center&#34; id=&#34;figure-viewport変換&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_Z_hu942a46d8dcfeda85742502a3e3fb79d7_19884_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;Viewport変換&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_Z_hu942a46d8dcfeda85742502a3e3fb79d7_19884_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;Viewport変換&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_Z_hu942a46d8dcfeda85742502a3e3fb79d7_19884_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;374&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_Z_hu942a46d8dcfeda85742502a3e3fb79d7_19884_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;374&#34;&gt;
 &lt;/a&gt;
 
 
@@ -288,10 +384,10 @@ $$&lt;/p&gt;
 &lt;figure class=&#34;center&#34; id=&#34;figure-視野角による係数の計算&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z1_hu67487b2524c3038e83bd1adbcfbe3e80_33075_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;視野角による係数の計算&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z1_hu67487b2524c3038e83bd1adbcfbe3e80_33075_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;視野角による係数の計算&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z1_hu67487b2524c3038e83bd1adbcfbe3e80_33075_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;808&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z1_hu67487b2524c3038e83bd1adbcfbe3e80_33075_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;808&#34;&gt;
 &lt;/a&gt;
 
 
@@ -338,10 +434,10 @@ $$&lt;/p&gt;
 &lt;figure class=&#34;center&#34; id=&#34;figure-視野角による係数の計算&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z2_huf5ee3975d2bdd72ab528fd0d389e5569_53727_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;視野角による係数の計算&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z2_huf5ee3975d2bdd72ab528fd0d389e5569_53727_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;視野角による係数の計算&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z2_huf5ee3975d2bdd72ab528fd0d389e5569_53727_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;992&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z2_huf5ee3975d2bdd72ab528fd0d389e5569_53727_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;992&#34;&gt;
 &lt;/a&gt;
 
 
@@ -388,10 +484,10 @@ $$
 &lt;figure class=&#34;center&#34; id=&#34;figure-視野のオフセットの計算&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z3_hu770a23a06793a884f7075f1eec4e4997_39058_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;視野のオフセットの計算&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z3_hu770a23a06793a884f7075f1eec4e4997_39058_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;視野のオフセットの計算&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z3_hu770a23a06793a884f7075f1eec4e4997_39058_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;893&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z3_hu770a23a06793a884f7075f1eec4e4997_39058_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;893&#34;&gt;
 &lt;/a&gt;
 
 
@@ -580,7 +676,8 @@ $$Y_{View1} = \frac{Y_{NDC} - d}{c} = tan(\frac{\phi}{2})Y_{NDC}$$&lt;/p&gt;
 また、今回は紹介しませんが、CUDA を使った処理もサポートされているので、必要に応じてこちらも使ってみると面白いかもしれません。&lt;/p&gt;
 &lt;h2 id=&#34;getting-started&#34;&gt;Getting Started&lt;/h2&gt;
 &lt;p&gt;早速ですが、環境をセットアップします。とはいっても、基本的には GitHub のリポジトリを Clone してビルドするだけです。&lt;br&gt;
-&lt;a href=&#34;https://github.com/nvidiagameworks/falcor&#34;&gt;https://github.com/nvidiagameworks/falcor&lt;/a&gt;&lt;/p&gt;
+
+&lt;a href=&#34;https://github.com/nvidiagameworks/falcor&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://github.com/nvidiagameworks/falcor&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;2020/11現在の推奨されるビルド環境は以下の通りです&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Windows 10 version 1809 or newer&lt;/li&gt;
@@ -655,10 +752,10 @@ $$Y_{View1} = \frac{Y_{NDC} - d}{c} = tan(\frac{\phi}{2})Y_{NDC}$$&lt;/p&gt;
 &lt;figure class=&#34;center&#34; id=&#34;figure-project-template&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ProjectTemplate_hu17968daff6882fcdd0a6eccf1134604b_25340_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Project Template&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ProjectTemplate_hu17968daff6882fcdd0a6eccf1134604b_25340_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;Project Template&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ProjectTemplate_hu17968daff6882fcdd0a6eccf1134604b_25340_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ProjectTemplate_hu17968daff6882fcdd0a6eccf1134604b_25340_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -705,10 +802,10 @@ D3D12Device はグローバル変数としてアクセス可能で、一通り�
 &lt;figure class=&#34;center&#34; id=&#34;figure-shadertoy&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ShaderToy_hu2b3746a333fae861e5f641d80618c199_316717_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ShaderToy&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ShaderToy_hu2b3746a333fae861e5f641d80618c199_316717_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;ShaderToy&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ShaderToy_hu2b3746a333fae861e5f641d80618c199_316717_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;759&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ShaderToy_hu2b3746a333fae861e5f641d80618c199_316717_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;759&#34;&gt;
 &lt;/a&gt;
 
 
@@ -762,10 +859,10 @@ Falcor のアセット読み込みのバックエンドは、
 &lt;figure class=&#34;center&#34; id=&#34;figure-modelviewer&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer01_hua46a1c90710a4eb0b2f7280e44c59e65_49694_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ModelViewer&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer01_hua46a1c90710a4eb0b2f7280e44c59e65_49694_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;ModelViewer&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer01_hua46a1c90710a4eb0b2f7280e44c59e65_49694_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer01_hua46a1c90710a4eb0b2f7280e44c59e65_49694_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -811,10 +908,10 @@ Falcor のアセット読み込みのバックエンドは、
 &lt;figure class=&#34;center&#34; id=&#34;figure-modelviewer-with-a-light&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer02_hu4af4f192b6c567b25173183ebc184c2f_101873_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ModelViewer with a light&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer02_hu4af4f192b6c567b25173183ebc184c2f_101873_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;ModelViewer with a light&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer02_hu4af4f192b6c567b25173183ebc184c2f_101873_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer02_hu4af4f192b6c567b25173183ebc184c2f_101873_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -854,10 +951,10 @@ Falcor のアセット読み込みのバックエンドは、
 &lt;figure class=&#34;center&#34; id=&#34;figure-modelviewer-fscene&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer03_hu0f84b7f164f683e83adc36f3959be573_2780056_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ModelViewer fscene&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer03_hu0f84b7f164f683e83adc36f3959be573_2780056_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;ModelViewer fscene&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer03_hu0f84b7f164f683e83adc36f3959be573_2780056_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer03_hu0f84b7f164f683e83adc36f3959be573_2780056_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -898,10 +995,10 @@ Falcor のアセット読み込みのバックエンドは、
 &lt;figure class=&#34;center&#34; id=&#34;figure-modelviewer-wire-frame&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer04_hucc614a67c5fbad2ebf671b0c2d57c68c_121887_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;ModelViewer wire frame&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer04_hucc614a67c5fbad2ebf671b0c2d57c68c_121887_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;ModelViewer wire frame&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer04_hucc614a67c5fbad2ebf671b0c2d57c68c_121887_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/ModelViewer04_hucc614a67c5fbad2ebf671b0c2d57c68c_121887_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -942,10 +1039,10 @@ Falcor のアセット読み込みのバックエンドは、
 &lt;figure class=&#34;center&#34; id=&#34;figure-hello-dxr-rtx-on&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR01_hu0dad088326deb0b53f9918ad0c5ed738_3254139_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Hello DXR (RTX ON)&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR01_hu0dad088326deb0b53f9918ad0c5ed738_3254139_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;Hello DXR (RTX ON)&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR01_hu0dad088326deb0b53f9918ad0c5ed738_3254139_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR01_hu0dad088326deb0b53f9918ad0c5ed738_3254139_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -984,10 +1081,10 @@ Falcor のアセット読み込みのバックエンドは、
 &lt;figure class=&#34;center&#34; id=&#34;figure-hello-dxr-rtx-off&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR02_hu3ace97392dbdea1ff721805c3675d6a4_2669467_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Hello DXR (RTX OFF)&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR02_hu3ace97392dbdea1ff721805c3675d6a4_2669467_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;Hello DXR (RTX OFF)&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR02_hu3ace97392dbdea1ff721805c3675d6a4_2669467_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/HelloDXR02_hu3ace97392dbdea1ff721805c3675d6a4_2669467_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -1061,10 +1158,10 @@ HUD上でRenderGraphを切り替えると、MinimalPathTracerにレンダリン�
 &lt;figure class=&#34;center&#34; id=&#34;figure-mogwai-render-graph&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai01_hucf237075bdd7b9e9afe14ce554f09d70_147063_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Mogwai Render Graph&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai01_hucf237075bdd7b9e9afe14ce554f09d70_147063_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;Mogwai Render Graph&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai01_hucf237075bdd7b9e9afe14ce554f09d70_147063_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai01_hucf237075bdd7b9e9afe14ce554f09d70_147063_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;1119&#34;&gt;
 &lt;/a&gt;
 
 
@@ -1106,10 +1203,10 @@ HUD上でRenderGraphを切り替えると、MinimalPathTracerにレンダリン�
 &lt;figure class=&#34;center&#34; id=&#34;figure-mogwai-render-graph&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai02_hu6c2dd509207f4d3927ccb0a42e7f7735_35792_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Mogwai Render Graph&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai02_hu6c2dd509207f4d3927ccb0a42e7f7735_35792_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;Mogwai Render Graph&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai02_hu6c2dd509207f4d3927ccb0a42e7f7735_35792_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;592&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/falcor_getting_started/Mogwai02_hu6c2dd509207f4d3927ccb0a42e7f7735_35792_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;592&#34;&gt;
 &lt;/a&gt;
 
 
@@ -1173,11 +1270,13 @@ DepthBuffer のフォーマットはクラス内部に保持されて、Guiに�
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;Importance Resampling for Global Illumination&lt;br&gt;
-&lt;a href=&#34;https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=1662&amp;amp;context=etd&#34;&gt;https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=1662&amp;amp;context=etd&lt;/a&gt;&lt;/p&gt;
+
+&lt;a href=&#34;https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=1662&amp;amp;context=etd&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=1662&amp;context=etd&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Rendering Millions of Dynamic Lights in Real-Time&lt;br&gt;
-&lt;a href=&#34;https://news.developer.nvidia.com/rendering-millions-of-dynamics-lights-in-realtime/&#34;&gt;https://news.developer.nvidia.com/rendering-millions-of-dynamics-lights-in-realtime/&lt;/a&gt;&lt;/p&gt;
+
+&lt;a href=&#34;https://news.developer.nvidia.com/rendering-millions-of-dynamics-lights-in-realtime/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://news.developer.nvidia.com/rendering-millions-of-dynamics-lights-in-realtime/&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;h1 id=&#34;resampled-importance-sampling&#34;&gt;Resampled Importance Sampling&lt;/h1&gt;
@@ -1217,10 +1316,10 @@ DepthBuffer のフォーマットはクラス内部に保持されて、Guiに�
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_01_huc2b7e299a054b0e62f25ef75ba296b6a_42113_2000x2000_fit_lanczos_2.PNG&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_01_huc2b7e299a054b0e62f25ef75ba296b6a_42113_2000x2000_fit_lanczos_3.PNG&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_01_huc2b7e299a054b0e62f25ef75ba296b6a_42113_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;603&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_01_huc2b7e299a054b0e62f25ef75ba296b6a_42113_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;603&#34;&gt;
 &lt;/a&gt;
 
 
@@ -1253,10 +1352,10 @@ DepthBuffer のフォーマットはクラス内部に保持されて、Guiに�
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_02_hu6161093dfe7af2499131def0ae96c035_41116_2000x2000_fit_lanczos_2.PNG&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_02_hu6161093dfe7af2499131def0ae96c035_41116_2000x2000_fit_lanczos_3.PNG&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_02_hu6161093dfe7af2499131def0ae96c035_41116_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;690&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_02_hu6161093dfe7af2499131def0ae96c035_41116_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;690&#34;&gt;
 &lt;/a&gt;
 
 
@@ -1289,10 +1388,10 @@ DepthBuffer のフォーマットはクラス内部に保持されて、Guiに�
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_03_hu2c51de8f2302371bf0bcff8fcc4d9e76_68621_2000x2000_fit_lanczos_2.PNG&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_03_hu2c51de8f2302371bf0bcff8fcc4d9e76_68621_2000x2000_fit_lanczos_3.PNG&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_03_hu2c51de8f2302371bf0bcff8fcc4d9e76_68621_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;862&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_03_hu2c51de8f2302371bf0bcff8fcc4d9e76_68621_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;862&#34;&gt;
 &lt;/a&gt;
 
 
@@ -1662,10 +1761,10 @@ CPUの実行コードは、デバッガがアタッチされている状況下�
 &lt;figure class=&#34;center&#34; id=&#34;figure-gpuとcpuの処理時間のずれ&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/GPUView_Framelatency_clipped_hu8d16dffa687010e8cb8fe6da31428ef9_85614_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;GPUとCPUの処理時間のずれ&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/GPUView_Framelatency_clipped_hu8d16dffa687010e8cb8fe6da31428ef9_85614_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;GPUとCPUの処理時間のずれ&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/GPUView_Framelatency_clipped_hu8d16dffa687010e8cb8fe6da31428ef9_85614_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;870&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/GPUView_Framelatency_clipped_hu8d16dffa687010e8cb8fe6da31428ef9_85614_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;870&#34;&gt;
 &lt;/a&gt;
 
 
@@ -1723,10 +1822,10 @@ DEVICE_REMOVEDが発生する前に出力されるDebug Layerのメッセージ�
 &lt;figure class=&#34;center&#34; id=&#34;figure-dxcplのインストール&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Graphics_tools_hud17edd7f0016c7970e8d79671c2245cb_50866_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;dxcplのインストール&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Graphics_tools_hud17edd7f0016c7970e8d79671c2245cb_50866_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;dxcplのインストール&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Graphics_tools_hud17edd7f0016c7970e8d79671c2245cb_50866_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;930&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Graphics_tools_hud17edd7f0016c7970e8d79671c2245cb_50866_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;930&#34;&gt;
 &lt;/a&gt;
 
 
@@ -1766,10 +1865,10 @@ DEVICE_REMOVEDが発生する前に出力されるDebug Layerのメッセージ�
 &lt;figure class=&#34;center&#34; id=&#34;figure-デバッグ対象アプリケーションを登録する&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Dxcpl_addname_hucbdb74109a3fd183c1975591731fc9c0_227302_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;デバッグ対象アプリケーションを登録する&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Dxcpl_addname_hucbdb74109a3fd183c1975591731fc9c0_227302_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;デバッグ対象アプリケーションを登録する&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Dxcpl_addname_hucbdb74109a3fd183c1975591731fc9c0_227302_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;902&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/Dxcpl_addname_hucbdb74109a3fd183c1975591731fc9c0_227302_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;902&#34;&gt;
 &lt;/a&gt;
 
 
@@ -1808,10 +1907,10 @@ DEVICE_REMOVEDが発生する前に出力されるDebug Layerのメッセージ�
 &lt;figure class=&#34;center&#34; id=&#34;figure-デバッグ対象アプリケーションを登録する&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/D3dConfg_hu66e5d0a7c318d4262e1366fb00f0e524_17980_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;デバッグ対象アプリケーションを登録する&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/D3dConfg_hu66e5d0a7c318d4262e1366fb00f0e524_17980_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;デバッグ対象アプリケーションを登録する&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/D3dConfg_hu66e5d0a7c318d4262e1366fb00f0e524_17980_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;466&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/D3dConfg_hu66e5d0a7c318d4262e1366fb00f0e524_17980_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;466&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2132,10 +2231,10 @@ windbg.exeはWindows10のSDKに同梱されている。通常は、&amp;ldquo;C:
 &lt;figure class=&#34;center&#34; id=&#34;figure-windbg上でdred12の情報を確認する&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/WinDbg_hu91d4c8ada4e4ee2168dbdfb94cdee135_75072_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;Windbg上で、DRED1.2の情報を確認する&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/WinDbg_hu91d4c8ada4e4ee2168dbdfb94cdee135_75072_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;Windbg上で、DRED1.2の情報を確認する&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/WinDbg_hu91d4c8ada4e4ee2168dbdfb94cdee135_75072_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1011&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/WinDbg_hu91d4c8ada4e4ee2168dbdfb94cdee135_75072_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1011&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2200,10 +2299,10 @@ Wave Intrinsicsは、Wave内のスレッド間に限定されますが、他の�
 &lt;figure class=&#34;center&#34; id=&#34;figure-waveとlane&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wave_hu550fc97d8560033e52f050ac0d549368_13159_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;WaveとLane&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wave_hu550fc97d8560033e52f050ac0d549368_13159_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;WaveとLane&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wave_hu550fc97d8560033e52f050ac0d549368_13159_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;441&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wave_hu550fc97d8560033e52f050ac0d549368_13159_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;441&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2250,10 +2349,10 @@ Pixel ShaderやCompute Shaderで必要とされるスレッド数が、Waveの�
 &lt;figure class=&#34;center&#34; id=&#34;figure-active-laneとinactive-lane&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/active_inactive_hu6f4caf7822c3e8aa1ace8fd32f3899a3_110070_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;Active LaneとInactive Lane&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/active_inactive_hu6f4caf7822c3e8aa1ace8fd32f3899a3_110070_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;Active LaneとInactive Lane&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/active_inactive_hu6f4caf7822c3e8aa1ace8fd32f3899a3_110070_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;965&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/active_inactive_hu6f4caf7822c3e8aa1ace8fd32f3899a3_110070_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;965&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2296,10 +2395,10 @@ Pixel Shaderにおけるddx/ddyなどのGradient命令や、テクスチャー�
 &lt;figure class=&#34;center&#34; id=&#34;figure-quadとhelper-lane&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;QuadとHelper Lane&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;QuadとHelper Lane&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2343,10 +2442,10 @@ NVIDIAのWarpは、伝統的に32 Lane/Waveです。対して、AMDのGCNアー�
 &lt;figure class=&#34;center&#34; id=&#34;figure-32-lanewaveと64-lanewave&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/32_64_lane_hu55f4de2178e3ca0a112fe7c34fbabb49_24264_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;32 Lane/Waveと64 Lane/Wave&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/32_64_lane_hu55f4de2178e3ca0a112fe7c34fbabb49_24264_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;32 Lane/Waveと64 Lane/Wave&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/32_64_lane_hu55f4de2178e3ca0a112fe7c34fbabb49_24264_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;630&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/32_64_lane_hu55f4de2178e3ca0a112fe7c34fbabb49_24264_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;630&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2392,10 +2491,10 @@ WaveのThread Group内でのマッピングは、Row Oriented　(X軸優先）�
 &lt;figure class=&#34;center&#34; id=&#34;figure-numthreadとwave&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/numthread_wave_hu87309c82afe6bdb07430f9b22f94f645_45303_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;numthreadとWave&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/numthread_wave_hu87309c82afe6bdb07430f9b22f94f645_45303_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;numthreadとWave&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/numthread_wave_hu87309c82afe6bdb07430f9b22f94f645_45303_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/numthread_wave_hu87309c82afe6bdb07430f9b22f94f645_45303_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2439,10 +2538,10 @@ Pixel Shaderでは、すべてのWave Intrinsicsの使用が許されていま�
 &lt;figure class=&#34;center&#34; id=&#34;figure-quadとhelper-lane&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;QuadとHelper Lane&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;QuadとHelper Lane&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2502,10 +2601,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetcount_hu017ff3431e51e38ea7691ac81e49e3c2_14763_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetcount_hu017ff3431e51e38ea7691ac81e49e3c2_14763_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetcount_hu017ff3431e51e38ea7691ac81e49e3c2_14763_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;382&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetcount_hu017ff3431e51e38ea7691ac81e49e3c2_14763_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;382&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2540,10 +2639,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetlaneindex_hue63fa13725fdb66d601d5d878c1d0ae3_26912_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetlaneindex_hue63fa13725fdb66d601d5d878c1d0ae3_26912_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetlaneindex_hue63fa13725fdb66d601d5d878c1d0ae3_26912_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;520&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetlaneindex_hue63fa13725fdb66d601d5d878c1d0ae3_26912_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;520&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2578,10 +2677,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveisfirstlane_huafbbbf3a8be6235948052771404a6e1b_51220_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveisfirstlane_huafbbbf3a8be6235948052771404a6e1b_51220_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveisfirstlane_huafbbbf3a8be6235948052771404a6e1b_51220_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;571&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveisfirstlane_huafbbbf3a8be6235948052771404a6e1b_51220_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;571&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2618,10 +2717,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveanytrue_hue78662cc8f443afcaa688bcef7c43ea2_59746_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveanytrue_hue78662cc8f443afcaa688bcef7c43ea2_59746_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveanytrue_hue78662cc8f443afcaa688bcef7c43ea2_59746_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;697&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveanytrue_hue78662cc8f443afcaa688bcef7c43ea2_59746_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;697&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2656,10 +2755,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivealltrue_hu3ee6171c79406bc5f05b75ba065dfffc_59680_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivealltrue_hu3ee6171c79406bc5f05b75ba065dfffc_59680_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivealltrue_hu3ee6171c79406bc5f05b75ba065dfffc_59680_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;708&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivealltrue_hu3ee6171c79406bc5f05b75ba065dfffc_59680_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;708&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2694,10 +2793,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveballot_hu441b454dd67f6c112671144c7a7d1adc_61292_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveballot_hu441b454dd67f6c112671144c7a7d1adc_61292_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveballot_hu441b454dd67f6c112671144c7a7d1adc_61292_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;769&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveballot_hu441b454dd67f6c112671144c7a7d1adc_61292_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;769&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2735,10 +2834,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlaneat_hu2ce763e09dbd4548c9ca84ea0f16840b_96939_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlaneat_hu2ce763e09dbd4548c9ca84ea0f16840b_96939_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlaneat_hu2ce763e09dbd4548c9ca84ea0f16840b_96939_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1120&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlaneat_hu2ce763e09dbd4548c9ca84ea0f16840b_96939_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1120&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2773,10 +2872,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlanefirst_hu6d9eb6b7bdb5af52098e10c274550961_77137_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlanefirst_hu6d9eb6b7bdb5af52098e10c274550961_77137_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlanefirst_hu6d9eb6b7bdb5af52098e10c274550961_77137_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;930&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlanefirst_hu6d9eb6b7bdb5af52098e10c274550961_77137_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;930&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2813,10 +2912,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveallequal_hub0d81e969a1494ea62407696e116d131_41919_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveallequal_hub0d81e969a1494ea62407696e116d131_41919_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveallequal_hub0d81e969a1494ea62407696e116d131_41919_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;886&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveallequal_hub0d81e969a1494ea62407696e116d131_41919_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;886&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2855,10 +2954,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivebitop_hu8c00d785c0bd006675ed4159e86102d6_54165_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivebitop_hu8c00d785c0bd006675ed4159e86102d6_54165_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivebitop_hu8c00d785c0bd006675ed4159e86102d6_54165_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1045&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivebitop_hu8c00d785c0bd006675ed4159e86102d6_54165_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1045&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2893,10 +2992,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivecountbits_hu45ba85d97c3b69abe8f3e4ff68f45109_54517_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivecountbits_hu45ba85d97c3b69abe8f3e4ff68f45109_54517_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivecountbits_hu45ba85d97c3b69abe8f3e4ff68f45109_54517_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;756&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivecountbits_hu45ba85d97c3b69abe8f3e4ff68f45109_54517_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;756&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2939,10 +3038,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveminmaxop_huc07e0fb502a11709116c047263e24c8f_56203_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveminmaxop_huc07e0fb502a11709116c047263e24c8f_56203_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveminmaxop_huc07e0fb502a11709116c047263e24c8f_56203_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1097&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveminmaxop_huc07e0fb502a11709116c047263e24c8f_56203_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1097&#34;&gt;
 &lt;/a&gt;
 
 
@@ -2986,10 +3085,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveprefixop_hu36665e6520788b3009382913080bbf2c_71179_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveprefixop_hu36665e6520788b3009382913080bbf2c_71179_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveprefixop_hu36665e6520788b3009382913080bbf2c_71179_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;742&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveprefixop_hu36665e6520788b3009382913080bbf2c_71179_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;742&#34;&gt;
 &lt;/a&gt;
 
 
@@ -3039,10 +3138,10 @@ Pixel ShaderにおけるQuad内のローカルのLane Indexは、下図に示し
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavequadop_hudda5976e667c4f4ea513984d01905e77_110927_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavequadop_hudda5976e667c4f4ea513984d01905e77_110927_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavequadop_hudda5976e667c4f4ea513984d01905e77_110927_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;916&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavequadop_hudda5976e667c4f4ea513984d01905e77_110927_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;916&#34;&gt;
 &lt;/a&gt;
 
 
@@ -3080,10 +3179,10 @@ Pixel ShaderにおけるQuad内のローカルのLane Indexは、下図に示し
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavematch_hu0c1f58aae92c4965302c5d4274ad6622_58909_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavematch_hu0c1f58aae92c4965302c5d4274ad6622_58909_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavematch_hu0c1f58aae92c4965302c5d4274ad6622_58909_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;707&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavematch_hu0c1f58aae92c4965302c5d4274ad6622_58909_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;707&#34;&gt;
 &lt;/a&gt;
 
 
@@ -3123,10 +3222,10 @@ Waveのサイズを超えるBitやInactive Laneのビットは無視されます
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavemultiprefixsum_hue9d268744f4c6ffd484f30d798dfb5fc_135719_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavemultiprefixsum_hue9d268744f4c6ffd484f30d798dfb5fc_135719_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavemultiprefixsum_hue9d268744f4c6ffd484f30d798dfb5fc_135719_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1182&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavemultiprefixsum_hue9d268744f4c6ffd484f30d798dfb5fc_135719_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1182&#34;&gt;
 &lt;/a&gt;
 
 
@@ -3199,7 +3298,8 @@ Error: Error building site: TOCSS: failed to transform &amp;quot;main_parsed.scs
 &lt;p&gt;ここで先人の知恵をお借りします&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Hugo + Academic テーマを使ったブログの作り方
-&lt;a href=&#34;https://qiita.com/harumaxy/items/58e7e4273c61e7e260b3&#34;&gt;https://qiita.com/harumaxy/items/58e7e4273c61e7e260b3&lt;/a&gt;&lt;/p&gt;
+
+&lt;a href=&#34;https://qiita.com/harumaxy/items/58e7e4273c61e7e260b3&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://qiita.com/harumaxy/items/58e7e4273c61e7e260b3&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;/config/_default/フォルダに格納されている以下のtomlファイルを編集していきます。&lt;/p&gt;
 &lt;ul&gt;
@@ -3296,10 +3396,10 @@ publishしたべージのコンテンツのみを公開状態にする必要が�
 &lt;figure class=&#34;center&#34; id=&#34;figure-vsyncoff_mtoff_60&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_60_hu33bc11a1f895fdcc3ac8673383111945_278989_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncoff_mtoff_60&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_60_hu33bc11a1f895fdcc3ac8673383111945_278989_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;vsyncoff_mtoff_60&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_60_hu33bc11a1f895fdcc3ac8673383111945_278989_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1435&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_60_hu33bc11a1f895fdcc3ac8673383111945_278989_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1435&#34;&gt;
 &lt;/a&gt;
 
 
@@ -3341,10 +3441,10 @@ publishしたべージのコンテンツのみを公開状態にする必要が�
 &lt;figure class=&#34;center&#34; id=&#34;figure-vsyncoff_mton_60&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_60_hu1169490fbcbadeadc14156a6fb3266a4_276171_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncoff_mton_60&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_60_hu1169490fbcbadeadc14156a6fb3266a4_276171_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;vsyncoff_mton_60&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_60_hu1169490fbcbadeadc14156a6fb3266a4_276171_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1640&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_60_hu1169490fbcbadeadc14156a6fb3266a4_276171_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1640&#34;&gt;
 &lt;/a&gt;
 
 
@@ -3385,10 +3485,10 @@ publishしたべージのコンテンツのみを公開状態にする必要が�
 &lt;figure class=&#34;center&#34; id=&#34;figure-vsyncoff_mtoff_120&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_120_hu577993647c8741ecb07125375c0cb93a_249296_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncoff_mtoff_120&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_120_hu577993647c8741ecb07125375c0cb93a_249296_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;vsyncoff_mtoff_120&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_120_hu577993647c8741ecb07125375c0cb93a_249296_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1071&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mtoff_120_hu577993647c8741ecb07125375c0cb93a_249296_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1071&#34;&gt;
 &lt;/a&gt;
 
 
@@ -3430,10 +3530,10 @@ publishしたべージのコンテンツのみを公開状態にする必要が�
 &lt;figure class=&#34;center&#34; id=&#34;figure-vsyncoff_mton_120&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_120_hucb7e813ec08e0a34392eae9da6d7a916_251387_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncoff_mton_120&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_120_hucb7e813ec08e0a34392eae9da6d7a916_251387_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;vsyncoff_mton_120&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_120_hucb7e813ec08e0a34392eae9da6d7a916_251387_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1018&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncoff_mton_120_hucb7e813ec08e0a34392eae9da6d7a916_251387_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1018&#34;&gt;
 &lt;/a&gt;
 
 
@@ -3475,10 +3575,10 @@ publishしたべージのコンテンツのみを公開状態にする必要が�
 &lt;figure class=&#34;center&#34; id=&#34;figure-vsyncon_mtoff_60&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncon_mtoff_60_hu1e8bb69aa4e2d9153699b0a96e4ee908_517763_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;vsyncon_mtoff_60&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncon_mtoff_60_hu1e8bb69aa4e2d9153699b0a96e4ee908_517763_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;vsyncon_mtoff_60&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncon_mtoff_60_hu1e8bb69aa4e2d9153699b0a96e4ee908_517763_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1619&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/check_input_latency_of_fortnite/vsyncon_mtoff_60_hu1e8bb69aa4e2d9153699b0a96e4ee908_517763_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1619&#34;&gt;
 &lt;/a&gt;
 
 

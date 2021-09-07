@@ -1,0 +1,1039 @@
+<!DOCTYPE html><html lang="en-us" >
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.8.0">
+
+  
+
+  
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="shikihuiku">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="Bufferに対して使うときに苦労したのでメモ">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://shikihuiku.github.io/memo/clearunorderedaccessview/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha256-FMvZuGapsJLjouA6k7Eo2lusoAX9i0ShlWFG6qt7SLc=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin="anonymous">
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.min.3934cd053659c69f72130ea239611b5f.css">
+
+  
+
+
+
+
+  
+
+
+  
+  
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu127225d7ed9c50974404790b7c221374_401884_32x32_fill_lanczos_center_3.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu127225d7ed9c50974404790b7c221374_401884_192x192_fill_lanczos_center_3.png">
+
+  <link rel="canonical" href="https://shikihuiku.github.io/memo/clearunorderedaccessview/">
+
+  
+  
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="shikihuiku – 色不異空 – Real-time rendering topics in Japanese.">
+  <meta property="og:url" content="https://shikihuiku.github.io/memo/clearunorderedaccessview/">
+  <meta property="og:title" content="ClearUnorderedAccessViewの使い方 | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.">
+  <meta property="og:description" content="Bufferに対して使うときに苦労したのでメモ"><meta property="og:image" content="https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png">
+  <meta property="twitter:image" content="https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2021-09-07T21:48:09&#43;09:00">
+    
+    <meta property="article:modified_time" content="2021-09-07T21:48:09&#43;09:00">
+  
+
+  
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>ClearUnorderedAccessViewの使い方 | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
+
+</head>
+
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" class=" ">
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search" class="form-control">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-end" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+            
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="https://shikihuiku.wordpress.com/" target="_blank" rel="noopener"><span>Old Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>About</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link  active" href="/memo"><span>ちらしの裏</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#" aria-label="Search"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item dropdown theme-dropdown">
+        <a href="#" class="nav-link js-theme-selector" data-toggle="dropdown" aria-haspopup="true">
+          <i class="fas fa-palette" aria-hidden="true"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item js-set-theme-light">
+            <span>Light</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-dark">
+            <span>Dark</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-auto">
+            <span>Automatic</span>
+          </a>
+        </div>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>ClearUnorderedAccessViewの使い方</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    2021/09/07
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" >
+
+
+  <a data-fancybox="" href="/memo/clearunorderedaccessview/Title_hu3abdfca4b9a62c4bb7e1e50724b1ec47_35598_2000x2000_fit_lanczos_3.PNG" >
+
+
+  <img data-src="/memo/clearunorderedaccessview/Title_hu3abdfca4b9a62c4bb7e1e50724b1ec47_35598_2000x2000_fit_lanczos_3.PNG" class="lazyload" alt="" width="60%" height="338">
+</a>
+
+
+
+</figure>
+
+<h3 id="参考資料">参考資料</h3>
+<ul>
+<li>
+<p>ID3D12GraphicsCommandList::ClearUnorderedAccessViewUint method (d3d12.h)<br>
+
+<a href="https://docs.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist-clearunorderedaccessviewuint" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist-clearunorderedaccessviewuint</a></p>
+</li>
+<li>
+<p>ID3D12GraphicsCommandList::ClearUnorderedAccessViewFloat method (d3d12.h)<br>
+
+<a href="https://docs.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist-clearunorderedaccessviewfloat" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist-clearunorderedaccessviewfloat</a></p>
+</li>
+</ul>
+<h1 id="なにをするためのものか">なにをするためのものか</h1>
+<p>Texture(RenderTarget)のクリアはRTVを通じて、ClearRenderTargetView()を使う方が効率的です。DepthBufferはDSVを通じてClearDepthStencilView()でクリアする事が強く推奨されます。
+では、ClearUnorderedAccessView*メソッドが使われる場合ですが、一般的にはCreateCommittedResource()やCreatePlacedResource()で作成したBuffer(VertexBufferやIndexBuffer、またUAVを通じてアクセスする汎用的なBuffer)をクリアするためのメソッドです。</p>
+<h1 id="syntax">Syntax</h1>
+<p>APIインターフェースは以下の様になっています。</p>
+<pre><code>void ClearUnorderedAccessViewUint(
+  D3D12_GPU_DESCRIPTOR_HANDLE ViewGPUHandleInCurrentHeap,
+  D3D12_CPU_DESCRIPTOR_HANDLE ViewCPUHandle,
+  ID3D12Resource              *pResource,
+  const UINT [4]              Values,
+  UINT                        NumRects,
+  const D3D12_RECT            *pRects
+);
+</code></pre>
+<p>大変手間のかかることに、GPU_DESCRIPTOR_HANDLEとCPU_DESCRIPTOR_HANDLEを指定しなければなりません。当然ながらこれらにはクリア対象リソースの全部又は一部の領域を設定したUAVが正しく記述されている必要があります。
+また、このメソッドでクリアしなくてはならないリソースの99.99%は、いわゆる1DBufferで、2次元の概念を保持していませんが、クリアの範囲をRECTで指定する必要があります。また、クリアの際に書き込む値はUINT[4]となっています。
+初見では疑問しか沸かないこのAPIインターフェースについて少し考えてみたいと思います。</p>
+<h3 id="なんでuavが二つもいるの">なんでUAVが二つもいるの？</h3>
+<p>このメソッド最大の面倒な点は、CPU側のUAVとGPU側のUAV二つを用意しなくてはならないところです。ちなみにGPU側のDescriptorHeap(つまりShader Visible Descriptor Heap)にも有効なCPU_DESCRIPTOR_HANDLEはありますが、
+これをこのメソッドの引数で渡すことはできません。CPU側のDescriptorHeap(つまりShader VisibleではないDescriptor Heap)を用意してUAVを設定して、そのCPU_DESCRIPTOR_HANDLEを引数で渡す必要があります。</p>
+<p>では、なぜこの二つのUAVが必要なのかというと、このクリア作業のコマンド構築をどのように行うかを考えると少しだけ理解できます。
+まず、GPUへのコマンド構築を、対象リソースのアドレス解決を含めて行う場合は、CPU側のDescriptor Heapに設定されたUAVを参照することで、キャッシュの効いた高速なメモリから情報を取得出来ます。
+一方で、GPU側にはUAVのアドレスとRECTのみを伝えるシンプルな形でのコマンド構築を行う場合は、GPU側から参照可能なUAVが必要となります。この二つのうちどちらが行われるかは、GPUの実装依存となります。</p>
+<p>しかし、ClearRenderTargetView()やClearDepthStencilView()はGPU側のDescriptorを必要としませんが、クリア作業はGPU側で行われます。
+つまり、コマンド構築時にUAVに相当する情報をコマンドバッファに書き込んでいるわけです。ClearUnorderedAccessView*()も同様の作りで問題なかったのではないかと思います。</p>
+<h3 id="rectでクリア範囲を指定しかも4要素">RECTでクリア範囲を指定？しかも4要素？</h3>
+<p>UAV全域をクリアする場合は、RECTによる範囲指定は必要ありませんが、UAVの領域の一部をクリアする場合はRECTを指定する必要があります。RECTは(left, top, right, bottom)を指定する形式になっています。
+クリア対象はテクスチャでない場合が多いにも関わらず、RECT指定なのは、単純にClearRenderTargetView()やClearDepthStencilView()のAPIに引きずられたためと思われます。また、RECTの範囲は(left, top)
+で指定した位置は含みますが、(right, bottom)で指定した位置を含みません。<br>
+例えば、R32UINTの16Byte(つまりR32UINT x 4)のUAVがあるとします。このUAVの先頭8Byteをクリアする場合は、RECTの指定は、(0, 0, 2, 1)となります。また、後半の8Byteをクリアする場合は、(2, 0, 4, 1)となります。
+RGBA32UINTの64Byte(つまりRGBA32UINT x 4)のUAVの場合は、同じRECTでそれぞれ先頭32Byte、後半32Byteをクリアする事ができます。
+また、クリアに使われる値ですが、R32UINTのリソースにはValue[4]の先頭の要素(Value[0])が繰り返し書き込まれます。RGBA32UINTには、Value[4]の要素が全て書き込まれます。
+ほとんどのケースでゼロを書き込むと思いますが、思い通りの値でBufferを埋めたい場合はUAVのFormatとValue[4]に工夫が必要です。</p>
+<h3 id="一体いくつのrectを指定可能なのでしょうか">一体いくつのRECTを指定可能なのでしょうか？</h3>
+<p>さて、今回これを書こうかなと思った直接の原因についてです。このAPIではRECTの数に上限が無いので、理論上はUINTの上限の個数までRECTが指定可能となっています。しかし実際は、クリア対象のリソースがそこまで大きいものを作成できないでしょう。
+また、GPUへのコマンド構築時に何らかの形でRECTの情報を含めないといけませんが、UINTの上限はサイズ的に無理でしょう。今回私は256KByteのリソースにカウンタ記録用の16ByteのUAVを動的に確保するプログラムを作成し、
+必要に応じてUAVの提供と、ゼロクリアを行うプログラムを記述しました。1フレームに2000個ほどのカウンタが確保されてクリアが行われました。クリア用にリソース全域を指定したUAVを使ってRECTを2000個設定したところ、
+プログラムはこそでクラッシュしました。まぁ、2000は無理かと思いましたので、1023, 511, 255とコマンドを分割しましたがまだクラッシュします。127でクラッシュしなくなりました。私のシステムではこの値が上限値の様です。
+さて、私が今書いているプログラムでは一体いくつを上限にするべきなのでしょうか。</p>
+
+    </div>
+
+    
+
+
+
+
+
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=https://shikihuiku.github.io/memo/clearunorderedaccessview/&amp;text=ClearUnorderedAccessView%e3%81%ae%e4%bd%bf%e3%81%84%e6%96%b9" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=https://shikihuiku.github.io/memo/clearunorderedaccessview/&amp;t=ClearUnorderedAccessView%e3%81%ae%e4%bd%bf%e3%81%84%e6%96%b9" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=ClearUnorderedAccessView%e3%81%ae%e4%bd%bf%e3%81%84%e6%96%b9&amp;body=https://shikihuiku.github.io/memo/clearunorderedaccessview/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=https://shikihuiku.github.io/memo/clearunorderedaccessview/&amp;title=ClearUnorderedAccessView%e3%81%ae%e4%bd%bf%e3%81%84%e6%96%b9" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="whatsapp://send?text=ClearUnorderedAccessView%e3%81%ae%e4%bd%bf%e3%81%84%e6%96%b9%20https://shikihuiku.github.io/memo/clearunorderedaccessview/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=https://shikihuiku.github.io/memo/clearunorderedaccessview/&amp;title=ClearUnorderedAccessView%e3%81%ae%e4%bd%bf%e3%81%84%e6%96%b9" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  
+    
+    
+    
+      
+    
+    
+    
+    <div class="media author-card content-widget-hr">
+      
+        
+        <img class="avatar mr-3 avatar-circle" src="/author/shikihuiku/avatar_hu83bef21d3d3e76bee62dd138e5083bbc_32201_270x270_fill_q90_lanczos_center.jpg" alt="shikihuiku">
+      
+
+      <div class="media-body">
+        <h5 class="card-title"><a href="https://shikihuiku.github.io/">shikihuiku</a></h5>
+        
+        <p class="card-text">リアルタイムレンダリングが好き</p>
+        <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/shikihuiku" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/shikihuiku" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+</ul>
+
+      </div>
+    </div>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js" integrity="sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/highlight.min.js" integrity="sha512-7t8APmYpzEsZP7CYoA7RfMPV9Bb+PJHa9x2WiUnDXZx3XHveuyWUtvNOexhkierl5flZ3tr92dP1mMS+SGlD+A==" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js" integrity="sha256-EErZamuLefUnbMBQbsEqu1USa+btR2oIlCpBJbyD4/g=" crossorigin="anonymous"></script>
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    <script>const isSiteThemeDark = false;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks",
+        'slides' : "Slides"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.72756512af279b10e3e4b09540ed6e9f.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    
+  </p>
+
+  
+  
+
+
+
+
+
+
+  <p class="powered-by">
+    
+    Published with
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic Website Builder</a>
+    
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

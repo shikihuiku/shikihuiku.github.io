@@ -7,7 +7,7 @@
     <description>OpenGL</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sun, 27 Dec 2020 00:09:34 +0900</lastBuildDate>
     <image>
-      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png</url>
+      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png</url>
       <title>OpenGL</title>
       <link>https://shikihuiku.github.io/tag/opengl/</link>
     </image>
@@ -100,10 +100,10 @@ $Z$は[-1, 1]あるいは[0,1]と決まっている。この座標系は、$X,Y$
 &lt;figure class=&#34;center&#34; id=&#34;figure-ndc&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/NDC_hu4fd7cebfd46de71214c033fa7c48caa4_34850_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;NDC&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/NDC_hu4fd7cebfd46de71214c033fa7c48caa4_34850_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;NDC&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/NDC_hu4fd7cebfd46de71214c033fa7c48caa4_34850_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;631&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/NDC_hu4fd7cebfd46de71214c033fa7c48caa4_34850_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;631&#34;&gt;
 &lt;/a&gt;
 
 
@@ -146,10 +146,10 @@ $Z$は[-1, 1]あるいは[0,1]と決まっている。この座標系は、$X,Y$
 &lt;figure class=&#34;center&#34; id=&#34;figure-viewport変換&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_XY_hua2bbf105df949899b049bc3dd40aae94_68866_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;Viewport変換&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_XY_hua2bbf105df949899b049bc3dd40aae94_68866_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;Viewport変換&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_XY_hua2bbf105df949899b049bc3dd40aae94_68866_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1207&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_XY_hua2bbf105df949899b049bc3dd40aae94_68866_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;1207&#34;&gt;
 &lt;/a&gt;
 
 
@@ -191,10 +191,10 @@ OpenGLは、NDCのZの範囲を[-1, 1]としているときは、必ずViewport�
 &lt;figure class=&#34;center&#34; id=&#34;figure-viewport変換&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_Z_hu942a46d8dcfeda85742502a3e3fb79d7_19884_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;Viewport変換&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_Z_hu942a46d8dcfeda85742502a3e3fb79d7_19884_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;Viewport変換&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_Z_hu942a46d8dcfeda85742502a3e3fb79d7_19884_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;374&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Viewport_Transform_Z_hu942a46d8dcfeda85742502a3e3fb79d7_19884_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;70%&#34; height=&#34;374&#34;&gt;
 &lt;/a&gt;
 
 
@@ -288,10 +288,10 @@ $$&lt;/p&gt;
 &lt;figure class=&#34;center&#34; id=&#34;figure-視野角による係数の計算&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z1_hu67487b2524c3038e83bd1adbcfbe3e80_33075_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;視野角による係数の計算&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z1_hu67487b2524c3038e83bd1adbcfbe3e80_33075_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;視野角による係数の計算&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z1_hu67487b2524c3038e83bd1adbcfbe3e80_33075_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;808&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z1_hu67487b2524c3038e83bd1adbcfbe3e80_33075_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;808&#34;&gt;
 &lt;/a&gt;
 
 
@@ -338,10 +338,10 @@ $$&lt;/p&gt;
 &lt;figure class=&#34;center&#34; id=&#34;figure-視野角による係数の計算&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z2_huf5ee3975d2bdd72ab528fd0d389e5569_53727_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;視野角による係数の計算&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z2_huf5ee3975d2bdd72ab528fd0d389e5569_53727_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;視野角による係数の計算&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z2_huf5ee3975d2bdd72ab528fd0d389e5569_53727_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;992&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z2_huf5ee3975d2bdd72ab528fd0d389e5569_53727_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;992&#34;&gt;
 &lt;/a&gt;
 
 
@@ -388,10 +388,10 @@ $$
 &lt;figure class=&#34;center&#34; id=&#34;figure-視野のオフセットの計算&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z3_hu770a23a06793a884f7075f1eec4e4997_39058_2000x2000_fit_lanczos_2.PNG&#34; data-caption=&#34;視野のオフセットの計算&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z3_hu770a23a06793a884f7075f1eec4e4997_39058_2000x2000_fit_lanczos_3.PNG&#34; data-caption=&#34;視野のオフセットの計算&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z3_hu770a23a06793a884f7075f1eec4e4997_39058_2000x2000_fit_lanczos_2.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;893&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/projection_matrix/Perspective_Z3_hu770a23a06793a884f7075f1eec4e4997_39058_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;893&#34;&gt;
 &lt;/a&gt;
 
 

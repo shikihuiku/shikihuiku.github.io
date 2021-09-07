@@ -1,159 +1,98 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
   <url>
+    <loc>https://shikihuiku.github.io/memo/clearunorderedaccessview/</loc>
+    <lastmod>2021-09-07T21:48:09+09:00</lastmod>
+  </url><url>
+    <loc>https://shikihuiku.github.io/memo/</loc>
+    <lastmod>2021-09-07T21:48:09+09:00</lastmod>
+  </url><url>
+    <loc>https://shikihuiku.github.io/</loc>
+    <lastmod>2021-09-07T21:48:09+09:00</lastmod>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/direct3d/</loc>
     <lastmod>2020-12-27T00:09:34+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/opengl/</loc>
     <lastmod>2020-12-27T00:09:34+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/post/</loc>
     <lastmod>2020-12-27T00:09:34+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/post/projection_matrix/</loc>
     <lastmod>2020-12-27T00:09:34+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://shikihuiku.github.io/</loc>
-    <lastmod>2020-12-27T00:09:34+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tags/</loc>
     <lastmod>2020-12-27T00:09:34+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/vulkan/</loc>
     <lastmod>2020-12-27T00:09:34+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/dx12/</loc>
     <lastmod>2020-11-08T11:12:51+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/post/falcor_getting_started/</loc>
     <lastmod>2020-11-08T11:12:51+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/memo/restir/</loc>
     <lastmod>2020-09-11T11:59:35+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://shikihuiku.github.io/memo/</loc>
-    <lastmod>2020-09-11T11:59:35+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/debug-layer/</loc>
     <lastmod>2020-09-04T18:00:00+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/post/cedec2020_prescriptions_for_deviceremoval/</loc>
     <lastmod>2020-09-04T18:00:00+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/dred/</loc>
     <lastmod>2020-09-04T18:00:00+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/gbv/</loc>
     <lastmod>2020-09-04T18:00:00+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/d3d12/</loc>
     <lastmod>2020-08-16T20:00:32+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/post/wave_intrinsics1/</loc>
     <lastmod>2020-08-16T20:00:32+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/waveintrinsics/</loc>
     <lastmod>2020-08-16T20:00:32+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/academic/</loc>
     <lastmod>2020-07-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/hugo/</loc>
     <lastmod>2020-07-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/post/hello_hugo_and_academic/</loc>
     <lastmod>2020-07-23T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/dx11/</loc>
     <lastmod>2020-06-16T01:33:02+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/fortnite/</loc>
     <lastmod>2020-06-16T01:33:02+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/gpuview/</loc>
     <lastmod>2020-06-16T01:33:02+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/tag/ue4/</loc>
     <lastmod>2020-06-16T01:33:02+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/post/check_input_latency_of_fortnite/</loc>
     <lastmod>2020-06-16T01:33:02+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/authors/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/categories/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/publication_types/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/publication/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/talk/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://shikihuiku.github.io/author/shikihuiku/</loc>
   </url>
-  
 </urlset>

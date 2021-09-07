@@ -7,7 +7,7 @@
     <description>WaveIntrinsics</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sun, 16 Aug 2020 20:00:32 +0900</lastBuildDate>
     <image>
-      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_2.png</url>
+      <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png</url>
       <title>WaveIntrinsics</title>
       <link>https://shikihuiku.github.io/tag/waveintrinsics/</link>
     </image>
@@ -59,10 +59,10 @@ Wave Intrinsicsは、Wave内のスレッド間に限定されますが、他の�
 &lt;figure class=&#34;center&#34; id=&#34;figure-waveとlane&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wave_hu550fc97d8560033e52f050ac0d549368_13159_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;WaveとLane&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wave_hu550fc97d8560033e52f050ac0d549368_13159_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;WaveとLane&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wave_hu550fc97d8560033e52f050ac0d549368_13159_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;441&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wave_hu550fc97d8560033e52f050ac0d549368_13159_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;441&#34;&gt;
 &lt;/a&gt;
 
 
@@ -109,10 +109,10 @@ Pixel ShaderやCompute Shaderで必要とされるスレッド数が、Waveの�
 &lt;figure class=&#34;center&#34; id=&#34;figure-active-laneとinactive-lane&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/active_inactive_hu6f4caf7822c3e8aa1ace8fd32f3899a3_110070_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;Active LaneとInactive Lane&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/active_inactive_hu6f4caf7822c3e8aa1ace8fd32f3899a3_110070_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;Active LaneとInactive Lane&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/active_inactive_hu6f4caf7822c3e8aa1ace8fd32f3899a3_110070_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;965&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/active_inactive_hu6f4caf7822c3e8aa1ace8fd32f3899a3_110070_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;965&#34;&gt;
 &lt;/a&gt;
 
 
@@ -155,10 +155,10 @@ Pixel Shaderにおけるddx/ddyなどのGradient命令や、テクスチャー�
 &lt;figure class=&#34;center&#34; id=&#34;figure-quadとhelper-lane&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;QuadとHelper Lane&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;QuadとHelper Lane&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
 &lt;/a&gt;
 
 
@@ -202,10 +202,10 @@ NVIDIAのWarpは、伝統的に32 Lane/Waveです。対して、AMDのGCNアー�
 &lt;figure class=&#34;center&#34; id=&#34;figure-32-lanewaveと64-lanewave&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/32_64_lane_hu55f4de2178e3ca0a112fe7c34fbabb49_24264_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;32 Lane/Waveと64 Lane/Wave&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/32_64_lane_hu55f4de2178e3ca0a112fe7c34fbabb49_24264_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;32 Lane/Waveと64 Lane/Wave&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/32_64_lane_hu55f4de2178e3ca0a112fe7c34fbabb49_24264_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;630&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/32_64_lane_hu55f4de2178e3ca0a112fe7c34fbabb49_24264_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;630&#34;&gt;
 &lt;/a&gt;
 
 
@@ -251,10 +251,10 @@ WaveのThread Group内でのマッピングは、Row Oriented　(X軸優先）�
 &lt;figure class=&#34;center&#34; id=&#34;figure-numthreadとwave&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/numthread_wave_hu87309c82afe6bdb07430f9b22f94f645_45303_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;numthreadとWave&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/numthread_wave_hu87309c82afe6bdb07430f9b22f94f645_45303_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;numthreadとWave&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/numthread_wave_hu87309c82afe6bdb07430f9b22f94f645_45303_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/numthread_wave_hu87309c82afe6bdb07430f9b22f94f645_45303_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
 &lt;/a&gt;
 
 
@@ -298,10 +298,10 @@ Pixel Shaderでは、すべてのWave Intrinsicsの使用が許されていま�
 &lt;figure class=&#34;center&#34; id=&#34;figure-quadとhelper-lane&#34;&gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_2.png&#34; data-caption=&#34;QuadとHelper Lane&#34;&gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;QuadとHelper Lane&#34;&gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/quad_helper_hu842ae506986670f32043d947253c500c_93104_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;755&#34;&gt;
 &lt;/a&gt;
 
 
@@ -361,10 +361,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetcount_hu017ff3431e51e38ea7691ac81e49e3c2_14763_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetcount_hu017ff3431e51e38ea7691ac81e49e3c2_14763_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetcount_hu017ff3431e51e38ea7691ac81e49e3c2_14763_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;382&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetcount_hu017ff3431e51e38ea7691ac81e49e3c2_14763_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;382&#34;&gt;
 &lt;/a&gt;
 
 
@@ -399,10 +399,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetlaneindex_hue63fa13725fdb66d601d5d878c1d0ae3_26912_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetlaneindex_hue63fa13725fdb66d601d5d878c1d0ae3_26912_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetlaneindex_hue63fa13725fdb66d601d5d878c1d0ae3_26912_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;520&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavegetlaneindex_hue63fa13725fdb66d601d5d878c1d0ae3_26912_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;520&#34;&gt;
 &lt;/a&gt;
 
 
@@ -437,10 +437,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveisfirstlane_huafbbbf3a8be6235948052771404a6e1b_51220_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveisfirstlane_huafbbbf3a8be6235948052771404a6e1b_51220_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveisfirstlane_huafbbbf3a8be6235948052771404a6e1b_51220_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;571&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveisfirstlane_huafbbbf3a8be6235948052771404a6e1b_51220_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;571&#34;&gt;
 &lt;/a&gt;
 
 
@@ -477,10 +477,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveanytrue_hue78662cc8f443afcaa688bcef7c43ea2_59746_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveanytrue_hue78662cc8f443afcaa688bcef7c43ea2_59746_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveanytrue_hue78662cc8f443afcaa688bcef7c43ea2_59746_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;697&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveanytrue_hue78662cc8f443afcaa688bcef7c43ea2_59746_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;697&#34;&gt;
 &lt;/a&gt;
 
 
@@ -515,10 +515,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivealltrue_hu3ee6171c79406bc5f05b75ba065dfffc_59680_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivealltrue_hu3ee6171c79406bc5f05b75ba065dfffc_59680_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivealltrue_hu3ee6171c79406bc5f05b75ba065dfffc_59680_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;708&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivealltrue_hu3ee6171c79406bc5f05b75ba065dfffc_59680_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;708&#34;&gt;
 &lt;/a&gt;
 
 
@@ -553,10 +553,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveballot_hu441b454dd67f6c112671144c7a7d1adc_61292_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveballot_hu441b454dd67f6c112671144c7a7d1adc_61292_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveballot_hu441b454dd67f6c112671144c7a7d1adc_61292_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;769&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveballot_hu441b454dd67f6c112671144c7a7d1adc_61292_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;769&#34;&gt;
 &lt;/a&gt;
 
 
@@ -594,10 +594,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlaneat_hu2ce763e09dbd4548c9ca84ea0f16840b_96939_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlaneat_hu2ce763e09dbd4548c9ca84ea0f16840b_96939_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlaneat_hu2ce763e09dbd4548c9ca84ea0f16840b_96939_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1120&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlaneat_hu2ce763e09dbd4548c9ca84ea0f16840b_96939_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1120&#34;&gt;
 &lt;/a&gt;
 
 
@@ -632,10 +632,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlanefirst_hu6d9eb6b7bdb5af52098e10c274550961_77137_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlanefirst_hu6d9eb6b7bdb5af52098e10c274550961_77137_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlanefirst_hu6d9eb6b7bdb5af52098e10c274550961_77137_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;930&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavereadlanefirst_hu6d9eb6b7bdb5af52098e10c274550961_77137_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;930&#34;&gt;
 &lt;/a&gt;
 
 
@@ -672,10 +672,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveallequal_hub0d81e969a1494ea62407696e116d131_41919_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveallequal_hub0d81e969a1494ea62407696e116d131_41919_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveallequal_hub0d81e969a1494ea62407696e116d131_41919_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;886&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveallequal_hub0d81e969a1494ea62407696e116d131_41919_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;886&#34;&gt;
 &lt;/a&gt;
 
 
@@ -714,10 +714,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivebitop_hu8c00d785c0bd006675ed4159e86102d6_54165_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivebitop_hu8c00d785c0bd006675ed4159e86102d6_54165_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivebitop_hu8c00d785c0bd006675ed4159e86102d6_54165_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1045&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivebitop_hu8c00d785c0bd006675ed4159e86102d6_54165_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1045&#34;&gt;
 &lt;/a&gt;
 
 
@@ -752,10 +752,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivecountbits_hu45ba85d97c3b69abe8f3e4ff68f45109_54517_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivecountbits_hu45ba85d97c3b69abe8f3e4ff68f45109_54517_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivecountbits_hu45ba85d97c3b69abe8f3e4ff68f45109_54517_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;756&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactivecountbits_hu45ba85d97c3b69abe8f3e4ff68f45109_54517_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;756&#34;&gt;
 &lt;/a&gt;
 
 
@@ -798,10 +798,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveminmaxop_huc07e0fb502a11709116c047263e24c8f_56203_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveminmaxop_huc07e0fb502a11709116c047263e24c8f_56203_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveminmaxop_huc07e0fb502a11709116c047263e24c8f_56203_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1097&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveactiveminmaxop_huc07e0fb502a11709116c047263e24c8f_56203_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1097&#34;&gt;
 &lt;/a&gt;
 
 
@@ -845,10 +845,10 @@ Quadを動作対象とした、変数値の取得&lt;/li&gt;
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveprefixop_hu36665e6520788b3009382913080bbf2c_71179_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveprefixop_hu36665e6520788b3009382913080bbf2c_71179_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveprefixop_hu36665e6520788b3009382913080bbf2c_71179_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;742&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/waveprefixop_hu36665e6520788b3009382913080bbf2c_71179_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;742&#34;&gt;
 &lt;/a&gt;
 
 
@@ -898,10 +898,10 @@ Pixel ShaderにおけるQuad内のローカルのLane Indexは、下図に示し
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavequadop_hudda5976e667c4f4ea513984d01905e77_110927_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavequadop_hudda5976e667c4f4ea513984d01905e77_110927_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavequadop_hudda5976e667c4f4ea513984d01905e77_110927_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;916&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavequadop_hudda5976e667c4f4ea513984d01905e77_110927_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;916&#34;&gt;
 &lt;/a&gt;
 
 
@@ -939,10 +939,10 @@ Pixel ShaderにおけるQuad内のローカルのLane Indexは、下図に示し
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavematch_hu0c1f58aae92c4965302c5d4274ad6622_58909_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavematch_hu0c1f58aae92c4965302c5d4274ad6622_58909_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavematch_hu0c1f58aae92c4965302c5d4274ad6622_58909_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;707&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavematch_hu0c1f58aae92c4965302c5d4274ad6622_58909_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;707&#34;&gt;
 &lt;/a&gt;
 
 
@@ -982,10 +982,10 @@ Waveのサイズを超えるBitやInactive Laneのビットは無視されます
 &lt;figure class=&#34;center&#34; &gt;
 
 
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavemultiprefixsum_hue9d268744f4c6ffd484f30d798dfb5fc_135719_2000x2000_fit_lanczos_2.png&#34; &gt;
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavemultiprefixsum_hue9d268744f4c6ffd484f30d798dfb5fc_135719_2000x2000_fit_lanczos_3.png&#34; &gt;
 
 
-  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavemultiprefixsum_hue9d268744f4c6ffd484f30d798dfb5fc_135719_2000x2000_fit_lanczos_2.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1182&#34;&gt;
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/wave_intrinsics1/wavemultiprefixsum_hue9d268744f4c6ffd484f30d798dfb5fc_135719_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;40%&#34; height=&#34;1182&#34;&gt;
 &lt;/a&gt;
 
 
