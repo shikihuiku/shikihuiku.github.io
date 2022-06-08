@@ -790,7 +790,7 @@ WRSではサンプルストリームに値を追加するたびにDraw（分布�
 </code></pre>
 <h2 id="combine-multiple-reservoirs">Combine Multiple Reservoirs</h2>
 <p>WRSの特長として、個々のストリームにアクセスすることなく、生成された複数のストリームを結合することができることが挙げられる。結合の方法は以下の通りで新しいReservoirに、結合するReservoirを入力することで行う。
-s.update()の第二引数のウエイトは、結合する際のReservoirのターゲット分布関数$g$が同じ場合は、r.wsumと等価である。しかし、結合する際のReservoirのターゲット分布関数が異なる場合、 $g(y)/g'(y)$をr.wsumに乗算する必要がある。
+s.update()の第二引数のウエイトは、結合する際のReservoirのターゲット分布関数$g$が同じ場合は、r.wsumと等価である。しかし、結合する際のReservoirのターゲット分布関数が異なる場合、 $g(y)/g&rsquo;(y)$をr.wsumに乗算する必要がある。
 これはそのための計算である。</p>
 <pre><code>function combineReservoirs(g, r1, r2, . . . , rk)
   Reservoir s // a new reservor
@@ -803,12 +803,12 @@ s.update()の第二引数のウエイトは、結合する際のReservoirのタ�
 </code></pre>
 <p>注釈１：ウエイトのスケーリング(g(r.y) · r.w · r.M)について。<br>
 結合元の$w$は、
-$$\frac{1}{g'(y')} \frac{1}{M'} \sum^{M'}_ {i=1} \frac{g'(X_i)}{p'(X_i)} $$
+$$\frac{1}{g&rsquo;(y&rsquo;)} \frac{1}{M&rsquo;} \sum^{M&rsquo;}_ {i=1} \frac{g&rsquo;(X_i)}{p&rsquo;(X_i)} $$
 なのだが、これは通常のImportance Samplingにおける確率密度関数の逆数に相当するものでなくてはならない。（通常1/p(x)で表すが本式のpとは意味が異なる。）
-したがって、これに$g(y')$ を乗算すると、以下の様になり、これは、通常のRISの一つのウエイトである、$g / p$と同義になる。（ただし、この場合のベースの確率密度関数（先ほどpと呼んでいたものに相当するもの）が実際にどんなプロファイルかは知らない）
-$$\frac{g(y')}{g'(y')} \frac{1}{M'} \sum^{M'}_{i=1} \frac{g'(X_i)}{p'(X_i)} $$
-そして、この$y'$は、$M'$個のサンプルの中から選択されたサンプルなので、加重平均で確率計算するために、その分のウエイトに相当する$M'$を乗算する。
-$$\frac{g(y')}{g'(y')} \sum^{1}_{M'} \frac{g'(X_i)}{p'(X_i)} $$
+したがって、これに$g(y&rsquo;)$ を乗算すると、以下の様になり、これは、通常のRISの一つのウエイトである、$g / p$と同義になる。（ただし、この場合のベースの確率密度関数（先ほどpと呼んでいたものに相当するもの）が実際にどんなプロファイルかは知らない）
+$$\frac{g(y&rsquo;)}{g&rsquo;(y&rsquo;)} \frac{1}{M&rsquo;} \sum^{M&rsquo;}<em>{i=1} \frac{g&rsquo;(X_i)}{p&rsquo;(X_i)} $$
+そして、この$y&rsquo;$は、$M&rsquo;$個のサンプルの中から選択されたサンプルなので、加重平均で確率計算するために、その分のウエイトに相当する$M&rsquo;$を乗算する。
+$$\frac{g(y&rsquo;)}{g&rsquo;(y&rsquo;)} \sum^{1}</em>{M&rsquo;} \frac{g&rsquo;(X_i)}{p&rsquo;(X_i)} $$
 このように、ウエイトのスケーリングを解釈する事ができる。<br>
 また、結合後のウエイトの計算部分((1 / g(s.y))(s.wsum / s.M))は、まず、(s.wsum / s.M)の部分は、全てのサンプルのg/pの平均値になり、関数pとgのプロファイルの比と考える事ができる。
 また、この値は、全てのサンプルのg/pの平均値なので、候補となった全サンプルにおいて一定の値と解釈でき、最終的な確率密度の逆数は、1/gに比例していると考える事ができる。</p>
@@ -1273,7 +1273,7 @@ Talbot et alの方法に比べたら、明らかに計算量が少ない。</p>
     
     
     
-    <script src="/js/academic.min.72756512af279b10e3e4b09540ed6e9f.js"></script>
+    <script src="/js/academic.min.341e58d06db179e1d53f3322b6883f4c.js"></script>
 
     
 
