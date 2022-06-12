@@ -5,12 +5,474 @@
     <link>https://shikihuiku.github.io/tag/direct3d/</link>
       <atom:link href="https://shikihuiku.github.io/tag/direct3d/index.xml" rel="self" type="application/rss+xml" />
     <description>Direct3D</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sun, 27 Dec 2020 00:09:34 +0900</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 07 Jun 2022 19:30:28 +0900</lastBuildDate>
     <image>
       <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png</url>
       <title>Direct3D</title>
       <link>https://shikihuiku.github.io/tag/direct3d/</link>
     </image>
+    
+    <item>
+      <title>RTXDIのminimal-sampleを理解する</title>
+      <link>https://shikihuiku.github.io/post/rtxdi_first_step/</link>
+      <pubDate>Tue, 07 Jun 2022 19:30:28 +0900</pubDate>
+      <guid>https://shikihuiku.github.io/post/rtxdi_first_step/</guid>
+      <description>&lt;h1 id=&#34;rtxdiとは&#34;&gt;RTXDIとは？&lt;/h1&gt;
+&lt;p&gt;GPU上かどうかにかかわらずレイトレーシングやパストレーシングを行う際の重要な課題の一つは、追跡する光線の軌跡（パスもしくはレイと呼ばれるもの）をどのように構築するかです。これはレンダラーの性能や画質などの特性に直結する問題です。たとえば、物体表面からの反射に限定すれば、最も簡単なパスの構築方法は、物体の表面から半球状ににランダムな方向を選択してパスを構築する方法があると思います。また、物体表面の反射特性に合わせて、より反射率の高い方向を高確率で選択する方法や、シーン上に存在する光源の方向にパスを構築する方法もあります。&lt;br&gt;
+このように、いろいろなパスの選択戦略があり、実際のレンダリングでは、これらを組み合わせて使うことがよくある思います。そして、最も理想的なパスの確率分布は、その物体表面から、観測者の方向へのRadianceに比例した確率分布といわれています。しかしこれは、一般的には解析的に解くことが極めて困難であることがほとんどです。なぜなら、物体表面の反射特性は分かっても、どの方向から強い光が差し込んでくるかはわかりません。その光も、シーン上に設定された光源からの直接光なのか、それとも何かほかの物体から反射された光なのかわかりません。&lt;br&gt;
+RTXDIは、光源からの直接光によって形成されるRadianceに対して、最適なパスの確率分布を形成するようにパスの選択をするためのNVIDIAのSDKです。名前の由来は、おそらくRTX Direct Illuminationです。&lt;/p&gt;
+&lt;h4 id=&#34;リポジトリ&#34;&gt;リポジトリ&lt;/h4&gt;
+&lt;p&gt;GitHubのリポジトリがあるので、さっそくCloneしてみましょう。&lt;br&gt;
+以降の説明では基本的にCloneしたソースを読める状態にある前提で書いています。&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://github.com/NVIDIAGameWorks/RTXDI/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://github.com/NVIDIAGameWorks/RTXDI/&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;ドキュメント&#34;&gt;ドキュメント&lt;/h4&gt;
+&lt;p&gt;RTXDIのSDKのドキュメントを見る前に、前提知識として、Resampled Importance Sampling(RIS)のアルゴリズムの基礎部分を理解した方がよいと思います。（これより先は、Resampled Importance SamplingをRISと省略します。）&lt;br&gt;
+
+&lt;a href=&#34;https://www.google.com/search?q=Importance&amp;#43;Resampling&amp;#43;for&amp;#43;Global&amp;#43;Illumination&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;ldquo;Importance Resampling for Global Illumination&amp;rdquo; by J. Talbot et al.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;RTXDIのSDKには、その概要を把握するのに下記のドキュメントがありますが、これを読んで理解できる人は、この記事はここで読むのを終了していただいて、SDKのドキュメントやソースコードを直接参照した方が良いでしょう。
+
+&lt;a href=&#34;https://github.com/NVIDIAGameWorks/RTXDI/blob/main/doc/Integration.md&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://github.com/NVIDIAGameWorks/RTXDI/blob/main/doc/Integration.md&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;rtxdi-sampleとminimal-sample&#34;&gt;rtxdi-sampleとminimal-sample&lt;/h4&gt;
+&lt;p&gt;このSDKにはサンプルプロジェクトが二つ付いています。&lt;br&gt;
+rtxdi-sampleは、RTXDIをパス選択の核として、RTXGIやNRDやDLSSを用いてレンダリングしています。またReGIRという、ワールド空間におけるRISも行っているので、かなり実践的なサンプルになっている一方で、初めのステップとして、RTXDIの動作を理解したい場合には不向きなサンプルです。&lt;br&gt;
+一方で、minimal-sampleは、設定を変更することで時間方向のRISや、BRDFに基づくサンプリングも無効にすることが出来ます。また、NRDによるデノイズも行っておらず、レンダリングは極力単純な形で留めてあります。そのため、RTXDIの核であるRISの仕組みや、その効果をわかりやすく見せてくれるサンプルになっています。本記事ではこちらのサンプルプログラムの動作を見ていきます。&lt;/p&gt;
+&lt;h1 id=&#34;minimal-sampleのスクリーンショット&#34;&gt;minimal-sampleのスクリーンショット&lt;/h1&gt;
+&lt;p&gt;端的にRTXDIの効果の一端を見るためにいくつかのスクリーンショットを用意しました。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-1サンプル&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/rtxdi_first_step/Sample1S_hu58be2117725250a7b77b2fd59d4ee080_555039_2000x2000_fit_q90_lanczos.jpg&#34; data-caption=&#34;1サンプル&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/rtxdi_first_step/Sample1S_hu58be2117725250a7b77b2fd59d4ee080_555039_2000x2000_fit_q90_lanczos.jpg&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;60%&#34; height=&#34;1390&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    1サンプル
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-8サンプル&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/rtxdi_first_step/Sample8S_hu58be2117725250a7b77b2fd59d4ee080_932721_2000x2000_fit_q90_lanczos.jpg&#34; data-caption=&#34;8サンプル&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/rtxdi_first_step/Sample8S_hu58be2117725250a7b77b2fd59d4ee080_932721_2000x2000_fit_q90_lanczos.jpg&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;60%&#34; height=&#34;1390&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    8サンプル
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-16サンプル&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/rtxdi_first_step/Sample16S_hu58be2117725250a7b77b2fd59d4ee080_989635_2000x2000_fit_q90_lanczos.jpg&#34; data-caption=&#34;16サンプル&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/rtxdi_first_step/Sample16S_hu58be2117725250a7b77b2fd59d4ee080_989635_2000x2000_fit_q90_lanczos.jpg&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;60%&#34; height=&#34;1390&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    16サンプル
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+まずは上記3枚は、RTXDIのパス選択候補を、8サンプル、16サンプルと増加させたものです。選択候補は増やしているのですが、実際にれらのサンプルでレイトレースを行った訳ではありません。レイトレースはあくまで1回のみ行います。&lt;/p&gt;
+&lt;p&gt;
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-16サンプルbrdf2サンプル&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/rtxdi_first_step/Sample16S2S_hu58be2117725250a7b77b2fd59d4ee080_1007168_2000x2000_fit_q90_lanczos.jpg&#34; data-caption=&#34;16サンプル＋BRDF2サンプル&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/rtxdi_first_step/Sample16S2S_hu58be2117725250a7b77b2fd59d4ee080_1007168_2000x2000_fit_q90_lanczos.jpg&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;60%&#34; height=&#34;1390&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    16サンプル＋BRDF2サンプル
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+次は、16サンプル+BRDF2サンプルの場合です。こちらはレイトレース回数は、合計3回となります。BRDFサンプルによって、良い選択候補が見つかるサーフェースでの変化が顕著に見られます。&lt;/p&gt;
+&lt;p&gt;
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-4サンプルbrdf1サンプルspatio-temporal-resample&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/rtxdi_first_step/Sample4S1S_ST_hu58be2117725250a7b77b2fd59d4ee080_978847_2000x2000_fit_q90_lanczos.jpg&#34; data-caption=&#34;4サンプル＋BRDF1サンプル&amp;#43;Spatio-Temporal Resample&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/rtxdi_first_step/Sample4S1S_ST_hu58be2117725250a7b77b2fd59d4ee080_978847_2000x2000_fit_q90_lanczos.jpg&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;60%&#34; height=&#34;1390&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    4サンプル＋BRDF1サンプル+Spatio-Temporal Resample
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+今回の記事では説明しませんが、Spatio-Temporalのパス選択候補を導入すると、上記のようになります。上記の16サンプルと同等の処理時間ですが、結果は圧倒的にこちらが優れています。デノイズ処理は一切入っていない状態でここまでレンダリングできれば、かなり高画質なレンダリングが期待できます。&lt;/p&gt;
+&lt;h1 id=&#34;minimal-sampleを読む前に前提知識&#34;&gt;minimal-sampleを読む前に（前提知識）&lt;/h1&gt;
+&lt;p&gt;ここでサンプルプログラムのレンダリングを見る前に、簡単に触れておいた方が良い前提知識について説明します。&lt;/p&gt;
+&lt;h4 id=&#34;nvrhiとdonutフレームワーク&#34;&gt;NVRHIとDonutフレームワーク&lt;/h4&gt;
+&lt;p&gt;RTXDI SDKのほかに、minimal-sampleが依存している主なライブラリとして、DonutとNVRHIがあります。&lt;br&gt;
+NVRHIは、D3D12とVulkanを抽象化するためのグラフィックスAPIの抽象化レイヤーです。とはいえそれほど深い抽象化が行われているわけではありません。&lt;br&gt;
+Donutは、サンプルアプリケーションのフレームワークに相当する部分になります。シーンのロードやシェーダーの管理、デバッグUIの表示などを行っています。こちらもサンプル向けのフレームワークなので、シンプルに記述されています。今回のサンプルプログラムでは、それほど多数のDispatchが呼び出されるわけではないので、動作の理解に苦しむことはないかと思います。&lt;/p&gt;
+&lt;h4 id=&#34;rab_プレフィックスについて&#34;&gt;RAB_プレフィックスについて&lt;/h4&gt;
+&lt;p&gt;RTXDIのサンプルを見ると、RTXDI_プレフィックスの関数や構造体とは別に、RAB_プレフィックスの関数や構造体がたくさんあります。RABの意味はRTXDI Application Bridgeという意味で、その名の通り、RTXDIとアプリケーションの橋渡しの役目があります。&lt;br&gt;
+RTXDIがRISを行うときに必要になる情報は、アプリケーションのレンダラーと密接に関係しています。そのため、RTXDIがアプリケーション由来の情報と思われるものを取得する際は、RAB_プレフィックスのついた関数を呼び出します。RTXDIが呼び出している、RABプレフィックスのついた関数を実装するのは、アプリケーション側の責任となります。
+しかし実際は、サンプルアプリケーションのRAB実装である、RtxdiApplicationBridge.hlslを改変する形で自身のアプリケーションに組み込む形になると思います。このようにすることで、アプリケーションごとに改変の必要な部分と不要な部分の切り分けを実現しています。&lt;/p&gt;
+&lt;h4 id=&#34;rtxdi特有のリソース&#34;&gt;RTXDI特有のリソース&lt;/h4&gt;
+&lt;p&gt;通常のG-Bufferなどに加えて、minimal-sampleでRTXDI SDKを導入したことで必要となるリソースは以下の通りです。RTXDIは、SDKの内部でリソースを確保することはありません。リソースの管理は、生成、破棄を含め、すべてアプリケーション側の管理となります。  SDK側からは必要に応じて、リソースのサイズやその中身がAPIを通じて提供されるので、アプリケーションはそれらを正しく管理しなくてはなりません。
+以下のリソースは、ソースコード全体の把握では大切な要素ですが、RISのアルゴリズム部分ではあまり関わりが無いので読み飛ばしても問題ありません。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;TaskBuffer&lt;br&gt;
+RTXDIは、毎フレーム直接光源情報のテーブルの更新を行っています。これはPrepareLightというGPU処理マーカーの中でComputeShaderとして行われています。この処理の入力として TaskBufferが必要となります。このバッファはPrepareLightsTask構造体の配列となっています。
+このサンプルでは、シーン上でEmissiveサーフェースを持ったGeometry Instanceの個数分のバッファを確保しています。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;LightBuffer&lt;br&gt;
+RTXDIがアクセスする光源の情報はすべてこのバッファに格納されます。個々の光源は、RAB_LightInfo構造体に格納されます。
+このサンプルでは、Emmisiveのマテリアルが設定されたポリゴン一つ一つがEmissiveTriangleの光源としてこの配列に設定されます。
+TaskBufferによって入力された情報をもとに、このバッファが構築されます。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;GeometryInstanceToLightBuffer&lt;br&gt;
+Geometry Instanceごとに、そのInstanceに含まれるEmissiveTriangleの光源としてのLightBufferにおける先頭のインデックスを格納します。つまり、GeometryInstanceのインデックスからLightBufferを参照するときに使われるテーブルです。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;NeighborOffsetBuffer&lt;br&gt;
+RTXDIがサイズを提供しと内容を指定します。スクリーンスペースでRISを行うときに参照するべきPixelへのオフセットになる値が格納されます。EvenとOddのフィールドがあるのでRTXDIが提供するNeighborOffsetCountの2倍の数で、RG8_SNORMのTypedBufferを確保します。
+レンダリングの前に、RTXDIのFillNeighborOffsetBuffer()で取得できるバイト列をこのバッファに書き込む必要があります。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;LightReservoirBuffer&lt;br&gt;
+RTXDIがサイズを提供し内容はComputeShaderで算出されます。
+ReservoirBuffer一つあたりのサイズはsizeof(RTXDI_PackedReservoir) * context.GetReservoirBufferElementCount()で、RTXDIから提供されます。
+これをアプリケーション側の好きな数だけ確保します。サンプルの初期値では3セット分のサイズのバッファを確保しています。
+時間方向でRISを行う場合のためのバッファになります。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;rtxdiのreservoirについて&#34;&gt;RTXDIのReservoirについて&lt;/h4&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;（ここより以下、RTXDIもしくはRISの文脈で、&amp;ldquo;サンプル&amp;quot;と言っている場合は、レイトレーシングにおけるサーフェースと光源を結ぶパスを構築するためのLight Sampleを指します。サンプルアプリケーションのことでもなければ、テクスチャのサンプリングのことでもありません。）&lt;/strong&gt;&lt;/em&gt;&lt;br&gt;
+RTXDI_Reservoir構造体はRISのReservoirとしての情報を保持します。Reservoirとは、RISをするためのサンプルの集合です。ただし、サンプルの集合の情報をすべて保持していたら、GPU上ではメモリが足りません。したがって、Reservoirは今まで生成してきたサンプルによる確率の計算と、現在そのReservoirで選択されているサンプルの情報を格納しています。具体的には、サンプルの選択確率に関する情報と、パスの接続対象なる光源のインデックス、その光源の表面における位置情報にあたるUVです。これがあれば、ワールド空間でパスを接続するべき位置（つまりは光源の表面位置）が計算でき、シェーディングを行った後にサンプルの確率密度を適用することができます。&lt;br&gt;
+Reservoirに関して全くイメージがわかないという場合は、まず初めに紹介した論文を軽く読んで、ReSTIRに関する論文、
+
+&lt;a href=&#34;https://research.nvidia.com/sites/default/files/pubs/2020-07_Spatiotemporal-reservoir-resampling/ReSTIR.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;ldquo;Spatiotemporal reservoir resampling for real-time ray tracing with dynamic direct lighting&amp;rdquo;, Bitterli et al. 2020&lt;/a&gt;&lt;br&gt;
+を読むとイメージできると思います。（もしこの二つを読んだならば、本記事は、この先読む必要がないでしょう）&lt;/p&gt;
+&lt;h4 id=&#34;reservoirを操作する関数群&#34;&gt;Reservoirを操作する関数群&lt;/h4&gt;
+&lt;p&gt;ここではRTXDIがReservoirを操作する関数群のなかで、最も基本的なものをザックリと説明します。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;RTXDI_Reservoir RTXDI_Reservoir RTXDI_EmptyReservoir()&lt;/code&gt;&lt;br&gt;
+有効なサンプルが一つも格納されていない、初期化された&lt;code&gt;RTXDI_Reservoir&lt;/code&gt;構造体を返します。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;bool RTXDI_StreamSample( inout RTXDI_Reservoir reservoir, uint lightIndex, float2 uv, float random, float targetPdf, float invSourcePdf)&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;reservoir&lt;/code&gt; - 格納するReservoir&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lightIndex&lt;/code&gt;, &lt;code&gt;uv&lt;/code&gt; - 追加するLight Sampleの情報&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;random&lt;/code&gt; - Light Sampleを更新するかどうかをDraw（選択）するときに使う乱数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;targetPdf&lt;/code&gt; - RISにおけるTarget PDF&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;invSourcePdf&lt;/code&gt; - 追加するサンプルを生成する確率の逆数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;一つのサンプルをReservoirに追加して、現在このReservoirの中で選択されているサンプルを更新します。&lt;br&gt;
+&lt;code&gt;targetPDF&lt;/code&gt;は実際は正規化されたPDFである必要はなく、単なるウエイト値で問題ありません。一方で、&lt;code&gt;invSourcePdf&lt;/code&gt;は、サンプルの発生確率に基づいたPDFである必要があります。関数内部では、RIS Weightが &lt;code&gt;targetPdf * invSourcePdf&lt;/code&gt; で計算され、Reservoir構造体の &lt;code&gt;weightSum&lt;/code&gt; に加算されます。Reservoirの保持サンプル数&lt;code&gt;M&lt;/code&gt;もインクリメントされます。また、与えられた &lt;code&gt;random&lt;/code&gt;でサンプルの選択を行い、新たに追加されたサンプルが選択された場合はReservoir内部の選択サンプルの情報を更新します。その場合は、返り値としてtrueを返します。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;void RTXDI_FinalizeResampling( inout RTXDI_Reservoir reservoir, float normalizationNumerator, float normalizationDenominator) &lt;/code&gt;&lt;br&gt;
+通常は、Reservoirへのサンプル追加が終わった段階で呼び出す処理で、Reservoirに蓄積されたサンプルの確率と、現在選択されているサンプルの確率から、選択されているサンプルの評価値（つまりはシェーディング結果）に乗算するべき値 (Importance Samplingにおける 1/PDF) を計算します。&lt;br&gt;
+&lt;code&gt;normalizationNumerator&lt;/code&gt;, &lt;code&gt;normalizationDenominator&lt;/code&gt;は蓄積されたサンプルの&lt;code&gt;weightSum&lt;/code&gt;を正規化するときの係数です。単独のReservoirであれば、Reservoirに蓄積されたサンプル数の逆数である、1/&lt;code&gt;M&lt;/code&gt;が係数として適切です。この場合、1/&lt;code&gt;targetPDF&lt;/code&gt; * (1/&lt;code&gt;M&lt;/code&gt; * &lt;code&gt;weightSum&lt;/code&gt;)を計算し、これを &lt;code&gt;weightSum&lt;/code&gt; に代入します。&lt;br&gt;
+したがって、この関数を呼び出す前と後では構造体メンバーの&lt;code&gt;weightSum&lt;/code&gt;の値の意味が変わります。呼び出す前はReservoirに蓄積されたサンプルのウエイトの合算で、呼び出した後は、選択されたサンプルの評価値に乗算するべき値となります。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;float RTXDI_GetReservoirInvPdf(const RTXDI_Reservoir reservoir)&lt;/code&gt;&lt;br&gt;
+Sampleの評価値に乗算するべき係数（Importance Samplingにおける1/PDF）を返します。&lt;br&gt;
+内部の処理は&lt;code&gt;weightSum&lt;/code&gt;の値を返すだけです。事前に&lt;code&gt;FinalizeResampling()&lt;/code&gt;を呼ぶ必要があります。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;bool RTXDI_CombineReservoirs( inout RTXDI_Reservoir reservoir, const RTXDI_Reservoir newReservoir, float random, float targetPdf)&lt;/code&gt;&lt;br&gt;
+二つのReservoirを結合します。&lt;br&gt;
+まず、結合前に結合される側の&lt;code&gt;newReservoir&lt;/code&gt;は&lt;code&gt;RTXDI_FinalizeResampling()&lt;/code&gt;で正規化されている必要があります。&lt;br&gt;
+引数&lt;code&gt;targetPdf&lt;/code&gt;は、結合される&lt;code&gt;newReservoir&lt;/code&gt;で選択されているサンプルの、結合先Reservoirにおける&lt;code&gt;targetPdf&lt;/code&gt;になります。結合される側と結合先でのtargetPdfが同じ場合は、引数の&lt;code&gt;targetPdf&lt;/code&gt;は、&lt;code&gt;newReservoir&lt;/code&gt;に保存されているサンプルのtargetPdfを指定すればよいです。&lt;br&gt;
+結合後は、現在どちらかのReservoirで選択されているサンプルが選択サンプルになります。これを&lt;code&gt;random&lt;/code&gt;を用いて決めます。選択サンプルが変更される場合は返り値としてtrueを返します。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;minimal-sampleの中身brfont-size1spatio-temporalでrisを行わない場合のレンダリングfont&#34;&gt;minimal-sampleの中身&lt;br&gt;&lt;font size=&#34;+1&#34;&gt;~Spatio-TemporalでRISを行わない場合のレンダリング~&lt;/font&gt;&lt;/h1&gt;
+&lt;p&gt;レンダリングを理解するうえでの前提知識が整ったので、さっそく一番簡単なケースのレンダリングを見たいと思います。
+Spatio-TemporalでのRISは、RTXDIの大きな特長の一つですが、今回は単純化のために無効化した状態でサンプルコードを読み、
+RTXDIの最もシンプルな形を理解するこにします。このサンプルアプリケーションは、&amp;ldquo;Enable Resampling&amp;quot;というDebugUIが用意されているのでこれをDisableにします。しかしこれはSpatio-TemporalのRISを行うかどうかを切り替えるためのフラグで、RTXDIを完全にDisableにするためのものではありません。また、BRDF Cutoffも、簡単のため0.0が設定されていると仮定します。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-settings&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/rtxdi_first_step/RTXDI_FirstStep_2_huccd38741da5f3de97312c8042bf911a5_51702_2000x2000_fit_q90_lanczos.jpg&#34; data-caption=&#34;Settings&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/rtxdi_first_step/RTXDI_FirstStep_2_huccd38741da5f3de97312c8042bf911a5_51702_2000x2000_fit_q90_lanczos.jpg&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;30%&#34; height=&#34;351&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Settings
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;レイトレーサー本体の概要&#34;&gt;レイトレーサー本体の概要&lt;/h4&gt;
+&lt;p&gt;Renderer.hlslのmain()がレイトレーサー本体のシェーダーコードです。カメラからレイを飛ばして、GBuffer相当の情報を取得している部分は特に難しい部分はないと思います。サーフェースにヒットした場合は、乱数シーケンスを初期化して、RTXDI_SampleParamterにサンプリングの設定をしています。その後の主な処理の流れは以下の通りです。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;空のReservoirに、&lt;code&gt;RTXDI_SampleLocalLights()&lt;/code&gt;(後述)で計算されたReservoirを結合する&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;RTXDI_SampleBrdf()&lt;/code&gt;(後述)で計算されたReservoirを結合する&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;RTXDI_FinalizeResampling()&lt;/code&gt;でReservoirの正規化を行う&lt;/li&gt;
+&lt;li&gt;選択パスが、RTXDI_SampleLocalLights()だったら、ShadowRayをキャストして、Visibilityをチェック&lt;/li&gt;
+&lt;li&gt;ShadeSurfaceWithLightSample()で、Reservoirで選択されたサンプルを使ってシェーディングを行う&lt;/li&gt;
+&lt;li&gt;再びShadowRayをキャストしてVisibilityをチェック&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Spatio-TemporalのRISが無効化されている場合は、最後の2度目のVisibilityチェックは必要ないはずです。しかし、大まかな処理の流れとしてはこのようになっています。以上を簡単に言い換えれば、1バウンスのライトサンプル(NEE)と、BRDFサンプルのMulti Importance Samplingのレイトレーサーが実装されているといえると思います。&lt;/p&gt;
+&lt;h3 id=&#34;rtxdi_samplelocallights&#34;&gt;RTXDI_SampleLocalLights()&lt;/h3&gt;
+&lt;p&gt;さっそくですが、1番めの処理についてです。この関数は&lt;code&gt;ResamplingFunctions.hlsli&lt;/code&gt;に実装されています。
+この関数は、&lt;code&gt;numLocalLightSamples&lt;/code&gt;で指定された数だけ、サンプルを構築してReservoirに蓄積する処理を行います。このサンプルアプリケーションの中の様々な個所で行われているRISの最も基本的な形になっています。&lt;/p&gt;
+&lt;h5 id=&#34;個々のサンプルの構築&#34;&gt;個々のサンプルの構築&lt;/h5&gt;
+&lt;p&gt;RTXSDKは事前にLight DataバッファにLocal Light (つまりは Emissive Triangle)のリストを構築しています。まず、このリストから、単純に乱数でLocal Lightを選択します。さらに乱数を2つ生成して、光源の三角形上の点を決定して、その位置に向けて、プライマリレイがヒットしたサーフェースからパスを構築します。&lt;br&gt;
+構築されたパスのPDFは、&lt;code&gt;RTXDI_LightBrdfMisWeight()&lt;/code&gt;で計算され、&lt;code&gt;blendedSroucePdf&lt;/code&gt;に代入されます。&lt;/p&gt;
+&lt;h5 id=&#34;blendedsourcepdfの計算&#34;&gt;blendedSourcePdfの計算&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;blendedSourcePdf&lt;/code&gt;は、RISにおけるsourcePDFなので、実際のパス生成確率に即したものでなければなりません。
+この計算を行っているのは、&lt;code&gt;RTXDI_LightBrdfMisWeight()&lt;/code&gt;関数です。&lt;br&gt;
+まず、ライトサンプルの確率は&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ライトの選択確率（単なる乱数選択なので、ライトの個数の逆数）&lt;/li&gt;
+&lt;li&gt;ライト上の特定の方向に向けたレイを選択する確率（サーフェースから見たLocal Lightの見かけの立体角の逆数）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;の乗算で計算できます。&lt;/p&gt;
+&lt;p&gt;そして、BRDFサンプルの確率は、&lt;code&gt;RAB_GetSurfaceBrdfPdf()&lt;/code&gt;で計算されるので、アプリケーション側の処理となりますが、&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;DiffuseRayの場合、CosineWeightedのPDF&lt;/li&gt;
+&lt;li&gt;SpecularRayの場合、GGX_VNDFのPDF&lt;/li&gt;
+&lt;li&gt;上記いずれかをDiffuseProbabilityで選択&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;したがって、&lt;br&gt;
+DiffuseProbablity * CosineWeightedPDF + (1 - DiffuseProbability) * GGX_VNDF_PDF&lt;br&gt;
+でBRDFサンプルの確率が計算できます。&lt;/p&gt;
+&lt;p&gt;1ピクセルあたりで、RISで検討されるライトサンプル数とBRDFサンプル数はDebug UIの設定で決まっていて、&lt;code&gt;numLocalLightSamples&lt;/code&gt;と&lt;code&gt;numBrdfSamples&lt;/code&gt;に設定されます。このサンプル数を用いて、これらはバランスヒューリスティックで結合されます。これは通常のMulti Importance Samplingと同様の考え方です。&lt;/p&gt;
+&lt;p&gt;注意点なのですが、&lt;code&gt;RTXDI_LightBrdfMisWeight()&lt;/code&gt;関数の最後では、&lt;code&gt;lightSolidAnglePdf&lt;/code&gt;に設定された&amp;quot;ライト上の特定の方向に向けたレイを選択する確率&amp;quot;で除算しています。ここはRTXDIのトリッキーな部分です。あくまで、実際の&amp;quot;sourcePdf&amp;quot;は、この除算の前の値です。
+しかし、RTXDIでは&lt;code&gt;targetPdf&lt;/code&gt;も&lt;code&gt;lightSolidAnglePdf&lt;/code&gt;で除算するので、計算のつじつまが合うようになっています。また、&lt;code&gt;taregetPdf&lt;/code&gt;は、シェーディング結果を除算しますが、シェーディング結果も&lt;code&gt;lightSolidAnglePdf&lt;/code&gt;で除算されるので、こちらも計算のつじつまが合う仕組みになっています。&lt;/p&gt;
+&lt;h5 id=&#34;targetpdfの計算&#34;&gt;targetPdfの計算&lt;/h5&gt;
+&lt;p&gt;説明が多少前後しましたが、&lt;code&gt;targetPdf&lt;/code&gt;の計算についてです。&lt;code&gt;targetPdf&lt;/code&gt;はRISにおいて、積分可能ではないが、理想的なサンプルの確率密度です。(この値は、簡単には積分できず大きさが正規化できないので、PDFと呼ぶべきではなく、単にWeightと呼ぶべきかもしれません。）
+&lt;code&gt;targetPdf&lt;/code&gt;はレンダリングの文脈では、サーフェースがカメラ方向に出すRadianceに比例したレイの分布になるのが一番望ましいです。言い換えれば、カメラの方に最も強く反射される光源へのレイを重点的にサンプリングする分布です。これは、光源のサーフェースでのカメラ方向への反射を計算すればわかります。しかし、光源とサーフェースがVisibleかどうかの判断は、実際にShadow Rayをトレースしなくては分かりません。しかし、これを行えば、実際にレイトレースを行ってシェーディングする処理とまったく変わらなくなり、単にレイのサンプル数を増やすことと同義です。これでは、RISの意味がなくなってしまいまいます。&lt;br&gt;
+&lt;code&gt;targetPdf&lt;/code&gt;の計算では、シェーディングの中で最も処理負荷の高いShadow Rayのテスト処理を省略した値（つまりい光源とサーフェースがVisibleかどうかの判断をせずにシェーディングした結果）が用いられます。&lt;/p&gt;
+&lt;p&gt;実際の計算は、&lt;code&gt;RtxdiApplicationBridge.hlsli&lt;/code&gt;の&lt;code&gt;RAB_GetLightSampleTargetPdfForSurface()&lt;/code&gt;に実装されています。この関数は&lt;code&gt;ShadeSurfaceWithLightSample()&lt;/code&gt;という関数を呼び出して、シェーディングの計算を行っています。算出された値の輝度値が、そのまま&lt;code&gt;targetPDF&lt;/code&gt;として扱われます。また、&lt;code&gt;blendedSourcePdf&lt;/code&gt;の項で説明した通り、シェーディングの計算の最後で、値は&lt;code&gt;lightSolidAnglePdf&lt;/code&gt;で除算されます。&lt;/p&gt;
+&lt;h5 id=&#34;reservoirにサンプルを追加する計算&#34;&gt;Reservoirにサンプルを追加する計算&lt;/h5&gt;
+&lt;p&gt;上記の通り、&lt;code&gt;blendedSourcePdf&lt;/code&gt;と&lt;code&gt;targetPdf&lt;/code&gt;の計算が完了すれば、Reservoirにサンプルを追加する処理は簡単です。
+&lt;code&gt;RTXDI_StreamSample()&lt;/code&gt;に、&lt;code&gt;blendedSourcePdf&lt;/code&gt;と&lt;code&gt;targetPdf&lt;/code&gt;を乱数と共に渡して、渡したサンプルが選択された場合は、現在選択中のサンプルの情報を更新します。&lt;/p&gt;
+&lt;h5 id=&#34;サンプル構築後の処理&#34;&gt;サンプル構築後の処理&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;numLocalLightSamples&lt;/code&gt;の数だけサンプルを構築し、Reservoirに蓄積した後は、現在Reservoirが選択中のサンプルの情報と、Reservoirに蓄積されたRISの情報のみが残ります。ここまでで複数のサンプルを検討していますが、実際にレイトレース処理は行っていません。しかし、Reservoirには、一番選択するべきサンプルの情報が残っています。&lt;br&gt;
+サンプルを構築するループの直後に、&lt;code&gt;RTXDI_FinalizeResampling()&lt;/code&gt;を呼び出しています。ここでの正規化の係数は、&lt;code&gt;1.0/numLocalLightSamples&lt;/code&gt;と思われるかもしれません。しかし実際のプログラムでは、&lt;code&gt;1.0/numMisSamples&lt;/code&gt;で正規化されています。またReservoirのサンプル数&lt;code&gt;M&lt;/code&gt;も1.0に設定しています。これについては後ほど説明します。&lt;/p&gt;
+&lt;h3 id=&#34;rtxdi_samplebrdf&#34;&gt;RTXDI_SampleBrdf()&lt;/h3&gt;
+&lt;p&gt;この関数は、numBrdfSamplesで指定された数だけ、サーフェースのBRDFをもとにサンプルを構築してReservoir蓄積する処理を行います。&lt;br&gt;
+この処理は、上記で説明した&lt;code&gt;RTXDI_SampleLocalLights()&lt;/code&gt;の処理と対を成す処理です。&lt;/p&gt;
+&lt;h5 id=&#34;個々のサンプルの構築-1&#34;&gt;個々のサンプルの構築&lt;/h5&gt;
+&lt;p&gt;まず、&lt;code&gt;RAB_GetSurfaceBrdfSample()&lt;/code&gt;を呼び出して、BRDFに基づいたサンプルを構築します。そして、実際にレイトレースを行い、Local Light（Emissive Triangle）にHitするかをテストします。Hitしなかった場合は、このサンプルの処理は終了しReservoirに関する処理は行われません。（しかし、このサンプルがReservoirに蓄積されないというわけではなく、正確にはtargetPDF=0として蓄積された扱いになります。これはReservoirの結合時の処理を見ると判明します。）&lt;br&gt;
+一方でLocal LightにHitした場合は、&lt;code&gt;targetPdf&lt;/code&gt;と&lt;code&gt;blendedSourcePdf&lt;/code&gt;をそれぞれ計算します。計算は、&lt;code&gt;RTXDI_SampleLocalLights()&lt;/code&gt;と全く同じ計算になります。&lt;/p&gt;
+&lt;h5 id=&#34;サンプルの構築後の処理&#34;&gt;サンプルの構築後の処理&lt;/h5&gt;
+&lt;p&gt;ここも、&lt;code&gt;RTXDI_SampleLocalLights()&lt;/code&gt;と基本的に同じ計算になります。
+サンプル構築のループの直後に、&lt;code&gt;RTXDI_FinalizeResampling()&lt;/code&gt;を呼び出しています。ここでの正規化の係数は、Shadow Rayによって棄却されたサンプルを含めるなら、&lt;code&gt;1.0/numBrdfSamples&lt;/code&gt;であるべきと思われるかもしれません。しかし実際のプログラムでは、&lt;code&gt;1.0/numMisSamples&lt;/code&gt;で除算されています。またReservoirのサンプル数&lt;code&gt;M&lt;/code&gt;も1.0に設定しています。これについては後ほど説明します。&lt;/p&gt;
+&lt;h3 id=&#34;light-sampleとbrdf-sampleのreservoirの結合処理&#34;&gt;Light SampleとBRDF SampleのReservoirの結合処理&lt;/h3&gt;
+&lt;p&gt;再び、&lt;code&gt;main()&lt;/code&gt;の処理に戻ります。&lt;code&gt;RTXDI_SampleLocalLights()&lt;/code&gt;によって構築された&lt;code&gt;localReservoir&lt;/code&gt;と、&lt;code&gt;RTXDI_SampleBrdf()&lt;/code&gt;によって構築された、&lt;code&gt;brdfReservoir&lt;/code&gt;を結合する処理を見ていきます。&lt;/p&gt;
+&lt;h5 id=&#34;rtxdi_combinereservoirsの処理&#34;&gt;RTXDI_CombineReservoirs()の処理&lt;/h5&gt;
+&lt;p&gt;まず、&lt;code&gt;RTXDI_CombineReservoirs()&lt;/code&gt;を呼ぶ前に、結合される側のReservoirは、&lt;code&gt;RTXDI_FinalizeResampling()&lt;/code&gt;が呼ばれている約束になっています。したがって、結合される側の&lt;code&gt;weightSum&lt;/code&gt;は、Finalize前の変数で解釈すると&lt;code&gt;1/targetPDF * 1/M * weightSum&lt;/code&gt;
+に相当する値が設定されています。（ただし&lt;code&gt;1/M&lt;/code&gt;はFinalize時に引数で渡す正規化係数）&lt;br&gt;
+これに、構造体に格納されている&lt;code&gt;M&lt;/code&gt;と、引数で渡された&lt;code&gt;targetPdf&lt;/code&gt;を乗算したものが、&lt;code&gt;risWeight&lt;/code&gt;という変数に設定されます。逆算すれば、&lt;code&gt;risWeight&lt;/code&gt;は、元の&lt;code&gt;weightSum&lt;/code&gt;に&lt;code&gt;(引数の)targetPdf / (構造体に保存されている)targetPdf&lt;/code&gt;を乗算したものですから、もしも、&lt;code&gt;1/M&lt;/code&gt;で正規化されていて、&lt;code&gt;targetPdf&lt;/code&gt;が同じならば、結局のところ元の&lt;code&gt;weightSum&lt;/code&gt;ということになります。&lt;br&gt;
+しかし、&lt;code&gt;RTXDI_CombineReservoirs()&lt;/code&gt;の引数に渡す&lt;code&gt;targetPdf&lt;/code&gt;は、結合元のReservoirで現在選択されているサンプルの、結合先のReservoirにおける&lt;code&gt;targetPdf&lt;/code&gt;なので、もしも、結合先で&lt;code&gt;targetPdf&lt;/code&gt;が異なる場合は、その比が&lt;code&gt;weightSum&lt;/code&gt;に乗算されることになります。しかし、今回のサンプルプログラムでは、Spatio-TemporalなRISの結合を行わないので、&lt;code&gt;targetPdf&lt;/code&gt;は結合の前後で変化しないので、この計算について深く考える必要はありません。&lt;/p&gt;
+&lt;p&gt;計算された&lt;code&gt;risWeight&lt;/code&gt;は、結合されるReservoir全体の、結合先Reservoirにおけるウエイトに相当する値です。&lt;br&gt;
+後は、サンプル数&lt;code&gt;M&lt;/code&gt;を合算し、&lt;code&gt;weightSum&lt;/code&gt;に&lt;code&gt;risWeight&lt;/code&gt;を加算して、選択サンプルを乱数で決定することで、Reservoirの結合が完了します。&lt;/p&gt;
+&lt;h5 id=&#34;localreservoir-と-brdfreservoir-の結合&#34;&gt;localReservoir と brdfReservoir の結合&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;RTXDI_SampleLocalLights()&lt;/code&gt;の項で説明したとおり、&lt;code&gt;localReservoir&lt;/code&gt;は、&lt;code&gt;1.0/numLocalLightSamples&lt;/code&gt;で除算して正規化するところを、&lt;code&gt;1.0/numMisSamples&lt;/code&gt;で除算したうえに、サンプル数 &lt;code&gt;M&lt;/code&gt; を1に設定していました。
+これを、&lt;code&gt;RTXDI_CombineReservoirs()&lt;/code&gt;の結合される側のReservoirとして処理をすると、&lt;code&gt;risWeight&lt;/code&gt;は、Finalize前の変数で解釈すると以下のようになります。&lt;br&gt;
+&lt;code&gt;1/numMisSamples * weightSum&lt;/code&gt;&lt;br&gt;
+この式をわかりやすく書き換えると、以下のようになります。&lt;br&gt;
+&lt;code&gt;numLocalLightSamples/numMisSamples * 1/numLocalLightSamples * weightSum&lt;/code&gt;&lt;br&gt;
+つまり、&lt;code&gt;localReservoir&lt;/code&gt;の正規化処理と、&lt;code&gt;localReservoir&lt;/code&gt;と&lt;code&gt;brdfReservoir&lt;/code&gt;の、それぞれのサンプル数に基づくバランスヒューリスティックによる結合を同時に処理しているわけです。&lt;/p&gt;
+&lt;p&gt;同様に、&lt;code&gt;brdfReservoir&lt;/code&gt;の結合時の&lt;code&gt;risWeight&lt;/code&gt;は、&lt;br&gt;
+&lt;code&gt;numBrdfSamples/numMisSamples * 1/numBrdfSamples * weightSum&lt;/code&gt;&lt;br&gt;
+と解釈できます。（ここで、&lt;code&gt;brdfReservoir&lt;/code&gt;の生成時に、Shadow RayがMissしてサンプルが破棄されているにも関わらず&lt;code&gt;targetPdf&lt;/code&gt;がゼロのサンプルとして扱われているという解釈ができるわけです。）&lt;/p&gt;
+&lt;p&gt;最後に、両者の結合後に、&lt;code&gt;RTXDI_FinalizeResampling()&lt;/code&gt;を正規化係数1.0で呼び出していますが、両者の正規化はMISのウエイトによって行われているので、計算のつじつまが合うわけです。&lt;/p&gt;
+&lt;h2 id=&#34;最後のレイトレースとシェーディング処理&#34;&gt;最後のレイトレースとシェーディング処理&lt;/h2&gt;
+&lt;p&gt;ついに、最終的に採用すべきサンプルが確定し、乗算すべきPDFの算出も完了しました。&lt;br&gt;
+あとはShadow Rayをキャストして、Visibilityを確認すればよいのですが、&lt;code&gt;brdfReservoir&lt;/code&gt;のサンプルはその生成過程ですでにShadow Rayを使ってVisibilityを確認しているので、もし、こちらのReservoirからサンプルが採用された場合は、この作業は不要なのでスキップするように処理が書かれています。&lt;code&gt;localReservoir&lt;/code&gt;側からからサンプルが選択された場合のみShadow Rayのトレースを行います。&lt;/p&gt;
+&lt;p&gt;シェーディング関数の&lt;code&gt;ShadeSurfaceWithLightSample()&lt;/code&gt;は、RISの過程で何度も呼び出しているので説明不要ですが、ここでも&lt;code&gt;solidAndlePDF&lt;/code&gt;が除算されているので、PDFとの計算のつじつまが合うわけです。
+&lt;code&gt;RTXDI_GetReservoirInvPdf()&lt;/code&gt;は、既にFinalizeされているReservoirに対して呼び出す関数で、単に&lt;code&gt;weightSum&lt;/code&gt;を返します。Finalizeが行われていればそこには、PDFの逆数に相当する値が格納されているはずです。
+シェーディングが終われば、TonemappingをかけてUAVに書き出すと、全体の処理が完了します。&lt;/p&gt;
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+&lt;p&gt;最後まで読んじゃった人は「にゃ～ん」ってつぶやいてほしいです。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Projection Matrixについて</title>

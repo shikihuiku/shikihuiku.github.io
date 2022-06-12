@@ -2,28 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://shikihuiku.github.io/tag/direct3d/</loc>
+    <lastmod>2022-06-07T19:30:28+09:00</lastmod>
+  </url><url>
+    <loc>https://shikihuiku.github.io/post/</loc>
+    <lastmod>2022-06-07T19:30:28+09:00</lastmod>
+  </url><url>
+    <loc>https://shikihuiku.github.io/tag/raytracing/</loc>
+    <lastmod>2022-06-07T19:30:28+09:00</lastmod>
+  </url><url>
+    <loc>https://shikihuiku.github.io/post/rtxdi_first_step/</loc>
+    <lastmod>2022-06-07T19:30:28+09:00</lastmod>
+  </url><url>
+    <loc>https://shikihuiku.github.io/</loc>
+    <lastmod>2022-06-07T19:30:28+09:00</lastmod>
+  </url><url>
+    <loc>https://shikihuiku.github.io/tags/</loc>
+    <lastmod>2022-06-07T19:30:28+09:00</lastmod>
+  </url><url>
     <loc>https://shikihuiku.github.io/memo/clearunorderedaccessview/</loc>
     <lastmod>2021-09-07T21:48:09+09:00</lastmod>
   </url><url>
     <loc>https://shikihuiku.github.io/memo/</loc>
     <lastmod>2021-09-07T21:48:09+09:00</lastmod>
   </url><url>
-    <loc>https://shikihuiku.github.io/</loc>
-    <lastmod>2021-09-07T21:48:09+09:00</lastmod>
-  </url><url>
-    <loc>https://shikihuiku.github.io/tag/direct3d/</loc>
-    <lastmod>2020-12-27T00:09:34+09:00</lastmod>
-  </url><url>
     <loc>https://shikihuiku.github.io/tag/opengl/</loc>
     <lastmod>2020-12-27T00:09:34+09:00</lastmod>
   </url><url>
-    <loc>https://shikihuiku.github.io/post/</loc>
-    <lastmod>2020-12-27T00:09:34+09:00</lastmod>
-  </url><url>
     <loc>https://shikihuiku.github.io/post/projection_matrix/</loc>
-    <lastmod>2020-12-27T00:09:34+09:00</lastmod>
-  </url><url>
-    <loc>https://shikihuiku.github.io/tags/</loc>
     <lastmod>2020-12-27T00:09:34+09:00</lastmod>
   </url><url>
     <loc>https://shikihuiku.github.io/tag/vulkan/</loc>
