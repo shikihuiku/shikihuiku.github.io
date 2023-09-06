@@ -998,13 +998,13 @@ Waveのサイズを超えるBitやInactive Laneのビットは無視されます
 &lt;h4 id=&#34;wavemultiprefixcountbit&#34;&gt;&lt;code&gt;WaveMultiPrefixCountBit&lt;/code&gt;&lt;/h4&gt;
 &lt;p&gt;引数に、bool値を指定します。また、引数に128bit-wideのビットマスクとなるuint4を指定します。&lt;br&gt;
 &lt;code&gt;WaveActiveCountBit&lt;/code&gt;と動作は似ていますが、乗算の対象となるLaneがビットマスクで指定されたLaneに限定される点が異なります。&lt;/p&gt;
-&lt;h4 id=&#34;wavemultiprefixand&#34;&gt;&lt;code&gt;WaveMultiPrefixAnd&lt;/code&gt;&lt;/h4&gt;
+&lt;h4 id=&#34;wavemultiprefixbitand&#34;&gt;&lt;code&gt;WaveMultiPrefixBitAnd&lt;/code&gt;&lt;/h4&gt;
 &lt;p&gt;引数に、読み取り対象となる整数型の変数を指定します。また、引数に128bit-wideのビットマスクとなるuint4を指定します。&lt;br&gt;
 &lt;code&gt;WaveActiveBitAnd&lt;/code&gt;と動作は似ていますが、乗算の対象となるLaneがビットマスクで指定されたLaneに限定される点が異なります。&lt;/p&gt;
-&lt;h4 id=&#34;wavemultiprefixor&#34;&gt;&lt;code&gt;WaveMultiPrefixOr&lt;/code&gt;&lt;/h4&gt;
+&lt;h4 id=&#34;wavemultiprefixbitor&#34;&gt;&lt;code&gt;WaveMultiPrefixBitOr&lt;/code&gt;&lt;/h4&gt;
 &lt;p&gt;引数に、読み取り対象となる整数型の変数を指定します。また、引数に128bit-wideのビットマスクとなるuint4を指定します。&lt;br&gt;
 &lt;code&gt;WaveActiveBitOr&lt;/code&gt;と動作は似ていますが、乗算の対象となるLaneがビットマスクで指定されたLaneに限定される点が異なります。&lt;/p&gt;
-&lt;h4 id=&#34;wavemultiprefixxor&#34;&gt;&lt;code&gt;WaveMultiPrefixXor&lt;/code&gt;&lt;/h4&gt;
+&lt;h4 id=&#34;wavemultiprefixbitxor&#34;&gt;&lt;code&gt;WaveMultiPrefixBitXor&lt;/code&gt;&lt;/h4&gt;
 &lt;p&gt;引数に、読み取り対象となる整数型の変数を指定します。また、引数に128bit-wideのビットマスクとなるuint4を指定します。&lt;br&gt;
 &lt;code&gt;WaveActiveBitXor&lt;/code&gt;と動作は似ていますが、乗算の対象となるLaneがビットマスクで指定されたLaneに限定される点が異なります。&lt;/p&gt;
 &lt;h2 id=&#34;終わりに&#34;&gt;終わりに&lt;/h2&gt;
