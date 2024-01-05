@@ -973,7 +973,7 @@ $$
 $$
 c = \frac{2n}{t-b}
 $$
-また、この指定方法の場合は、$l, r$の値がZ軸で対称でない場合は、オフセットの値が発生する。例として、$l, r$によるオフセットの図を示す。
+また、この指定方法の場合は、$l, r$の値がZ軸において対称でない場合は、オフセットの値が発生する。例として、$l, r$によるオフセット計算の図を示す。
 
 
 
@@ -1000,10 +1000,10 @@ $$
 <figure class="center" id="figure-視野のオフセットの計算">
 
 
-  <a data-fancybox="" href="/post/projection_matrix/Perspective_Z3_hu770a23a06793a884f7075f1eec4e4997_39058_2000x2000_fit_lanczos_3.PNG" data-caption="視野のオフセットの計算">
+  <a data-fancybox="" href="/post/projection_matrix/Perspective_Z3_hu26ba68dc21b12d6542ccc7434c2e9e2e_80001_2000x2000_fit_lanczos_3.PNG" data-caption="視野のオフセットの計算">
 
 
-  <img data-src="/post/projection_matrix/Perspective_Z3_hu770a23a06793a884f7075f1eec4e4997_39058_2000x2000_fit_lanczos_3.PNG" class="lazyload" alt="" width="50%" height="893">
+  <img data-src="/post/projection_matrix/Perspective_Z3_hu26ba68dc21b12d6542ccc7434c2e9e2e_80001_2000x2000_fit_lanczos_3.PNG" class="lazyload" alt="" width="50%" height="1303">
 </a>
 
 
@@ -1016,9 +1016,10 @@ $$
 
 </figure>
 </p>
-<p>上図はView座標系でのオフセット値になるので、NDC座標系に変換するには、$2/(r-l)$を乗算する必要がある。したがってオフセットの値は以下の様に計算できる。
+<p>上図はView座標系での、$Z_{View}=near$平面上でのオフセット値になるので、NDC座標系に変換するには、$2/(r-l)$を乗算する必要がある。したがって、オフセットの値は以下の様になる。
 $$b = -\frac{r+l}{r-l}$$
-$$d = -\frac{t+b}{t-b}$$</p>
+$$d = -\frac{t+b}{t-b}$$
+オフセットの値は、NDC座標系において一定なので、View座標系においては$Z_{View}$の値に比例する。</p>
 <p>また、オフセットがない場合は、$near, left, right, top, bottom$と$\theta, \phi$に、以下のような関係が成り立つ。
 $$
 l = n \cdot tan(\frac{\theta}{2})
