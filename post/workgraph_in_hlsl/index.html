@@ -1,0 +1,1385 @@
+<!DOCTYPE html><html lang="en-us" >
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.8.0">
+
+  
+
+  
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="shikihuiku">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="Work Graphはややこしいので自分なりの要点のまとめ">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://shikihuiku.github.io/post/workgraph_in_hlsl/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha256-FMvZuGapsJLjouA6k7Eo2lusoAX9i0ShlWFG6qt7SLc=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin="anonymous">
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.min.3934cd053659c69f72130ea239611b5f.css">
+
+  
+
+
+
+
+  
+
+
+  
+  
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu127225d7ed9c50974404790b7c221374_401884_32x32_fill_lanczos_center_3.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu127225d7ed9c50974404790b7c221374_401884_192x192_fill_lanczos_center_3.png">
+
+  <link rel="canonical" href="https://shikihuiku.github.io/post/workgraph_in_hlsl/">
+
+  
+  
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="shikihuiku – 色不異空 – Real-time rendering topics in Japanese.">
+  <meta property="og:url" content="https://shikihuiku.github.io/post/workgraph_in_hlsl/">
+  <meta property="og:title" content="Work Graph in HLSL | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.">
+  <meta property="og:description" content="Work Graphはややこしいので自分なりの要点のまとめ"><meta property="og:image" content="https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png">
+  <meta property="twitter:image" content="https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2024-08-19T19:00:41&#43;09:00">
+    
+    <meta property="article:modified_time" content="2024-08-19T19:00:41&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://shikihuiku.github.io/post/workgraph_in_hlsl/"
+  },
+  "headline": "Work Graph in HLSL",
+  
+  "datePublished": "2024-08-19T19:00:41+09:00",
+  "dateModified": "2024-08-19T19:00:41+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "shikihuiku"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "shikihuiku – 色不異空 – Real-time rendering topics in Japanese.",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_192x192_fill_lanczos_center_3.png"
+    }
+  },
+  "description": "Work Graphはややこしいので自分なりの要点のまとめ"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>Work Graph in HLSL | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
+
+</head>
+
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" class=" ">
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search" class="form-control">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-end" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+            
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="https://shikihuiku.wordpress.com/" target="_blank" rel="noopener"><span>Old Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>About</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/memo"><span>ちらしの裏</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#" aria-label="Search"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item dropdown theme-dropdown">
+        <a href="#" class="nav-link js-theme-selector" data-toggle="dropdown" aria-haspopup="true">
+          <i class="fas fa-palette" aria-hidden="true"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item js-set-theme-light">
+            <span>Light</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-dark">
+            <span>Dark</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-auto">
+            <span>Automatic</span>
+          </a>
+        </div>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>Work Graph in HLSL</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    2024/08/19
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    13 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>基本的な機能に関する説明は割愛。自分が Work Graph を書くときに、度忘れしたときに参照するもののつもりで書いた。描画系はあとで書き足すかも。</p>
+<h2 id="hlsl関数のattribute">HLSL関数のAttribute</h2>
+<ul>
+<li><code>[Shader(&quot;node&quot;)]</code>
+<ul>
+<li>この属性をつけたHLSL関数は Work Graph のノードとして宣言。</li>
+</ul>
+</li>
+<li><code>[NodeIsProgramEntry]</code>
+<ul>
+<li>Work Graph のエントリポイントとなれる。つまり、Input RecordをCommand Listや外部のGPUメモリから受け取ることができる。</li>
+</ul>
+</li>
+<li><code>[NodeLaunch(&quot;mode&quot;)]</code>
+<ul>
+<li><code>“broadcasting”</code><br>
+一つの Input Record を、複数の Dispatch Grid で共有して処理するノードとして宣言。</li>
+<li><code>“coalescing”</code><br>
+複数の Input Redcord を、一つの Dispatch Grid で処理するノードとして宣言。</li>
+<li><code>“thread”</code><br>
+一つの Input Record を、一つのスレッドで処理するノードとして宣言。</li>
+<li><code>“mesh”</code><br>
+<code>“broadcasting”</code>ノードと同様の起動方式だが、Work Graph の末端でしか使用できない。<br>
+Mesh shaderとして動作する。（Amplification Shader は Work Graph ではサポートされていない）</li>
+</ul>
+</li>
+<li><code>[NumThreads(x,y,z)]</code>
+<ul>
+<li>Thread Group のサイズ。通常の Compute Shader と同じ。</li>
+</ul>
+</li>
+<li><code>[NodeDispatchGrid(x,y,z)]</code> or <code>[NodeMaxDispatchGrid(x,y,z)]</code>
+<ul>
+<li><code>NodeLaunch</code>が<code>“broadcasting”</code>の場合は、上記のいずれかが宣言されている必要がある。</li>
+<li><code>NodeMaxDispatchGrid</code>が宣言されている場合は、Input Record 内の<code>SV_DispatchGrid</code>セマンティクスの変数で Dispatch Grid のサイズが指定される必要がある。<br>
+この場合は、Disapatch Grid サイズが Input Record ごとに変更できる。</li>
+</ul>
+</li>
+<li><code>[NodeID(&quot;nodeName&quot;,arrayIndex)]</code>
+<ul>
+<li>ノードとしての識別名の定義。これを省略すると、関数名がノードの識別名になる。</li>
+<li>複数のHLSL関数で、Work Graph のノード配列を定義する場合は、同一の<code>”nodeName”</code>で、異なる<code>arrayIndex</code>を指定する。
+<ul>
+<li><code>arrayIndex</code> は省略可能で、省略した場合は０番を宣言したとみなされる。</li>
+<li><code>arrayIndex</code> は、必ずしも連続して、隙間なく宣言されている必要はない。</li>
+</ul>
+</li>
+<li>ノード配列として定義されるノード要素に相当するHLSL関数は、以下の項目が同一でなければならない。
+<ul>
+<li>Input Record の宣言</li>
+<li><code>NodeLaunch</code>属性</li>
+<li><code>NodeDispatchGrid</code>属性、もしくは<code>NodeMaxDispatchGrid</code>属性で定義された Dispatch Grid のサイズ。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>[NodeLocalRootArgumentsTableIndex(index)]</code>
+<ul>
+<li>このノードが実行されるとき、<code>index</code>で指定した Local Root Table がバインドされる。</li>
+<li>この属性を定義しない場合や、<code>index</code>に-1を設定した場合は、Work Graph がコンパイルされる時に自動で割り振られたインデックスがアサインされる。</li>
+</ul>
+</li>
+<li><code>[NodeShareInputOf(&quot;nodeIDWhoseInputToShare&quot;, optionalArrayIndex)]</code>
+<ul>
+<li>同一の Input Record で、異なる種類のノードを起動する場合は、同時に起動するノードには、この属性で、Input Record を共有するノードが示されている必要がある。</li>
+<li>異なる種類のノードが Input Record を共有する場合は、一つの代表する<code>NodeID</code>を他のすべてのノードが指すように宣言する。</li>
+<li>最高で256種類のノードが同一の Input Record で起動できる。</li>
+<li>RW Input Record（書き込み可能な Input Record）は、異なる種類のノードで共有することはできない。</li>
+</ul>
+</li>
+<li><code>[NodeMaxRecursionDepth(count)]</code>
+<ul>
+<li>このノードの最大再帰呼び出し回数を宣言する。</li>
+<li>参考：現在のWork Graphでは複数ノードを介した再帰呼び出しグラフはサポートされていない。</li>
+</ul>
+</li>
+<li><code>[NodeMaxInputRecordsPerGraphEntryRecord(count, sharedAcrossNodeArray)]</code>
+<ul>
+<li>この<code>”mesh&quot;</code>ノードが一度に受け取ることのできる Input Record の最大数を宣言する。</li>
+<li>この最大数は、<code>DispatchGrid()</code>呼び出し時の、一つの Input Record によって動作する全ての Work Graph ノードが出力する、このノードに対する Input Record の総数という意味。</li>
+<li><code>sharedAcrossNodeArray</code>が<code>true</code>の場合は、Input Record を受け取るノード配列全体で、この最大数を共有する。</li>
+<li>参考：GPUのアーキテクチャによっては、コンピュートシェーダーを実行するときと、描画用のシェーダーを実行するときに、実行コンテキストのスイッチが必要なものがある。<br>
+頻繁な実行コンテキストスイッチを避けるため、<code>”mesh”</code>ノードへの Input Record は可能な限り蓄積される必要があるが、その上限を定義することで、Backing Memory のサイズと実行性能を適切にバランスすることができるようになると思われる。</li>
+</ul>
+</li>
+</ul>
+<h2 id="input-record">Input Record</h2>
+<p>Input Recordは、自身の<code>NodeLaunch</code>属性で受け取れる型が決まる。</p>
+<h4 id="broadcasting-launch">Broadcasting Launch</h4>
+<ul>
+<li><code>DispatchNodeInputRecord&lt;recordType&gt;</code>
+<ul>
+<li>読み出し専用の Input Record。</li>
+</ul>
+</li>
+<li><code>RWDispatchNodeInputRecord&lt;recordType&gt;</code>
+<ul>
+<li>読み書きが可能な Input Record。一時的なUAVバッファのように扱える。</li>
+</ul>
+</li>
+<li><code>globallycoherent RWDispatchNodeInputRecord&lt;recordType&gt;</code>
+<ul>
+<li>前者と基本的に同じだが、<code>Barrier()</code>と<code>FinishedCrossGroupSharing()</code>メソッドを適切に使うことで、<br>
+Input Record のメモリ領域を、同時に起動した Dispatch Grid の他の Thread Group とのコミュニケーションにつかうことができる。</li>
+<li>参考：<code>FinishedCrossGroupSharing()</code>メソッドを使うときは、Input Recordの構造体に、<code>[NodeTrackRWInputSharing]</code>属性をつけなくてはいけない。</li>
+</ul>
+</li>
+</ul>
+<h4 id="coalescing-launch">Coalescing Launch</h4>
+<ul>
+<li><code>[MaxRecords(maxCount)] GroupNodeInputRecords&lt;recordType&gt;</code>
+<ul>
+<li>1 ～ <code>maxCount</code>数の、読み出し専用の Input Record。</li>
+<li><code>Count()</code>メソッドで、受け渡された Input Record の配列の長さがわかる。</li>
+</ul>
+</li>
+<li><code>[MaxRecords(maxCount)] RWGroupNodeInputRecords&lt;recordType&gt;</code>
+<ul>
+<li>読み書き可能なInput Record。一時的なUAVバッファのように扱える。</li>
+<li><code>Count()</code>メソッドで、受け渡された Input Record の配列の長さがわかる。</li>
+<li>参考：この Input Record にアクセスできるのは、Coalescing Launch の特性上、一つの Thread Group なので、あまり使い道がないかもしれない。</li>
+</ul>
+</li>
+<li><code>[MaxRecords(maxCount)] EmptyNodeInput</code>
+<ul>
+<li>データの受け渡しはない。</li>
+<li><code>Count()</code>メソッドで、受け渡された Input Record の配列の長さがわかる。</li>
+</ul>
+</li>
+</ul>
+<h4 id="thread-launch">Thread Launch</h4>
+<ul>
+<li><code>ThreadNodeInputRecord&lt;recordType&gt;</code>
+<ul>
+<li>読み出し専用の Input Record。</li>
+</ul>
+</li>
+<li><code>RWThreadNodeInputRecord&lt;recordType&gt;</code>
+<ul>
+<li>読み書きが可能な Input Record。一時的なUAVバッファのように扱える。</li>
+<li>ただし、Thread Launch なので、他のスレッドとのデータのやり取りなどには使えない。</li>
+</ul>
+</li>
+</ul>
+<h2 id="node-outputとoutput-record">Node OutputとOutput Record</h2>
+<p>Input Record は、ノード関数の引数で直接受け取る形になっているが、Output Record は、NodeOutput 型が Output Record を抽象化して保持している形になっているので注意。
+Input Record とは異なり、呼び出し先のノードの <code>NodeLaunch</code>属性にかかわらず、同じ型を使用する。</p>
+<h4 id="node-output">Node Output</h4>
+<p>配列型かどうかと、Empty型かどうかを選択する形で、計４種類がある。</p>
+<ul>
+<li><code>attribute-list NodeOutput&lt;recordType&gt;</code>
+<ul>
+<li>単一の Node Output を出力する場合。</li>
+<li>注意：Output Record 自体が、基本的には可変長の配列のようなものなので、Output Record が一つしか出力できないという意味ではない。</li>
+</ul>
+</li>
+<li><code>attribute-list NodeOutputArray&lt;recordType&gt;</code>
+<ul>
+<li>配列型の Node Output を出力する場合。</li>
+<li>この出力を受け取るノードは、配列で宣言されていることが期待される。</li>
+<li><code>operator []</code> で、上記の<code>NodeOutput</code>型が取得できる。</li>
+</ul>
+</li>
+<li><code>attribute-list EmptyNodeOutput</code>
+<ul>
+<li>Output Record を出力しない場合の Node Output。</li>
+</ul>
+</li>
+<li><code>attribute-list EmptyNodeOutputArray</code>
+<ul>
+<li>配列型の<code>EmptyNodeOutput</code>。</li>
+<li><code>operator []</code> で、上記の<code>EmptyNodeOutput</code>型が取得できる。</li>
+</ul>
+</li>
+</ul>
+<h4 id="上記の-attribute-list-について">上記の <code>attribute-list</code> について</h4>
+<ul>
+<li><code>[MaxRecords(count)]</code> or <code>[MaxRecordsSharedWith(nameInShader)]</code>
+<ul>
+<li><code>count</code>で、出力する Output Record の最大数を宣言する。</li>
+<li><code>MaxRecordsSharedWith</code>は、このノードの関数の引数宣言で、先に宣言された<code>nameInShader</code>引数と同じ最大数を、宣言として使う場合に使用する。
+<ul>
+<li>同じ最大数を、複数の下流ノードに出力する場合に有用。</li>
+</ul>
+</li>
+<li>配列型の Node Output は、配列のすべての要素に対してこの最大数が適用される。</li>
+</ul>
+</li>
+<li><code>[NodeID(&quot;nodeName&quot;)]</code> or <code>[NodeID(&quot;nodeName&quot;,baseArrayIndex)]</code>
+<ul>
+<li>出力先のノード名を明示的に宣言する。</li>
+<li>この属性をつけない場合は、宣言した変数名が出力先のノードとみなされる。</li>
+</ul>
+</li>
+<li><code>[AllowSparseNodes]</code>
+<ul>
+<li>出力先のノードが存在しないことを許可する。</li>
+<li>特に配列型の Node Output では、いくつかの配列要素に対する出力ノードが存在しないことを許可する。
+<ul>
+<li>参考：<code>IsValid()</code>メソッドで、Work Graph に有効な出力ノードが存在するかを確認することができる。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>[NodeArraySize(count)]</code> or <code>[UnboundedSparseNodes]</code>
+<ul>
+<li><code>count</code>で、配列型の Node Output の最大要素数を宣言する。</li>
+<li><code>UnboundedSparseNodes</code>は、<code>[NodeArraySize(0xffffffff)] [AllowSparseNodes]</code>と宣言するのと同義。
+<ul>
+<li>参考：実際には、Work Graphをコンパイルするときに、存在する有効な出力ノードの数と範囲は検出されるので、このサイズの Output Record が作られるわけではない。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="output-record-の生成と取得操作など">Output Record の生成と取得、操作など。</h4>
+<p>基本的には、Output Record を、スレッド単位で確保するか、Therad Group 単位で確保するかで分かれている。<br>
+各メソッドの呼び出し時には、Thread Group が Uniform でなくてはならないというルールがある。<br>
+（つまり、すべてのスレッドがその命令を通過するか、すべてのスレッドがその命令を通過しないかのいずれかでなくてはならない。）</p>
+<ul>
+<li><code>ThreadNodeOutputRecords&lt;recordType&gt; NodeOutput&lt;recordType&gt;::GetThreadNodeOutputRecords(uint numRecordsForThisThread)</code>
+<ul>
+<li>Output Record を個々のスレッド単位で確保する。</li>
+<li>呼び出しは Unfirom だが、確保する Output Record の数や、配列型 Output Record の場合の、確保する要素のインデックスは、各スレッドで可変でよい。</li>
+<li>Output Record のハンドルの配列が返される。<code>Get(int index=0)</code>メソッドが、Output Record の配列の先頭に対する簡単なアクセスを提供する。</li>
+<li>すべての書き込み処理が終了したら、呼び出しが Uniform な状態で、取得した <code>ThreadNodeOutputRecords&lt;&gt;</code> に対して<code>OutputComplete()</code>メソッドを必ず呼び出さなければならない。</li>
+</ul>
+</li>
+<li><code>GroupNodeOutputRecords&lt;recordType&gt; NodeOutput&lt;recordType&gt;.GetGroupNodeOutputRecords(uint numRecords)</code>
+<ul>
+<li>Output Record を Thread Group 全体で<code>numRecord</code>数確保する。</li>
+<li>呼び出しは Unfirom で、確保数や、配列型 Output Record の場合の確保する要素のインデックスも Uniform でなくてはならない。</li>
+<li>すべての書き込み処理が終了したら、呼び出しが Uniform な状態で、取得した<code>GroupNodeOutputRecords&lt;&gt;</code>に対して<code>OutputComplete()</code>メソッドを必ず呼び出さなければならない。</li>
+<li>Thread Launch のノードではこのメソッドを呼び出すことはできない。</li>
+</ul>
+</li>
+<li><code>EmptyNodeOutput::ThreadIncrementOutputCount(uint count)</code>
+<ul>
+<li>スレッド単位で（Emptyな）Output Record の数をインクリメントする。</li>
+<li>呼び出しは Uniform である必要があるが、個々のスレッドが指定するインクリメント数は可変でよい。</li>
+</ul>
+</li>
+<li><code>EmptyNodeOutput::GroupIncrementOutputCount(uint count)</code>
+<ul>
+<li>Thread Group 単位で（Emptyな）Output Recordを<code>count</code>数インクリメントする。</li>
+<li>呼び出しは Uniform で、インクリメント数も Uniform でなければならない。</li>
+</ul>
+</li>
+</ul>
+<h2 id="barrier組み込み関数"><code>Barrier()</code>組み込み関数</h2>
+<p><code>Barrier()</code>組み込み関数は、Work Graphの導入に伴いShader Model 6.8から新しく導入されたが、Work Graphに関係なく使える。<br>
+以下の３つの型がある。</p>
+<ul>
+<li><code>void Barrier(uint MemoryTypeFlags, uint SemanticFlags)</code>
+<ul>
+<li><code>MemoryTypeFlags</code>で指定したタイプの、すべてのリソースの同期をとる。</li>
+<li><code>MemoryTypeFlags</code> は ビットマスクになっていて下記を組み合わせて指定できる。
+<ul>
+<li><code>UAV_MEMORY</code></li>
+<li><code>GROUP_SHARED_MEMORY</code></li>
+<li><code>NODE_INPUT_MEMORY</code></li>
+<li><code>NODE_OUTPUT_MEMORY</code></li>
+<li><code>ALL_MEMORY</code>
+<ul>
+<li>これはすべてのビットマスクの組み合わせ。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>template&lt;typename UAVResource&gt; void Barrier(UAVResource, uint SemanticFlags)</code>
+<ul>
+<li>引数で指定した<code>UAVResource</code>を同期の対象とする。</li>
+</ul>
+</li>
+<li><code>template&lt;typename NodeRecordObject&gt; void Barrier(NodeRecordObject o, uint SemanticFlags)</code>
+<ul>
+<li>引数で指定した<code>NodeRecordObject</code>の同期をとる。</li>
+<li><code>NodeRecordObject</code>は、<code>RW{Dispatch|Group|Thread}NodeInputRecords</code> or <code>{Group|Thread}NodeOutputRecords</code>を指定できる。</li>
+</ul>
+</li>
+</ul>
+<h4 id="semanticflagsについて"><code>SemanticFlags</code>について</h4>
+<p>どのような同期をとるかを指定するのが<code>SemanticFlags</code>。以下の３つがある。<code>_SYNC</code>と<code>_SCOPE</code>は論理和で組み合わせて指定できる。</p>
+<ul>
+<li>
+<p><code>GROUP_SYNC</code></p>
+<ul>
+<li>Thread Group 内のすべてのスレッドが、このバリア命令の直前の命令まで発行し終わるまで、ここですべてのスレッドが待つことを指示する。</li>
+<li>他の２つはメモリアクセスの完了に関連する制御だが、これはシェーダーの命令発行の制御。</li>
+</ul>
+</li>
+<li>
+<p><code>GROUP_SCOPE</code></p>
+<ul>
+<li>このバリア命令の前に発行された、メモリアクセス処理が完了するまで、ここで待つことを指示する。</li>
+<li>参考：<code>GROUP_SYNC</code>と組み合わせて指定した場合は、Thread Group 内のすべてのスレッドが、<br>
+このバリア命令の前に記述されたすべてのメモリアクセス処理が、完了するまでここで待つことを指示する。</li>
+<li>参考：<code>GROUP_SYNC</code>がない場合は、Thread Group が複数の Wave に分かれている場合は、Wave 間での同期は保証されない。</li>
+<li>例として、以下のオブジェクトに対してのメモリアクセスを同期したい場合に使う。
+<ul>
+<li><code>groupshared</code>で修飾されたオブジェクト</li>
+<li><code>RWGroupNodeInputRecords</code></li>
+<li><code>GroupNodeOutputRecords</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>DEVICE_SCOPE</code></p>
+<ul>
+<li>このバリア命令の前に発行された、メモリアクセス処理が完了するまで、ここで待つことを指示する。<br>
+加えて、<code>globallycoherent</code>で修飾されたオブジェクトに対するメモリアクセス処理と、<code>Interlocked</code>系の命令によるメモリアクセス処理が完了して、<br>
+GPUの他の処理ユニットからその処理結果が正しく読み出せるようになるまで、ここで待つことを指示する。</li>
+<li>参考：<code>GROUP_SYNC</code>と組み合わせた場合の効果は、<code>GROUP_SCOPE</code>の項で説明したのと同じ。</li>
+<li>具体的には、以下のオブジェクトに対してのメモリアクセスを同期したい場合に使う。
+<ul>
+<li><code>globallycoherent</code>で修飾されたUAV</li>
+<li><code>globallycoherent</code>で修飾された<code>RWDispatchNodeInputRecord</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="work-graphにおけるgloballycoherent修飾について">Work Graphにおける<code>globallycoherent</code>修飾について。</h4>
+<ul>
+<li>
+<p><code>globallycoherent</code>修飾されたUAVについて</p>
+<ul>
+<li>Work Graph の上流ノードと下流ノードでのデータの受け渡しは、基本的に{Input|Output} Record を使うが、データの格納形式や、必要とされるデータの寿命などによって、UAVを使うのが適切な場合がある。</li>
+<li><code>globallycoherent</code>修飾されたUAVを介して、上流ノードと下流ノードでデータを受け渡す場合は、上流ノードにおいて、UAVに対する処理と、下流ノードを起動するための Output Record の生成完了（つまり、<code>OutputComplete()</code>の呼び出しや、<code>IncrementOutputCount()</code>の呼び出し）の間に、<code>DEVICE_SCOPE</code>のバリアを設定することで、両ノードの、UAVへのデータ競合を避けることができる。
+<ul>
+<li>注意：Work Graphの実行順序は、必ずしもグラフの上流ノードから下流ノードと順番が決まっているわけではなく、{Input|Output} Recordの依存関係で決まっている。</li>
+<li>上流ノードの、複数の Thread Group が同一のUAVを処理し、全ての処理の完了を待ってから下流ノードの処理を始めたい場合は、<code>InterlockedAdd()</code>などを駆使して、上流ノードの Thread Group の中で、最後に処理が完了した Thread Groupを検出して、その Thread Group が下流ノードを起動するための Output Record を生成する必要がある。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>globallycoherent</code>で修飾された<code>RWDispatchNodeInputRecord</code>について</p>
+<ul>
+<li>
+<p>Broadcasting Launch では、複数のThread Group が、一つの Input Recordを読み書きすることができる。<br>
+<code>globallycoherent</code>修飾をつけておけば、<code>globallycoherent</code>修飾のついた短期的なUAVバッファとして扱うことができるので、  <code>Interlocked</code>系の命令やバリアを適切に使用すれば Thread Group 間で、データのやり取りおよび同期をとることができる。</p>
+</li>
+<li>
+<p><code>bool RWDispatchNodeInputRecord&lt;recordType&gt;::FinishedCrossGroupSharing()</code>を使えば、最後にこのメソッドを呼び出した Thread Group にのみ、<code>true</code>が返されるので、複数の Therad Group で行った処理全体の終了を知ることができる。</p>
+<ul>
+<li>このメソッドを使用するInput Recordの宣言には、<code>[NodeTrackRWInputSharing]</code>属性がついてる必要がある。この属性をつけると、Input Recordのサイズが4byte大きくなる。
+<ul>
+<li>参考：結局のところ、この4byteの領域を上流ノードでゼロに設定しておき、各Therad Groupが<code>RWDispatchNodeInputRecord</code>に対する処理が終了した時点で、その4byte領域に<code>InterlockedAdd()</code>を実行していると思われる。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="rwthreadnodeinputrecord-threadnodeoutputrecordsオブジェクトとbarrierについて"><code>RWThreadNodeInputRecord</code>, <code>ThreadNodeOutputRecords</code>オブジェクトと<code>Barrier()</code>について</h4>
+<ul>
+<li>この二つのオブジェクトは、いずれもスレッドローカルなので、<code>GROUP_SCOPE</code>, <code>DEVICE_SCOPE</code>いずれも適用できない。</li>
+<li><code>Barrier()</code>命令を跨いで、対象オブジェクトに対するメモリアクセス命令を、コンパイラによる命令スケジューリングで移動することを抑制する。</li>
+</ul>
+
+    </div>
+
+    
+
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tag/direct3d/">Direct3D</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=https://shikihuiku.github.io/post/workgraph_in_hlsl/&amp;text=Work%20Graph%20in%20HLSL" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=https://shikihuiku.github.io/post/workgraph_in_hlsl/&amp;t=Work%20Graph%20in%20HLSL" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Work%20Graph%20in%20HLSL&amp;body=https://shikihuiku.github.io/post/workgraph_in_hlsl/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=https://shikihuiku.github.io/post/workgraph_in_hlsl/&amp;title=Work%20Graph%20in%20HLSL" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="whatsapp://send?text=Work%20Graph%20in%20HLSL%20https://shikihuiku.github.io/post/workgraph_in_hlsl/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=https://shikihuiku.github.io/post/workgraph_in_hlsl/&amp;title=Work%20Graph%20in%20HLSL" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  
+    
+    
+    
+      
+    
+    
+    
+    <div class="media author-card content-widget-hr">
+      
+        
+        <img class="avatar mr-3 avatar-circle" src="/author/shikihuiku/avatar_hu83bef21d3d3e76bee62dd138e5083bbc_32201_270x270_fill_q90_lanczos_center.jpg" alt="shikihuiku">
+      
+
+      <div class="media-body">
+        <h5 class="card-title"><a href="https://shikihuiku.github.io/">shikihuiku</a></h5>
+        
+        <p class="card-text">リアルタイムレンダリングが好き</p>
+        <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/shikihuiku" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/shikihuiku" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+</ul>
+
+      </div>
+    </div>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/rtxdi_second_step/">RTXDIのminimal-sampleを理解する(2)</a></li>
+      
+      <li><a href="/post/rtxdi_first_step/">RTXDIのminimal-sampleを理解する(1)</a></li>
+      
+      <li><a href="/post/projection_matrix/">Projection Matrixについて</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js" integrity="sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/highlight.min.js" integrity="sha512-7t8APmYpzEsZP7CYoA7RfMPV9Bb+PJHa9x2WiUnDXZx3XHveuyWUtvNOexhkierl5flZ3tr92dP1mMS+SGlD+A==" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js" integrity="sha256-EErZamuLefUnbMBQbsEqu1USa+btR2oIlCpBJbyD4/g=" crossorigin="anonymous"></script>
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    <script>const isSiteThemeDark = false;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks",
+        'slides' : "Slides"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.341e58d06db179e1d53f3322b6883f4c.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    
+  </p>
+
+  
+  
+
+
+
+
+
+
+  <p class="powered-by">
+    
+    Published with
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic Website Builder</a>
+    
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
