@@ -5,12 +5,707 @@
     <link>https://shikihuiku.github.io/</link>
       <atom:link href="https://shikihuiku.github.io/index.xml" rel="self" type="application/rss+xml" />
     <description>shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Mon, 19 Aug 2024 19:00:41 +0900</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sat, 01 Feb 2025 18:00:00 +0900</lastBuildDate>
     <image>
       <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png</url>
       <title>shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
       <link>https://shikihuiku.github.io/</link>
     </image>
+    
+    <item>
+      <title>ID3D12CommandQueue::UpdateTileMappingsが起こすデッドロックについて</title>
+      <link>https://shikihuiku.github.io/post/d3d12utm/</link>
+      <pubDate>Sat, 01 Feb 2025 18:00:00 +0900</pubDate>
+      <guid>https://shikihuiku.github.io/post/d3d12utm/</guid>
+      <description>&lt;p&gt;English is here. 
+&lt;a href=&#34;#Eng&#34;&gt;Deadlocks Caused by ID3D12CommandQueue::UpdateTileMappings&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;D3D12のゲームが低い頻度でハングアップしてしまう理由の一つとして、&lt;code&gt;UpdateTilemappnigs&lt;/code&gt;が原因となるデッドロックがあります。詳しい仕組みは、いまだ不明ですが、最近やっと自分の考えを人に説明できるぐらいにはなってきたので、メモ代わりに残しておこうと思います。&lt;br&gt;
+ただし、以下に記述することは、あくまでも、おそらくこういうことだろうなぁ、という程度の想像の話です。確かなことはSDKやOSを設計している人に聞いてみないとわかりません。
+今のところ、Windows11 24H2 (OS Build 26100.2894)では起きるようですが、将来的にOS側に修正が入る可能性もあるかと思います。&lt;/p&gt;
+&lt;h2 id=&#34;gpuviewで確認するd3d12のid3d12commandqueueupdatetilemappingsの動作&#34;&gt;GPUViewで確認するD3D12のID3D12CommandQueue::UpdateTileMappingsの動作&lt;/h2&gt;
+&lt;p&gt;まずは、GPUViewを使って&lt;code&gt;UpdateTileMappings&lt;/code&gt;の動作を確認してみます。GPUViewのEvent Listの中から、&lt;code&gt;DxgKrnl UpdateGPUVirtualAddress&lt;/code&gt;を選択して、呼び出し箇所を特定します。
+以下のスクリーンショットは、あるフレームのレンダリング処理を、プロセスのGPU実行キューに積んだ後に、&lt;code&gt;UpdateTileMappings&lt;/code&gt;（以下UTM）を何度か呼び出している箇所です。&lt;br&gt;
+UTMの呼び出しで、アプリケーションのスレッドがカーネルモードにスイッチしているのがわかります。また、その区間では、&lt;code&gt;DxgKrnl UpdateGPUVirtualAddress&lt;/code&gt;のイベント一つにつき、フェンスが二つ設定されているのがわかります。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-gpu-view---1&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/d3d12utm/image1_hub9ccdd4ec5701d8ba5db3e6a9b8229e2_36733_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;GPU View - 1&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/d3d12utm/image1_hub9ccdd4ec5701d8ba5db3e6a9b8229e2_36733_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;90%&#34; height=&#34;978&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    GPU View - 1
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;次に、このフェンスがプロセスのGPU実行キューで処理されるタイミングを見てみます。まず、積み上げられたフェンスは同一のオブジェクトなのがわかります。１つのフェンスが、フェンス値をインクリメントしながら使用されているようです。UTMのフェンスが、プロセスのGPU実行キューの先頭に到達すると、アプリケーションのスレッドでDPCが呼び出されます（これはOSによる割り込みと解釈して問題ありません。）このDPCは、プロセスのPaging QueueにPaging Queu Packetを送出します。&lt;br&gt;
+以下のスクリーンショットでは、UTMが送出した一連のフェンスをハイライトしています。先頭が、実行キューの先頭に到達する直前で、アプリケーションの白いバーで示されているThread上で、DPCが起動されます。このDPCが動作するタイミングでPaging Queue Packetが送出されますようです。矢印で図示しておきました。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-gpu-view---2&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/d3d12utm/image2_hu3213b80c4faf65051a2dffba27d98fa5_481072_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;GPU View - 2&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/d3d12utm/image2_hu3213b80c4faf65051a2dffba27d98fa5_481072_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;90%&#34; height=&#34;1000&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    GPU View - 2
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;送出されたPaging Queue Packetは、OSのVidMm WorkerThreadで処理されます。パケットを受け取ったOSのスレッドが、System Paging Contextに、Paging Command Packetを送出します。このパケットは、GPU上のHardware Copy Queueに送出されて、GPU上で処理されます。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-gpu-view---3&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/d3d12utm/image3_hu92bebf72723ca2a2ad84b4939408949e_84146_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;GPU View - 3&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/d3d12utm/image3_hu92bebf72723ca2a2ad84b4939408949e_84146_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;90%&#34; height=&#34;896&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    GPU View - 3
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;System Paging Contextには、Paging Command Packetの直後に、３つのフェンスが設定されており、GPU上でのUTM処理の完了をCPU側で検知するようです。このうちの一つは、UTMを送出したプロセスのスレッドでDPCを起動して、これがUTMのフェンスのフェンス値をインクリメントするようです。その結果、プロセス側のGPU実行QueueでUTMの完了を待っていたフェンスが解決されます。これで一つのUTM処理が完了したことになります。&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-gpu-view---4&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/d3d12utm/image4_huce2858e525986fbbb1701b9fc14dc36c_412330_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;GPU View - 4&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/d3d12utm/image4_huce2858e525986fbbb1701b9fc14dc36c_412330_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;90%&#34; height=&#34;1017&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    GPU View - 4
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;h2 id=&#34;utmの処理をwindbgで追ってみる&#34;&gt;UTMの処理をWindbgで追ってみる&lt;/h2&gt;
+&lt;p&gt;次は、デバッガーを使って、UTMの処理を追ってみます。適当なサンプルアプリケーションのUTMコールを、Microsoftのシンボルサーバーだけを使って追ってみました。処理は、D3Dのランタイム、ユーザーモードドライバー、Windows APIなどで構成されており、その中で主だった処理を、順を追って見てみたいと思います。&lt;/p&gt;
+&lt;h4 id=&#34;1-d3d12coreが管理するmutexの取得&#34;&gt;1. D3D12Coreが管理するMutexの取得&lt;/h4&gt;
+&lt;p&gt;UTM呼び出しの冒頭で、D3D12Coreが管理するミューテックスを取得します。おそらくこれは、該当の&lt;code&gt;CGraphicsCommandQueue&lt;/code&gt;に対する呼び出しの、排他制御の為と思われます。&lt;code&gt;CGraphicsCommandQueue&lt;/code&gt;はスレッドセーフな設計となっているので、必要に応じてD3Dのランタイム側でで排他制御が行われているのだと思われます。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   ntdll!RtlAcquireSRWLockExclusive     
+[0x1]   msvcp_win!Mtx_lock+0x31    
+[0x2]   D3D12Core!std::_Mutex_base::lock+0x10    
+[0x3]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0xe2    
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;2-device-driver-interfaceに登録された関数の呼び出し&#34;&gt;2. Device Driver Interfaceに登録された関数の呼び出し&lt;/h4&gt;
+&lt;p&gt;Device Driver Interface (DDI)は、OSやランタイムが、デバイスドライバーを呼び出すときの関数のインターフェースです。呼び出し先は、その時インストールされているドライバーのコードになります。呼び出されたDDIの引数のを見ると、&lt;code&gt;d3d12umddi.h&lt;/code&gt;に定義されている、&lt;code&gt;PFND3D12DDI_UPDATETILEMAPPINGS&lt;/code&gt;だとわかります。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x2]   D3D12Core!TableFunctionTraits&amp;lt;2&amp;gt;::Detail::InvokerImpl&amp;lt;TableFunctionTraitsImpl&amp;lt;2&amp;gt;::FunctionTraits&amp;lt;70,0,void&amp;gt;,void,void,D3D12DDI_HCOMMANDQUEUE,D3D10DDI_HRESOURCE,unsigned int,D3D12DDI_TILED_RESOURCE_COORDINATE const * __ptr64,D3D12DDI_TILE_REGION_SIZE const * __ptr64,D3D12DDI_HHEAP,unsigned int,enum D3D12DDI_TILE_RANGE_FLAGS const * __ptr64,unsigned int const * __ptr64,unsigned int const * __ptr64,enum D3D12DDI_TILE_MAPPING_FLAGS&amp;gt;::Call&amp;lt;CGraphicsCommandQueue&amp;gt;+0x9f   
+[0x3]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x15e      
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;参考：&lt;code&gt;d3d12umddi.h&lt;/code&gt;の&lt;code&gt;PFND3D12DDI_UPDATETILEMAPPINGS&lt;/code&gt;の定義&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;typedef VOID ( APIENTRY* PFND3D12DDI_UPDATETILEMAPPINGS )( D3D12DDI_HCOMMANDQUEUE, D3D12DDI_HRESOURCE,
+    UINT NumTiledResourceRegions,
+    _In_reads_(NumTiledResourceRegions) const D3D12DDI_TILED_RESOURCE_COORDINATE* pResourceRegionStartCoords,
+    _In_reads_opt_(NumTiledResourceRegions) const D3D12DDI_TILE_REGION_SIZE* pResourceRegionSizes,
+    D3D12DDI_HHEAP, UINT NumRanges,
+    _In_reads_opt_(NumRanges) const D3D12DDI_TILE_RANGE_FLAGS*,
+    _In_reads_opt_(NumRanges) const UINT* pHeapStartOffsets,
+    _In_reads_opt_(NumRanges) const UINT* pRangeTileCounts,
+    D3D12DDI_TILE_MAPPING_FLAGS );
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;3-umdのコード内でのcritical-sectionの取得&#34;&gt;3. UMDのコード内でのCritical Sectionの取得&lt;/h4&gt;
+&lt;p&gt;Critical SectionはWindwosが提供するる、プロセス内で使える同期オブジェクトです。Callstackを見ると、UMDのコードが&lt;code&gt;nvwgf2umx!OpenAdapter&lt;/code&gt;となっていますが、これは、UMDのDLLでExportされているSymbolからのオフセットアドレスを表示しているだけで、DDIコールで&lt;code&gt;OpenAdapter&lt;/code&gt;が呼ばれているわけではありません。NVIDIAのUMDのDLLのPDBファイルが無いので、Symbolが解決できないだけです。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   ntdll!RtlEnterCriticalSection   
+[0x1]   nvwgf2umx!OpenAdapter12+0x7e5f   
+[0x2]   D3D12Core!TableFunctionTraits&amp;lt;2&amp;gt;::Detail::InvokerImpl&amp;lt;TableFunctionTraitsImpl&amp;lt;2&amp;gt;::FunctionTraits&amp;lt;70,0,void&amp;gt;,void,void,D3D12DDI_HCOMMANDQUEUE,D3D10DDI_HRESOURCE,unsigned int,D3D12DDI_TILED_RESOURCE_COORDINATE const * __ptr64,D3D12DDI_TILE_REGION_SIZE const * __ptr64,D3D12DDI_HHEAP,unsigned int,enum D3D12DDI_TILE_RANGE_FLAGS const * __ptr64,unsigned int const * __ptr64,unsigned int const * __ptr64,enum D3D12DDI_TILE_MAPPING_FLAGS&amp;gt;::Call&amp;lt;CGraphicsCommandQueue&amp;gt;+0x9f   
+[0x3]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x15e   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4-フェンスのシグナルの送出&#34;&gt;4. フェンスのシグナルの送出&lt;/h4&gt;
+&lt;p&gt;次に、UMDのUTM処理コードは、D3DCoreの、&lt;code&gt;SubmitSignalSyncObjectsToHwQueueCB&lt;/code&gt;を呼び出します。このコールバックは、OSがD3DRuntimeに登録するコールバックと思われます。登録されているコールバック関数は、&lt;code&gt;win32u!NtGdiDdDDISubmitSignalSyncObjectsToHwQueue&lt;/code&gt;のようです。この関数のアセンブラコードを見ると、すぐに&lt;code&gt;syscall&lt;/code&gt;を実行して、カーネルモードに入っています。ここまでの呼び出し経路は少々複雑で、Application→D3DRuntime→UMD→D3DRuntime→GDIとなっています。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   win32u!NtGdiDdDDISubmitSignalSyncObjectsToHwQueue+0x12   
+[0x1]   D3D12Core!CallAndLogImpl&amp;lt;long (__cdecl*)(_D3DKMT_SUBMITSIGNALSYNCOBJECTSTOHWQUEUE const * __ptr64),_D3DKMT_SUBMITSIGNALSYNCOBJECTSTOHWQUEUE * __ptr64&amp;gt;+0x1d   
+[0x2]   D3D12Core!NDXGI::CDevice::SubmitSignalSyncObjectsToHwQueueCB+0xdd   
+[0x3]   nvwgf2umx!....
+....
+[0xa]   nvwgf2umx!....
+[0xb]   D3D12Core!TableFunctionTraits&amp;lt;2&amp;gt;::Detail::InvokerImpl&amp;lt;TableFunctionTraitsImpl&amp;lt;2&amp;gt;::FunctionTraits&amp;lt;70,0,void&amp;gt;,void,void,D3D12DDI_HCOMMANDQUEUE,D3D10DDI_HRESOURCE,unsigned int,D3D12DDI_TILED_RESOURCE_COORDINATE const * __ptr64,D3D12DDI_TILE_REGION_SIZE const * __ptr64,D3D12DDI_HHEAP,unsigned int,enum D3D12DDI_TILE_RANGE_FLAGS const * __ptr64,unsigned int const * __ptr64,unsigned int const * __ptr64,enum D3D12DDI_TILE_MAPPING_FLAGS&amp;gt;::Call&amp;lt;CGraphicsCommandQueue&amp;gt;+0x9f   
+[0xc]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x15e   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;参考：&lt;code&gt;NtGdiDdDDISubmitSignalSyncObjectsToHwQueue&lt;/code&gt;のアセンブラコード&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;win32u!NtGdiDdDDISubmitSignalSyncObjectsToHwQueue:
+mov     r10, rcx
+mov     eax, 125Dh
+test    byte ptr [7FFE0308h], 1
+jne     win32u!NtGdiDdDDISubmitSignalSyncObjectsToHwQueue+0x15
+syscall 
+ret   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;5-d3dkmt_updategpuvirtualaddressの呼び出し&#34;&gt;5. D3DKMT_UPDATEGPUVIRTUALADDRESSの呼び出し&lt;/h4&gt;
+&lt;p&gt;ついにUTMの処理の本体とも呼べる箇所に到達しました。呼び出し経路は、先ほどのシグナルと似た経路です。こちらもGDIの関数で、関数内部で、すぐに&lt;code&gt;sycall&lt;/code&gt;を実行するだけです。処理の実体はカーネルモードにあると思います。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   win32u!NtGdiDdDDIUpdateGpuVirtualAddress+0x12   
+[0x1]   D3D12Core!CallAndLogImpl&amp;lt;long (__cdecl*)(_D3DKMT_UPDATEGPUVIRTUALADDRESS const * __ptr64),_D3DKMT_UPDATEGPUVIRTUALADDRESS * __ptr64&amp;gt;+0x11   
+[0x2]   D3D12Core!NDXGI::CDevice::UpdateGpuVirtualAddressCB+0x64   
+[0x3]   nvwgf2umx!....
+....
+[0x8]   nvwgf2umx!....
+[0x9]   D3D12Core!TableFunctionTraits&amp;lt;2&amp;gt;::Detail::InvokerImpl&amp;lt;TableFunctionTraitsImpl&amp;lt;2&amp;gt;::FunctionTraits&amp;lt;70,0,void&amp;gt;,void,void,D3D12DDI_HCOMMANDQUEUE,D3D10DDI_HRESOURCE,unsigned int,D3D12DDI_TILED_RESOURCE_COORDINATE const * __ptr64,D3D12DDI_TILE_REGION_SIZE const * __ptr64,D3D12DDI_HHEAP,unsigned int,enum D3D12DDI_TILE_RANGE_FLAGS const * __ptr64,unsigned int const * __ptr64,unsigned int const * __ptr64,enum D3D12DDI_TILE_MAPPING_FLAGS&amp;gt;::Call&amp;lt;CGraphicsCommandQueue&amp;gt;+0x9f   
+[0xa]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x15e   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;参考：&lt;code&gt;NtGdiDdDDIUpdateGpuVirtualAddress&lt;/code&gt;のアセンブラコード&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;win32u!NtGdiDdDDIUpdateGpuVirtualAddress:
+mov     r10, rcx
+mov     eax, 1264h
+test    byte ptr [7FFE0308h], 1
+jne     win32u!NtGdiDdDDIUpdateGpuVirtualAddress+0x15 (7ff81e415f15)
+syscall 
+ret     
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;6-フェンスのウエイトの設定&#34;&gt;6. フェンスのウエイトの設定&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;D3DKMT_UPDATEGPUVIRTUALADDRESS&lt;/code&gt;が呼ばれた後に、フェンスのウエイトの設定処理があります。私の環境では複数回呼び出されていました。こちらも、GDI関数で処理され、処理の本体は、カーネルモードで実行されています。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   win32u!NtGdiDdDDISubmitWaitForSyncObjectsToHwQueue+0x12   
+[0x1]   D3D12Core!CallAndLogImpl&amp;lt;long (__cdecl*)(_D3DKMT_SUBMITWAITFORSYNCOBJECTSTOHWQUEUE const * __ptr64),_D3DKMT_SUBMITWAITFORSYNCOBJECTSTOHWQUEUE * __ptr64&amp;gt;+0x1d   
+[0x2]   D3D12Core!NDXGI::CDevice::SubmitWaitForSyncObjectsToHwQueueCB+0x4d   
+[0x3]   nvwgf2umx!...
+...
+[0xa]   nvwgf2umx!... 
+[0xb]   D3D12Core!TableFunctionTraits&amp;lt;2&amp;gt;::Detail::InvokerImpl&amp;lt;TableFunctionTraitsImpl&amp;lt;2&amp;gt;::FunctionTraits&amp;lt;70,0,void&amp;gt;,void,void,D3D12DDI_HCOMMANDQUEUE,D3D10DDI_HRESOURCE,unsigned int,D3D12DDI_TILED_RESOURCE_COORDINATE const * __ptr64,D3D12DDI_TILE_REGION_SIZE const * __ptr64,D3D12DDI_HHEAP,unsigned int,enum D3D12DDI_TILE_RANGE_FLAGS const * __ptr64,unsigned int const * __ptr64,unsigned int const * __ptr64,enum D3D12DDI_TILE_MAPPING_FLAGS&amp;gt;::Call&amp;lt;CGraphicsCommandQueue&amp;gt;+0x9f   
+[0xc]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x15e   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;win32u!NtGdiDdDDISubmitWaitForSyncObjectsToHwQueue:
+mov     r10, rcx
+mov     eax, 125Eh
+test    byte ptr [7FFE0308h], 1
+jne     win32u!NtGdiDdDDISubmitWaitForSyncObjectsToHwQueue+0x15 (7ff81e415e55)
+syscall 
+ret     
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;7-umdのコードで取得したcritical-sectionの解放&#34;&gt;7. UMDのコードで取得したCritical Sectionの解放&lt;/h4&gt;
+&lt;p&gt;冒頭で、UMDが取得したCritical Sectionをリリースしています。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   ntdll!RtlLeaveCriticalSection   
+[0x1]   nvwgf2umx!...
+[0x2]   D3D12Core!TableFunctionTraits&amp;lt;2&amp;gt;::Detail::InvokerImpl&amp;lt;TableFunctionTraitsImpl&amp;lt;2&amp;gt;::FunctionTraits&amp;lt;70,0,void&amp;gt;,void,void,D3D12DDI_HCOMMANDQUEUE,D3D10DDI_HRESOURCE,unsigned int,D3D12DDI_TILED_RESOURCE_COORDINATE const * __ptr64,D3D12DDI_TILE_REGION_SIZE const * __ptr64,D3D12DDI_HHEAP,unsigned int,enum D3D12DDI_TILE_RANGE_FLAGS const * __ptr64,unsigned int const * __ptr64,unsigned int const * __ptr64,enum D3D12DDI_TILE_MAPPING_FLAGS&amp;gt;::Call&amp;lt;CGraphicsCommandQueue&amp;gt;+0x9f   
+[0x3]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x15e   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;8-d3dcoreのmutexの解放&#34;&gt;8. D3DCoreのMutexの解放&lt;/h4&gt;
+&lt;p&gt;冒頭で、D3DRuntimeが取得したMutexをリリースしています。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   ntdll!RtlReleaseSRWLockExclusive   0xc9a75ffd18   0x7ff81e8a366b   
+[0x1]   msvcp_win!Mtx_unlock+0x1b   0xc9a75ffd20   0x7fff94976bd8   
+[0x2]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x168   0xc9a75ffd50   0x7ff6e60e183d   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;windbgで確認できるutmの動作のまとめ&#34;&gt;Windbgで確認できるUTMの動作のまとめ&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;CommandQueueごとの排他制御と思われるMutex（D3DRuntime管理）を取得している。&lt;/li&gt;
+&lt;li&gt;UMDのコード内でCritical Sectionを取得している。（これはGPUやドライバーによって異なる可能性がある）&lt;/li&gt;
+&lt;li&gt;以下のGDI関数を呼び出している（いずれも処理の本体はカーネルモード）
+&lt;ul&gt;
+&lt;li&gt;NtGdiDdDDISubmitSignalSyncObjectsToHwQueue&lt;/li&gt;
+&lt;li&gt;NtGdiDdDDIUpdateGpuVirtualAddress&lt;/li&gt;
+&lt;li&gt;NtGdiDdDDISubmitWaitForSyncObjectsToHwQueue&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;d3dkmtupdategpuvirtualaddressの仕様について&#34;&gt;D3DKMTUpdateGpuVirtualAddressの仕様について&lt;/h2&gt;
+&lt;p&gt;参考：
+
+&lt;a href=&#34;https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3dkmthk/nf-d3dkmthk-d3dkmtupdategpuvirtualaddress&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3dkmthk/nf-d3dkmthk-d3dkmtupdategpuvirtualaddress&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;上記のページのRemarksの最後の部分に、重要なことが記述されています。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ドライバーは多くのUpdateGpuVirtualAddress呼び出しを送信できますが、それはレンダリングフェンスの後ろにキューイングされます。
+キューイングされた更新操作の数が128を超えると、呼び出し元のスレッドはビデオメモリマネージャーによって以前の操作が処理されるまでブロックされます。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;つまり、UTMはID3D12CommandQueueのメソッドなので、大量のUTM処理を発行したとしても、それはCommandQueueに蓄積されるだけではないかと我々は想像してしまいますが、実際は、最大で128リクエストしか蓄積することができず、これを超えると、前に発行したUTMが完了するまで処理がブロックされるということがこのドキュメントから分かります。&lt;/p&gt;
+&lt;h2 id=&#34;utmのデッドロック条件&#34;&gt;UTMのデッドロック条件&lt;/h2&gt;
+&lt;p&gt;UTMのデッドロックは、おそらく先ほど説明した、128以上のUTM処理の蓄積によっておこるUTM処理のブロッキングに起因するものと思われます。このブロッキングの解消には、前に発行したUTM処理がGPU上で完了する必要があります。&lt;br&gt;
+UTMは、&lt;code&gt;ID3D12CommandQueue&lt;/code&gt;のメソッドなので、UTMの直前までに実行キューに積まれたすべての処理が完了し、UTM処理を開始するためのフェンスがシグナルされるまで処理は開始されません。もしも、UTMを実行キューに積む前にフェンスのウエイトが設定されて、それが解決しない状況に陥ればデッドロックになることが予想されます。&lt;br&gt;
+しかし、一般的に、フェンスが解決しない状況はUTMの動作とは関係なくデッドロック状態に陥るので、UTM特有の問題とは言えません。では、何がUTM特有なのかというと、UTM処理のブロッキング、つまり前に発行したUTMの処理完了待ちをどこで行っているかというところです。
+これは、UTMデッドロックに陥っているプロセスのメモリダンプを見るとわかるのですが、UTMのブロッキングは、&lt;code&gt;⁠win32u!NtGdiDdDDIUpdateGpuVirtualAddress&lt;/code&gt; 内の&lt;code&gt;syscall&lt;/code&gt;の箇所、つまりカーネル空間の処理の最中に行われます。&lt;br&gt;
+先の章で、WinDbgでUTMの処理をトレースした際に確認しましたが、この箇所に到達するまでに、D3D12Coreにあるミューテックスを取得して、UMDの中でCiritical Sectionを取得しています。他にも、GDIレイヤーのカーネル空間でも排他処理が行われているかもしれません。もしも、これらの排他処理が、UTMより先に設定されたウエイトをシグナルするために必要な処理をブロックした場合はデッドロックが成立します。
+そんなことが実際に起きるのか？と疑問に思うのは自然なことだと思います。しかし次の章で、UMTブロッキング時に競合する他のAPIのリストを見れば納得できると思います。&lt;/p&gt;
+&lt;h2 id=&#34;utmの排他リソースと競合する処理&#34;&gt;UTMの排他リソースと競合する処理&lt;/h2&gt;
+&lt;p&gt;では、UTMブロッキング時に競合する他の処理を見てみましょう。&lt;br&gt;
+D3DCoreのミューテックスとUMDのCritical Sectionは、デバッガで追えば競合している状況を確認できます。しかし、複数のUTMデッドロックを起こしたプロセスのメモリダンプを確認すると、どうやらカーネル空間で処理が行われているGDI関数の方にも排他処理が存在するようです。&lt;br&gt;
+ここでは、UTMのデッドロックが発生しているプロセスのメモリダンプでよく観測される箇所、つまり、UTMブロッキングで処理が停止する可能性の高い処理をリストアップしたいと思います。&lt;/p&gt;
+&lt;h4 id=&#34;id3d12commandqueueexecutecommandlists&#34;&gt;ID3D12CommandQueue::ExecuteCommandLists&lt;/h4&gt;
+&lt;p&gt;私の経験上、最もよく見かけます。
+D3DCoreの中で、ミューテックスを取得しようとして失敗するため、&lt;code&gt;NtWaitForAlertByThreadId&lt;/code&gt; でスリープして待機状態に入っています。
+このミューテックスがUTMが確保したものならば、おそらく同じコマンドキューに対するECLなので、ミューテックスの取得に失敗して待機するのは納得がいきます。しかし、この処理は、UTMの後にキューに積まれるべき処理のはずなので、UTMデッドロックの直接の原因にはならないでしょう。&lt;/p&gt;
+&lt;h4 id=&#34;id3d12commandqueuesignal&#34;&gt;ID3D12CommandQueue::Signal&lt;/h4&gt;
+&lt;p&gt;Signalは、D3DCoreから、直接Win32uの&lt;code&gt;NtGdiDdDDISubmitSignalSyncObjectsToHwQueue&lt;/code&gt; を呼び出し、&lt;code&gt;syscall&lt;/code&gt;の中で止まっているのを観測します。
+私の考えでは、UTMのキューに設定されたウエイトをシグナルするための、他のキューに設定されるべきシグナルが設定できないためにデッドロックが発生します。
+したがって、シグナルを呼んでいるスレッドが&lt;code&gt;syscall&lt;/code&gt;の中で止まっているというのは、大変興味深いです。&lt;/p&gt;
+&lt;h4 id=&#34;id3d12fenceseteventoncompletion&#34;&gt;ID3D12Fence::SetEventOnCompletion&lt;/h4&gt;
+&lt;p&gt;この処理は、&lt;code&gt;D3D12Core!CFence::SetEventOnCompletion&lt;/code&gt;から、&lt;code&gt;D3D12Core!CDevice::SetEventOnMultipleFenceCompletion&lt;/code&gt;というメソッドを呼んでいるので、API上は、&lt;code&gt;ID3D12Fence&lt;/code&gt;ですが、実質上は、&lt;code&gt;ID3D12Device&lt;/code&gt;の処理だと考えたほうがよさそうです。
+最終的には、&lt;code&gt;NtGdiDdDDIWaitForSynchronizationObjectFromCpu&lt;/code&gt; を呼び出し、&lt;code&gt;syscall&lt;/code&gt;の中で止まっているのを観測します。&lt;/p&gt;
+&lt;h4 id=&#34;id3d12devicecreateplacedresource&#34;&gt;ID3D12Device::CreatePlacedResource&lt;/h4&gt;
+&lt;p&gt;このメソッドは、私の環境では、UMDから、&lt;code&gt;D3D12Core!NDXGI::CDevice::UpdateGpuVirtualAddressCB&lt;/code&gt;を呼び出し、最終的には、&lt;code&gt;NtGdiDdDDIUpdateGpuVirtualAddress&lt;/code&gt;を呼び出しています。
+途中から、&lt;code&gt;ID3D12CommandQueue::UpdateTileMappings&lt;/code&gt;と同じコードパスを辿ります。UTMと同じカーネル呼び出しですので、競合するのは理解ができます。&lt;/p&gt;
+&lt;h4 id=&#34;id3d12fencerelease&#34;&gt;ID3D12Fence::Release()&lt;/h4&gt;
+&lt;p&gt;観測した中で、最も意外だったのが、フェンスオブジェクトの解放処理である、&lt;code&gt;Release()&lt;/code&gt;です。この処理は最終的に、&lt;code&gt;NtGdiDdDDIDestroySynchronizationObject&lt;/code&gt;を呼び出しているのですが、この関数の&lt;code&gt;syscall&lt;/code&gt;で止まっているのが複数回観測できました。&lt;/p&gt;
+&lt;h2 id=&#34;utmデッドロックの回避方法&#34;&gt;UTMデッドロックの回避方法&lt;/h2&gt;
+&lt;p&gt;まとめです。D3D12のAPIのユーザーとして、どのようなことに気を付ければ、UTMデッドロックを回避できるのでしょうか。&lt;/p&gt;
+&lt;h3 id=&#34;プログラム側でutmの発行回数を制限する&#34;&gt;プログラム側で、UTMの発行回数を制限する&lt;/h3&gt;
+&lt;p&gt;いろいろと考えられますが、最も効果的な方法を一つだけ提案します。それは、UTMの発行数をアプリ側で監視して制御する方法です。&lt;br&gt;
+具体的な方法は、UTM専用のスレッド、UTM専用のCopyQueue、UTM専用のフェンスを用意して、UTMの呼び出しごとに、シグナルを設定して、フェンス値をインクリメントします。そして、UTMを呼び出す前に、&lt;code&gt;GetCompletedValue()&lt;/code&gt;でGPU側での完了状況をチェックして、128個以上キューに積まれそうな状況では、&lt;code&gt;SetEventOnCompletion()&lt;/code&gt;を使って、先に発行されたUTMの完了を待ちます。こうして、128個以上UTMがコマンドキューに積みあがらないようににプログラム側で調整します。GraphicsQueueや、ComputeQueueとの同期が必要な場合は、随時UTM専用のCopyQueueとフェンスを設定して同期します。&lt;/p&gt;
+&lt;h4 id=&#34;なぜ専用のスレッドを用意するのか&#34;&gt;なぜ専用のスレッドを用意するのか&lt;/h4&gt;
+&lt;p&gt;まず、&lt;code&gt;SetEventOnCompletion()&lt;/code&gt;で、スレッドを待機させなければならない状況も考えられるので、専用のスレッドを用意するのは自然な考えです。
+加えて、UTMの呼び出しは、もともとCPU側のフェンス処理を伴います。GPU Viewで観測したとおり多数のDPCコールが発生することが予想されます。これらは、UTMのスレッドからCPU時間を奪い取り、L1キャッシュの状態を乱す可能性があります。ならば、UTMの呼び出し元はUTMの処理に特化し、単純な処理をするスレッドにしておくべきです。&lt;/p&gt;
+&lt;h4 id=&#34;なぜ専用のcopyqueueを用意するのか&#34;&gt;なぜ専用のCopyQueueを用意するのか&lt;/h4&gt;
+&lt;p&gt;専用のCopyQueueを使う第一の理由は、UTMの個数を正確に数えるためです。UTMブロッキングの128という条件は、コマンドキューごとの数で、プロセス内で発行された総数ではありません。極端な話をすれば、コマンドキューを二つ用意して、UTMを分散すると、256個までUTMを発行できます。
+専用のキューを用意してフェンスで他のキューと同期をとるのは、一見するとオーバーヘッドの高い処理に感じるかもしれません。しかし、UTMの処理は、もともとOSのメモリマネージャーによる処理を伴い、フェンスでUTMの発行されたキューと同期をとっています。つまり、もともとオーバーヘッドの高い処理なのです。&lt;br&gt;
+他のGraphicsQueueやComputeQueueとフェンスで同期すれば、結局それらのキューはUTMのキューを待つことになり、全体の実行スピードは変わらないかもしれません。しかし、GraphicsQueueやComputeQueueがUTMのキューを長時間待つのを観測できれば、UTMと同期するフェンスの位置を調整したり、他の依存関係のない処理を挿入したりして最適化を行うことができます。ちなみに、UTMの処理は、GPU上ではHWCopyQueue上で非常に短時間に処理されます。つまり、UTM処理中は、GPUの演算ユニットはアイドリングしているのです。上手くスケジューリングすることができればUTMのGPUコストを隠蔽することができます。&lt;/p&gt;
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+&lt;p&gt;結局、UTMに起因するデッドロックの発生の仕組みは予測の域を出ません。また、ほかにもUTMデッドロックを回避する手法はありますが、UTMブロッキングが発生すると、様々なD3DAPIがブロックされることが分かっており、マルチスレッドで動作するプログラムにおいて、これは多数のレンダリングに関連するスレッドが同時にストールする可能性を意味します。つまり、UTMブロッキングが発生している時点で、すでにプログラムとしては大きな性能の問題に直面しているのです。だとするならば、UTMデッドロックを避けるだけでなく、UTMブロッキング自体を起こさないようにアプリケーションで制御するしかないのが現状です。&lt;br&gt;
+APIやドライバモデルの設計から一度やり直した方がよいのではないかという気がしてきます。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;以下英語版&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;a id=&#34;Eng&#34;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h1 id=&#34;deadlocks-caused-by-id3d12commandqueueupdatetilemappings&#34;&gt;Deadlocks Caused by ID3D12CommandQueue::UpdateTileMappings&lt;/h1&gt;
+&lt;p&gt;One of the reasons for hang-ups happening infrequently in D3D12 games is a deadlock caused by &lt;code&gt;UpdateTileMappings&lt;/code&gt;. Its precise mechanism is still unknown, but recently I&amp;rsquo;ve been able to compile my observations on this issue to be able to explain to others, so I&amp;rsquo;d like to leave this note as a memo.&lt;br&gt;
+However, what I will describe below is merely a guess that it could probably be happening in the system. The exact details can only be confirmed by asking the people who design the SDK and the OS. Additionally, the survey has been done with the current latest OS, Windows 11 24H2 (OS Build 26100.2894), and the issue I&amp;rsquo;m going to descrbie would be fixed in the future.&lt;/p&gt;
+&lt;h2 id=&#34;observing-the-behavior-of-id3d12commandqueueupdatetilemappings-with-gpuview&#34;&gt;Observing the behavior of ID3D12CommandQueue::UpdateTileMappings with GPUView&lt;/h2&gt;
+&lt;p&gt;Let&amp;rsquo;s use GPUView to check the behavior of &lt;code&gt;UpdateTileMappings&lt;/code&gt;. In the GPUView&amp;rsquo;s event list, select &lt;code&gt;DxgKrnl UpdateGPUVirtualAddress&lt;/code&gt; to identify the call sites. The following screenshot shows a section where, after rendering process for a frame has been enqueued in the process&amp;rsquo;s GPU execution queue, &lt;code&gt;UpdateTileMappings&lt;/code&gt; (from here, we call this UTM) is called several times. During the UTM calls, we can find that the application&amp;rsquo;s thread switches to kernel mode. Also we can see that two fences are set for each UTM call.&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-gpu-view---1&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/d3d12utm/image1_hub9ccdd4ec5701d8ba5db3e6a9b8229e2_36733_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;GPU View - 1&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/d3d12utm/image1_hub9ccdd4ec5701d8ba5db3e6a9b8229e2_36733_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;90%&#34; height=&#34;978&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    GPU View - 1
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;Next, let&amp;rsquo;s observe the timing when these fences are started to be processed in the process&amp;rsquo;s GPU execution queue. First, you can see that the stacked fence objects are identical. It appears that a single fence object is used with incrimenting its fence value. When the UTM&amp;rsquo;s fence reaches the front of the process&amp;rsquo;s GPU execution queue, a DPC (Deferred Procedure Call) is invoked on the application&amp;rsquo;s thread (which can be interpreted as an OS interrupt). This DPC sends a Paging Queue Packet to the process&amp;rsquo;s paging queue. In the following screenshot, the fence object sent out by the UTMs is highlighted. Just before the head of the series of fences from the UTM reaches the front of the execution queue, a DPC is initiated on the thread indicated by the white bar of the application&amp;rsquo;s thread, then, a Paging Queue Packet seems to be sent out while the DPC is working. I have illustrated this with red arrows.&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-gpu-view---2&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/d3d12utm/image2_hu3213b80c4faf65051a2dffba27d98fa5_481072_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;GPU View - 2&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/d3d12utm/image2_hu3213b80c4faf65051a2dffba27d98fa5_481072_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;90%&#34; height=&#34;1000&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    GPU View - 2
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;The dispatched Paging Queue Packet is processed by the OS&amp;rsquo;s VidMm Worker Thread. The OS thread that receives the packet sends a Paging Command Packet to the System Paging Context. This packet is then sent to the Hardware Copy Queue on the GPU, where it is actually processed.&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-gpu-view---3&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/d3d12utm/image3_hu92bebf72723ca2a2ad84b4939408949e_84146_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;GPU View - 3&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/d3d12utm/image3_hu92bebf72723ca2a2ad84b4939408949e_84146_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;90%&#34; height=&#34;896&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    GPU View - 3
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;In the System Paging Context, three fences are set immediately after the Paging Command Packet. It seems these are used to detect the completion of the UTM processing on the GPU side on the CPU side. One of these fences appears to trigger a DPC on the thread of the process that originally sent out the UTM. The DPC then increments the fence value of the UTM. As a result, the fence that was waiting for the UTM to complete in the process&amp;rsquo;s GPU execution queue is resolved. This means that one UTM processing is completed.&lt;/p&gt;
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; id=&#34;figure-gpu-view---4&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/post/d3d12utm/image4_huce2858e525986fbbb1701b9fc14dc36c_412330_2000x2000_fit_lanczos_3.png&#34; data-caption=&#34;GPU View - 4&#34;&gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/post/d3d12utm/image4_huce2858e525986fbbb1701b9fc14dc36c_412330_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;90%&#34; height=&#34;1017&#34;&gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    GPU View - 4
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;h2 id=&#34;tracking-utm-processing-with-windbg&#34;&gt;Tracking UTM Processing with Windbg&lt;/h2&gt;
+&lt;p&gt;Next, let&amp;rsquo;s use a debugger to track the UTM processing. I traced a UTM call of a sample application using only Microsoft&amp;rsquo;s symbol server. The process consists of the D3D runtime, user-mode driver, and Windows API. I would like to list out some major processing steps in order.&lt;/p&gt;
+&lt;h4 id=&#34;1-acquiring-the-mutex-managed-by-d3d12core&#34;&gt;1. Acquiring the Mutex Managed by D3D12Core&lt;/h4&gt;
+&lt;p&gt;At the beginning of the UTM call, a mutex managed by D3D12Core is acquired. It is likely that this is for mutual exclusion control for calls to the same &lt;code&gt;CGraphicsCommandQueue&lt;/code&gt;. As &lt;code&gt;CGraphicsCommandQueue&lt;/code&gt; interface is designed to be thread-safe, it appears that the D3D runtime manages mutual exclusion control as needed.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   ntdll!RtlAcquireSRWLockExclusive     
+[0x1]   msvcp_win!Mtx_lock+0x31    
+[0x2]   D3D12Core!std::_Mutex_base::lock+0x10    
+[0x3]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0xe2    
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;2-calling-the-function-registered-in-the-device-driver-interface&#34;&gt;2. Calling the Function Registered in the Device Driver Interface&lt;/h4&gt;
+&lt;p&gt;The Device Driver Interface (DDI) is an interface for functions used by the OS and runtime to call device drivers. The call destination will be the code of the installed driver. Judging by the arguments of the call of the DDI, it&amp;rsquo;s clear that this is &lt;code&gt;PFND3D12DDI_UPDATETILEMAPPINGS&lt;/code&gt; defined in &lt;code&gt;d3d12umddi.h&lt;/code&gt;.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x2]   D3D12Core!TableFunctionTraits&amp;lt;2&amp;gt;::Detail::InvokerImpl&amp;lt;TableFunctionTraitsImpl&amp;lt;2&amp;gt;::FunctionTraits&amp;lt;70,0,void&amp;gt;,void,void,D3D12DDI_HCOMMANDQUEUE,D3D10DDI_HRESOURCE,unsigned int,D3D12DDI_TILED_RESOURCE_COORDINATE const * __ptr64,D3D12DDI_TILE_REGION_SIZE const * __ptr64,D3D12DDI_HHEAP,unsigned int,enum D3D12DDI_TILE_RANGE_FLAGS const * __ptr64,unsigned int const * __ptr64,unsigned int const * __ptr64,enum D3D12DDI_TILE_MAPPING_FLAGS&amp;gt;::Call&amp;lt;CGraphicsCommandQueue&amp;gt;+0x9f   
+[0x3]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x15e      
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;FYI, the definition of &lt;code&gt;PFND3D12DDI_UPDATETILEMAPPINGS&lt;/code&gt; in &lt;code&gt;d3d12umddi.h&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;typedef VOID ( APIENTRY* PFND3D12DDI_UPDATETILEMAPPINGS )( D3D12DDI_HCOMMANDQUEUE, D3D12DDI_HRESOURCE,
+    UINT NumTiledResourceRegions,
+    _In_reads_(NumTiledResourceRegions) const D3D12DDI_TILED_RESOURCE_COORDINATE* pResourceRegionStartCoords,
+    _In_reads_opt_(NumTiledResourceRegions) const D3D12DDI_TILE_REGION_SIZE* pResourceRegionSizes,
+    D3D12DDI_HHEAP, UINT NumRanges,
+    _In_reads_opt_(NumRanges) const D3D12DDI_TILE_RANGE_FLAGS*,
+    _In_reads_opt_(NumRanges) const UINT* pHeapStartOffsets,
+    _In_reads_opt_(NumRanges) const UINT* pRangeTileCounts,
+    D3D12DDI_TILE_MAPPING_FLAGS );
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;3-acquiring-a-critical-section-in-the-umd-code&#34;&gt;3. Acquiring a Critical Section in the UMD Code&lt;/h4&gt;
+&lt;p&gt;A Critical Section is a synchronization object provided by Windows OS that can be used within a process. Looking at the call stack, it shows &lt;code&gt;nvwgf2umx!OpenAdapter&lt;/code&gt; for the UMD code, but this simply indicates the offset address from an exported symbol in the UMD&amp;rsquo;s DLL, not that &lt;code&gt;OpenAdapter&lt;/code&gt; is actually being called by the DDI call. Since we don&amp;rsquo;t have the PDB file for NVIDIA&amp;rsquo;s UMD DLL, the symbol cannot be resolved properly.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   ntdll!RtlEnterCriticalSection   
+[0x1]   nvwgf2umx!OpenAdapter12+0x7e5f   
+[0x2]   D3D12Core!TableFunctionTraits&amp;lt;2&amp;gt;::Detail::InvokerImpl&amp;lt;TableFunctionTraitsImpl&amp;lt;2&amp;gt;::FunctionTraits&amp;lt;70,0,void&amp;gt;,void,void,D3D12DDI_HCOMMANDQUEUE,D3D10DDI_HRESOURCE,unsigned int,D3D12DDI_TILED_RESOURCE_COORDINATE const * __ptr64,D3D12DDI_TILE_REGION_SIZE const * __ptr64,D3D12DDI_HHEAP,unsigned int,enum D3D12DDI_TILE_RANGE_FLAGS const * __ptr64,unsigned int const * __ptr64,unsigned int const * __ptr64,enum D3D12DDI_TILE_MAPPING_FLAGS&amp;gt;::Call&amp;lt;CGraphicsCommandQueue&amp;gt;+0x9f   
+[0x3]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x15e   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4-setting-a-fence-signal&#34;&gt;4. Setting a Fence Signal&lt;/h4&gt;
+&lt;p&gt;Next, it calls &lt;code&gt;SubmitSignalSyncObjectsToHwQueueCB&lt;/code&gt; of D3DCore. This callback is likely registered by the OS in the D3D runtime. The registered callback function appears to be &lt;code&gt;win32u!NtGdiDdDDISubmitSignalSyncObjectsToHwQueue&lt;/code&gt;. By checking the assembly code of this function, I found it almost immediately called a &lt;code&gt;syscall&lt;/code&gt; to enter kernel mode. The call path up to this point is somewhat complex: Application → D3D Runtime → UMD → D3D Runtime → GDI.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   win32u!NtGdiDdDDISubmitSignalSyncObjectsToHwQueue+0x12   
+[0x1]   D3D12Core!CallAndLogImpl&amp;lt;long (__cdecl*)(_D3DKMT_SUBMITSIGNALSYNCOBJECTSTOHWQUEUE const * __ptr64),_D3DKMT_SUBMITSIGNALSYNCOBJECTSTOHWQUEUE * __ptr64&amp;gt;+0x1d   
+[0x2]   D3D12Core!NDXGI::CDevice::SubmitSignalSyncObjectsToHwQueueCB+0xdd   
+[0x3]   nvwgf2umx!....
+....
+[0xa]   nvwgf2umx!....
+[0xb]   D3D12Core!TableFunctionTraits&amp;lt;2&amp;gt;::Detail::InvokerImpl&amp;lt;TableFunctionTraitsImpl&amp;lt;2&amp;gt;::FunctionTraits&amp;lt;70,0,void&amp;gt;,void,void,D3D12DDI_HCOMMANDQUEUE,D3D10DDI_HRESOURCE,unsigned int,D3D12DDI_TILED_RESOURCE_COORDINATE const * __ptr64,D3D12DDI_TILE_REGION_SIZE const * __ptr64,D3D12DDI_HHEAP,unsigned int,enum D3D12DDI_TILE_RANGE_FLAGS const * __ptr64,unsigned int const * __ptr64,unsigned int const * __ptr64,enum D3D12DDI_TILE_MAPPING_FLAGS&amp;gt;::Call&amp;lt;CGraphicsCommandQueue&amp;gt;+0x9f   
+[0xc]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x15e   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;FYI the code snippet of &lt;code&gt;NtGdiDdDDISubmitSignalSyncObjectsToHwQueue&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;win32u!NtGdiDdDDISubmitSignalSyncObjectsToHwQueue:
+mov     r10, rcx
+mov     eax, 125Dh
+test    byte ptr [7FFE0308h], 1
+jne     win32u!NtGdiDdDDISubmitSignalSyncObjectsToHwQueue+0x15
+syscall 
+ret   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;5-calling-d3dkmt_updategpuvirtualaddress&#34;&gt;5. Calling D3DKMT_UPDATEGPUVIRTUALADDRESS&lt;/h4&gt;
+&lt;p&gt;Finally, we have reached the core processing part of UTM. The call path is similar to that of the signaling the fence mentioned earlier. This is also a GDI function, and it immediately executes a &lt;code&gt;syscall&lt;/code&gt; within the function. The actual processing seems to be in kernel mode.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   win32u!NtGdiDdDDIUpdateGpuVirtualAddress+0x12   
+[0x1]   D3D12Core!CallAndLogImpl&amp;lt;long (__cdecl*)(_D3DKMT_UPDATEGPUVIRTUALADDRESS const * __ptr64),_D3DKMT_UPDATEGPUVIRTUALADDRESS * __ptr64&amp;gt;+0x11   
+[0x2]   D3D12Core!NDXGI::CDevice::UpdateGpuVirtualAddressCB+0x64   
+[0x3]   nvwgf2umx!....
+....
+[0x8]   nvwgf2umx!....
+[0x9]   D3D12Core!TableFunctionTraits&amp;lt;2&amp;gt;::Detail::InvokerImpl&amp;lt;TableFunctionTraitsImpl&amp;lt;2&amp;gt;::FunctionTraits&amp;lt;70,0,void&amp;gt;,void,void,D3D12DDI_HCOMMANDQUEUE,D3D10DDI_HRESOURCE,unsigned int,D3D12DDI_TILED_RESOURCE_COORDINATE const * __ptr64,D3D12DDI_TILE_REGION_SIZE const * __ptr64,D3D12DDI_HHEAP,unsigned int,enum D3D12DDI_TILE_RANGE_FLAGS const * __ptr64,unsigned int const * __ptr64,unsigned int const * __ptr64,enum D3D12DDI_TILE_MAPPING_FLAGS&amp;gt;::Call&amp;lt;CGraphicsCommandQueue&amp;gt;+0x9f   
+[0xa]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x15e   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;FYI, the code snippet of &lt;code&gt;NtGdiDdDDIUpdateGpuVirtualAddress&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;win32u!NtGdiDdDDIUpdateGpuVirtualAddress:
+mov     r10, rcx
+mov     eax, 1264h
+test    byte ptr [7FFE0308h], 1
+jne     win32u!NtGdiDdDDIUpdateGpuVirtualAddress+0x15 (7ff81e415f15)
+syscall 
+ret     
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;6-setting-fence-waits&#34;&gt;6. Setting Fence Waits&lt;/h4&gt;
+&lt;p&gt;After &lt;code&gt;D3DKMT_UPDATEGPUVIRTUALADDRESS&lt;/code&gt; is called, it sets some fence waits from the UMD code in my environment. This processing is also handled by a GDI function executed in kernel mode.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   win32u!NtGdiDdDDISubmitWaitForSyncObjectsToHwQueue+0x12   
+[0x1]   D3D12Core!CallAndLogImpl&amp;lt;long (__cdecl*)(_D3DKMT_SUBMITWAITFORSYNCOBJECTSTOHWQUEUE const * __ptr64),_D3DKMT_SUBMITWAITFORSYNCOBJECTSTOHWQUEUE * __ptr64&amp;gt;+0x1d   
+[0x2]   D3D12Core!NDXGI::CDevice::SubmitWaitForSyncObjectsToHwQueueCB+0x4d   
+[0x3]   nvwgf2umx!...
+...
+[0xa]   nvwgf2umx!... 
+[0xb]   D3D12Core!TableFunctionTraits&amp;lt;2&amp;gt;::Detail::InvokerImpl&amp;lt;TableFunctionTraitsImpl&amp;lt;2&amp;gt;::FunctionTraits&amp;lt;70,0,void&amp;gt;,void,void,D3D12DDI_HCOMMANDQUEUE,D3D10DDI_HRESOURCE,unsigned int,D3D12DDI_TILED_RESOURCE_COORDINATE const * __ptr64,D3D12DDI_TILE_REGION_SIZE const * __ptr64,D3D12DDI_HHEAP,unsigned int,enum D3D12DDI_TILE_RANGE_FLAGS const * __ptr64,unsigned int const * __ptr64,unsigned int const * __ptr64,enum D3D12DDI_TILE_MAPPING_FLAGS&amp;gt;::Call&amp;lt;CGraphicsCommandQueue&amp;gt;+0x9f   
+[0xc]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x15e   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;win32u!NtGdiDdDDISubmitWaitForSyncObjectsToHwQueue:
+mov     r10, rcx
+mov     eax, 125Eh
+test    byte ptr [7FFE0308h], 1
+jne     win32u!NtGdiDdDDISubmitWaitForSyncObjectsToHwQueue+0x15 (7ff81e415e55)
+syscall 
+ret     
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;7-releasing-the-critical-section-acquired-in-the-umd-code&#34;&gt;7. Releasing the Critical Section Acquired in the UMD Code&lt;/h4&gt;
+&lt;p&gt;The UMD acquired a critical section at the beginning, which is now being released.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   ntdll!RtlLeaveCriticalSection   
+[0x1]   nvwgf2umx!...
+[0x2]   D3D12Core!TableFunctionTraits&amp;lt;2&amp;gt;::Detail::InvokerImpl&amp;lt;TableFunctionTraitsImpl&amp;lt;2&amp;gt;::FunctionTraits&amp;lt;70,0,void&amp;gt;,void,void,D3D12DDI_HCOMMANDQUEUE,D3D10DDI_HRESOURCE,unsigned int,D3D12DDI_TILED_RESOURCE_COORDINATE const * __ptr64,D3D12DDI_TILE_REGION_SIZE const * __ptr64,D3D12DDI_HHEAP,unsigned int,enum D3D12DDI_TILE_RANGE_FLAGS const * __ptr64,unsigned int const * __ptr64,unsigned int const * __ptr64,enum D3D12DDI_TILE_MAPPING_FLAGS&amp;gt;::Call&amp;lt;CGraphicsCommandQueue&amp;gt;+0x9f   
+[0x3]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x15e   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;8-releasing-the-mutex-managed-by-d3dcore&#34;&gt;8. Releasing the Mutex managed by D3DCore&lt;/h4&gt;
+&lt;p&gt;At the end, D3D runtime releases the mutex that was acquired at the beginning of the UMD.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[0x0]   ntdll!RtlReleaseSRWLockExclusive   0xc9a75ffd18   0x7ff81e8a366b   
+[0x1]   msvcp_win!Mtx_unlock+0x1b   0xc9a75ffd20   0x7fff94976bd8   
+[0x2]   D3D12Core!CGraphicsCommandQueue::UpdateTileMappings+0x168   0xc9a75ffd50   0x7ff6e60e183d   
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;summary-of-the-utm-behavior&#34;&gt;Summary of the UTM Behavior&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Acquiring a mutex (managed by the D3D runtime) likely for mutual exclusion control per CommandQueue object.&lt;/li&gt;
+&lt;li&gt;Acquiring a critical section within UMD code.  (This may vary depending on the GPU or driver used.)&lt;/li&gt;
+&lt;li&gt;Calling the following GDI functions. (Most of the processing for these functions are in kernel mode.)
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;NtGdiDdDDISubmitSignalSyncObjectsToHwQueue&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;NtGdiDdDDIUpdateGpuVirtualAddress&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;NtGdiDdDDISubmitWaitForSyncObjectsToHwQueue&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;specifications-of-d3dkmtupdategpuvirtualaddress&#34;&gt;Specifications of D3DKMTUpdateGpuVirtualAddress&lt;/h2&gt;
+&lt;p&gt;FYI：
+
+&lt;a href=&#34;https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3dkmthk/nf-d3dkmthk-d3dkmtupdategpuvirtualaddress&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3dkmthk/nf-d3dkmthk-d3dkmtupdategpuvirtualaddress&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The last part of the remarks section on the page above says important information.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Drivers can submit many UpdateGpuVirtualAddress calls, which will be queued behind the rendering fence. When the number of queued update operations exceeds 128, the calling thread will be blocked until the previous operations are processed by the video memory manager.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;That is to say, since UTM is a method of ID3D12CommandQueue, we might imagine that even issuing a large number of UTM processes would only result in them being accumulated in the CommandQueue. However, in reality, only up to 128 requests can be accumulated, and once a UTM call touches this limit, the processing is blocked until the UTMs issued earlier are completed.&lt;/p&gt;
+&lt;h2 id=&#34;deadlock-conditions-of-utm&#34;&gt;Deadlock Conditions of UTM&lt;/h2&gt;
+&lt;p&gt;The deadlock of UTM is likely caused by the blocking of UTM processing due to the accumulation of more than 128 UTM processes, as described earlier. This blocking can only be resolved when the previously issued UTM processes are completed on the GPU. Because UTM is a method of &lt;code&gt;ID3D12CommandQueue&lt;/code&gt;, the UTM processing will not start until all processes enqueued before the UTM are completed and the fence to start the UTM processing is signaled. If a wait of a fence is set before enqueuing the UTM and it is not resolved, a deadlock is expected to occur.&lt;/p&gt;
+&lt;p&gt;However, generally, a situation where the wait of a fence is not resolved can lead to a deadlock regardless of the UTM operations, so it cannot be said to be a UTM-specific problem. So, what is unique to UTM is where the blocking to wait for the completion of the previously issued UTM processing is performed.
+By examining some memory dumps of processes in UTM deadlock situations, we can see that the blocking occurs during the processing within the &lt;code&gt;syscall&lt;/code&gt; in &lt;code&gt;win32u!NtGdiDdDDIUpdateGpuVirtualAddress&lt;/code&gt;, which means it is blocking in kernel space.&lt;/p&gt;
+&lt;p&gt;In the previous chapter, when we traced UTM processing with WinDbg, we confirmed that before reaching this point, the mutex in D3D12Core and the Critical Section in UMD are secured. Additional exclusive processing might also be performed in the kernel space of the GDI layer. If these exclusive processes blocks to signal a wait fence set on the queue before calling the UTM, a deadlock will occur.&lt;br&gt;
+It&amp;rsquo;s natural to wonder if such a thing could actually happen. However, in the next chapter, I believe you will be convinced when you see the list of other APIs that are blcoked during UMT blocking.&lt;/p&gt;
+&lt;h2 id=&#34;apis-that-conflict-with-utm&#34;&gt;APIs that conflict with UTM&lt;/h2&gt;
+&lt;p&gt;Let&amp;rsquo;s take a look at other API calls that stops during UTM blocking. The mutex in D3DCore and the critical section in UMD can be observed to conflict with a debugger. However, examining dumps of processes that stopped with UTM deadlocks reveals that exclusive processing also seems to exist in the GDI functions performed in kernel space.
+Here, I want to list the functions frequently observed in the dumps of processes where UTM deadlocks occurred, meaning the functions that likely be blocked due to UTM blocking.&lt;/p&gt;
+&lt;h4 id=&#34;id3d12commandqueueexecutecommandlists-1&#34;&gt;ID3D12CommandQueue::ExecuteCommandLists&lt;/h4&gt;
+&lt;p&gt;In my experience, this is most frequently observed. Within D3DCore, the attempt to acquire a mutex fails, causing the thread to sleep and wait in &lt;code&gt;NtWaitForAlertByThreadId&lt;/code&gt;. If this mutex is secured by UTM, it is likely bound to the same CommandQueue, so it makes sense that the API call is blocked to acquire the mutex and enter a wait state. So, this ECL should be queued after the UTM, and it shouldn&amp;rsquo;t be the direct cause of a deadlock caused by UTM.&lt;/p&gt;
+&lt;h4 id=&#34;id3d12commandqueuesignal-1&#34;&gt;ID3D12CommandQueue::Signal&lt;/h4&gt;
+&lt;p&gt;This is observed to call &lt;code&gt;NtGdiDdDDISubmitSignalSyncObjectsToHwQueue&lt;/code&gt; from D3DCore directly to Win32u and stopped within the &lt;code&gt;syscall&lt;/code&gt;. A deadlock should occur if a signal fence set on another queue to signal the wait fence set on the UTM queue cannot be set.&lt;br&gt;
+It is really interesting that the thread calling the signal is halted within the &lt;code&gt;syscall&lt;/code&gt;.&lt;/p&gt;
+&lt;h4 id=&#34;id3d12fenceseteventoncompletion-1&#34;&gt;ID3D12Fence::SetEventOnCompletion&lt;/h4&gt;
+&lt;p&gt;This API calls the method &lt;code&gt;D3D12Core!CFence::SetEventOnCompletion&lt;/code&gt; from &lt;code&gt;D3D12Core!CDevice::SetEventOnMultipleFenceCompletion&lt;/code&gt;. Therefore, although the API is classified as &lt;code&gt;ID3D12Fence&lt;/code&gt;, it seems more appropriate to consider it as a process of &lt;code&gt;ID3D12Device&lt;/code&gt;. Ultimately, it calls &lt;code&gt;NtGdiDdDDIWaitForSynchronizationObjectFromCpu&lt;/code&gt; and stooped in the &lt;code&gt;syscall&lt;/code&gt;.&lt;/p&gt;
+&lt;h4 id=&#34;id3d12devicecreateplacedresource-1&#34;&gt;ID3D12Device::CreatePlacedResource&lt;/h4&gt;
+&lt;p&gt;In my environment, this method calls &lt;code&gt;D3D12Core!NDXGI::CDevice::UpdateGpuVirtualAddressCB&lt;/code&gt; from UMD, and ultimately calls &lt;code&gt;NtGdiDdDDIUpdateGpuVirtualAddress&lt;/code&gt;. It follows the same code path as &lt;code&gt;ID3D12CommandQueue::UpdateTileMappings&lt;/code&gt;. Since it involves the same kernel call as UTM, it is understandable that it conflicts.&lt;/p&gt;
+&lt;h4 id=&#34;id3d12fencerelease-1&#34;&gt;ID3D12Fence::Release()&lt;/h4&gt;
+&lt;p&gt;The most surprising observation was the release of a fence object. This process ultimately calls &lt;code&gt;NtGdiDdDDIDestroySynchronizationObject&lt;/code&gt;. I&amp;rsquo;ve seen the API stopped in the &lt;code&gt;syscall&lt;/code&gt; of it multiple times.&lt;/p&gt;
+&lt;h2 id=&#34;how-should-we-avoid-utm-deadlocks&#34;&gt;How Should We Avoid UTM deadlocks?&lt;/h2&gt;
+&lt;h4 id=&#34;limit-and-manage-number-of-in-flight-utms&#34;&gt;Limit and Manage number of in-flight UTMs.&lt;/h4&gt;
+&lt;p&gt;There may be some ways to avoid UTM deadlock, but I propose one of the most effective methods. That is to monitor and control the number of UTM issues on the application side. The method involves preparing a dedicated CPU thread, a dedicated copy queue, and a dedicated fence for processing UTMs. After calling a UTM, set a signal and increment its fence value. Before calling UTM, check the completion status on the GPU side with &lt;code&gt;GetCompletedValue()&lt;/code&gt;, and if it appears that more than 128 requests are likely to be queued, use &lt;code&gt;SetEventOnCompletion()&lt;/code&gt; to wait for the completion of previously issued UTMs. This way, you can prevent more than 128 UTMs from piling up on the command queue. If synchronization with a GraphicsQueue or ComputeQueue is necessary, set a fence between them as needed for synchronization.&lt;/p&gt;
+&lt;h4 id=&#34;why-prepare-a-dedicated-thread&#34;&gt;Why Prepare a Dedicated Thread&lt;/h4&gt;
+&lt;p&gt;First of all, it is natural to prepare a dedicated thread, considering the situation where the thread may need to wait with &lt;code&gt;SetEventOnCompletion()&lt;/code&gt;. In addition, the UTM call inherently involves CPU-side fence processing. It is expected that many DPC calls will occur as observed in GPU View. These processings may potentially steal CPU time and disturb L1 cache state from the caller thread. Therefore, the UTM calls should be in a thread specialized for UTM processing.&lt;/p&gt;
+&lt;h4 id=&#34;why-prepare-a-dedicated-copy-queue&#34;&gt;Why Prepare a Dedicated Copy Queue&lt;/h4&gt;
+&lt;p&gt;The primary reason for using a dedicated copy queue is to accurately count the number of UTMs. The condition of UTM blocking with 128 is based on the number per command queue, not the total number issued within the process. As an extreme example, if you prepare two command queues and evenly distribute UTM requests, you can issue up to 256 UTMs.&lt;br&gt;
+Preparing a dedicated queue and synchronizing with other queues using a fence might initially seem like a high-overhead process. However, UTM processing inherently involves operations by the OS memory manager and synchronizes with the queue issued by the UTM using a fence. In other words, it is inherently a high-overhead process.&lt;br&gt;
+If you synchronize with other graphics queues or compute queues using a fence, those queues will ultimately wait for the UTM queue. The overall throughput may not change. However, if you find that the graphics queue or compute queue is waiting for the UTM queue for a long time, you may want to adjust the timings of the fence synchronizing with the UTM queue, or, insert other non-dependent processes for optimization.&lt;br&gt;
+FYI, UTM processing is handled in a very short time on the hardware copy queue on the GPU. This means that during UTM processing, the GPU&amp;rsquo;s compute units are idling. Proper scheduling has a possibility to hide the GPU cost of UTM.&lt;/p&gt;
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;p&gt;In the end, the mechanism behind deadlocks caused by UTM remains speculative. There are other methods to avoid UTM deadlocks, but when UTM blocking occurs, we found that various D3D APIs are blocked. In a multi-threaded program, this means that many threads related to rendering could stall simultaneously. In other words, once UTM blocking occurs, the program is already facing significant performance issues. Therefore, it is not only necessary to avoid UTM deadlocks but also to control the application to prevent UTM blocking itself.
+I hope it will be solved in the OS in the future.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Work Graph in HLSL</title>
