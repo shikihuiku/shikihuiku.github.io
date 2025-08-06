@@ -1,0 +1,1854 @@
+<!DOCTYPE html><html lang="en-us" >
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.8.0">
+
+  
+
+  
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="shikihuiku">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="かんたんなやつね">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://shikihuiku.github.io/post/pixelsortingcs/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha256-FMvZuGapsJLjouA6k7Eo2lusoAX9i0ShlWFG6qt7SLc=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css" integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin="anonymous">
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.min.3934cd053659c69f72130ea239611b5f.css">
+
+  
+
+
+
+
+  
+
+
+  
+  
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu127225d7ed9c50974404790b7c221374_401884_32x32_fill_lanczos_center_3.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu127225d7ed9c50974404790b7c221374_401884_192x192_fill_lanczos_center_3.png">
+
+  <link rel="canonical" href="https://shikihuiku.github.io/post/pixelsortingcs/">
+
+  
+  
+  
+  
+  
+  
+  
+    
+  
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="og:site_name" content="shikihuiku – 色不異空 – Real-time rendering topics in Japanese.">
+  <meta property="og:url" content="https://shikihuiku.github.io/post/pixelsortingcs/">
+  <meta property="og:title" content="スクリーンスペースでピクセル位置ごとのタスクをソーティング/パッキングするときのCompute Shader | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.">
+  <meta property="og:description" content="かんたんなやつね"><meta property="og:image" content="https://shikihuiku.github.io/post/pixelsortingcs/featured.png">
+  <meta property="twitter:image" content="https://shikihuiku.github.io/post/pixelsortingcs/featured.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2025-08-06T15:46:21&#43;09:00">
+    
+    <meta property="article:modified_time" content="2025-08-06T15:46:21&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://shikihuiku.github.io/post/pixelsortingcs/"
+  },
+  "headline": "スクリーンスペースでピクセル位置ごとのタスクをソーティング/パッキングするときのCompute Shader",
+  
+  "image": [
+    "https://shikihuiku.github.io/post/pixelsortingcs/featured.png"
+  ],
+  
+  "datePublished": "2025-08-06T15:46:21+09:00",
+  "dateModified": "2025-08-06T15:46:21+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "shikihuiku"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "shikihuiku – 色不異空 – Real-time rendering topics in Japanese.",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_192x192_fill_lanczos_center_3.png"
+    }
+  },
+  "description": "かんたんなやつね"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>スクリーンスペースでピクセル位置ごとのタスクをソーティング/パッキングするときのCompute Shader | shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
+
+</head>
+
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" class=" ">
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search" class="form-control">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-end" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+            
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="https://shikihuiku.wordpress.com/" target="_blank" rel="noopener"><span>Old Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>About</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/memo"><span>ちらしの裏</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#" aria-label="Search"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item dropdown theme-dropdown">
+        <a href="#" class="nav-link js-theme-selector" data-toggle="dropdown" aria-haspopup="true">
+          <i class="fas fa-palette" aria-hidden="true"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item js-set-theme-light">
+            <span>Light</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-dark">
+            <span>Dark</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-auto">
+            <span>Automatic</span>
+          </a>
+        </div>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+
+<div class="article-container pt-3">
+  <h1>スクリーンスペースでピクセル位置ごとのタスクをソーティング/パッキングするときのCompute Shader</h1>
+
+  
+  <p class="page-subtitle">Pixel sorting CS for execution efficiency on GPUs.</p>
+  
+
+  
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    2025/08/06
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    16 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+<div class="article-header article-container featured-image-wrapper mt-4 mb-4" style="max-width: 720px; max-height: 623px;">
+  <div style="position: relative">
+    <img src="/post/pixelsortingcs/featured_hu9b8cd107b1ea72927df319f1ffb96e3f_207933_720x0_resize_lanczos_3.png" alt="" class="featured-image">
+    
+  </div>
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>　コンピュートシェーダーを使って処理をしていると、GPU上で後続の複雑なシェーダーの並列実行性や、メモリアクセスのコヒーレンシーを高めるために、ピクセル（タスク）のパッキング／ソーティングを行いたい場合があります。例えば、ピクセルを、レイの種類ごとにソートしたり、マテリアルIDごとにソートしたり、ライトリストのIDごとにソートするなどが考えられます。
+後続のシェーダーのメモリアクセスや、アルゴリズムの分岐方向などは、warp内でなるべく同じになるほうがシェーダー実行速度と、キャッシュヒット率の面で有利です。
+そのため、簡単なコンピュートシェーダーでピクセルをソートできれば、後続のシェーダーで、ソートにかかる時間以上の処理速度向上が得られる場合があります。
+今回は、スクリーンスペースで、ピクセル位置をタスク要素とみなし、関連付けられた情報（Material ID, Light List IDなど）でピクセルをソートすることを考えてみます。</p>
+<h2 id="タイルごとに分割したリストにする">タイルごとに分割したリストにする</h2>
+<p>　ピクセルをタスクごとにソートすれば、後続のシェーダーで、メモリアクセスや、分岐のコヒーレンシーの向上が得られます。しかし、一般的に、画面全体で完璧にソートされたピクセルリストを作ることは、負荷の高い処理となります。一方で、ソートにかけて良いコストは、後続の複雑なシェーダーの高速化で得られる時間を、安定的に下回る必要があります。トントン程度ならば、メモリと時間の無駄遣いなので、やらない方がシンプルでバグも少ないプログラムになります。<br>
+　今回は、画面をある程度の大きさ（タイル）に分割して、タイルごとに処理をします。タイルごとにソートされたリストは分かれてしまいますが、タイル同士のメモリアクセス競合が発生しません。結果として、ソート時の並列実行性が高まります。例えばですが、64x64 pixelsでタイルを区切るなら、4096 pixels/tileとなります。レンダリング解像度が2560x1440 pixelsであれば、40x23(22.5) tiles = 920 tilesで処理することになります。
+タイルごとにパッキングを行った場合の効率を考えると、32threads/warpのGPUの場合、1タイルあたり最大128 warps分のタスクがあり、タイルごとにパッキングした際のパディングは、最大31threadsで、パディングされるwarpの平均タスク充填率を50%とすると、約0.5warpに相当します。つまり、画面全体で考えると、約410warps分の、処理をしないスレッドが起動されると考えられます。
+一方で、画面全体の2560x1440 pixelsのを処理する際に必要なwarp数は、115,200です。画面内のタスク充填率が50%とした場合でも5,7600 warp分のタスクがあり、920tilesに分割してパッキングしたリストを使用した場合に、処理をしないスレッド数が、起動されるスレッド数に占める割合は、おおよそ1%未満程度となります。逆を言えば、起動スレッドに対して、99%以上のタスク充填率になります。
+パッキングの効率だけを考えた場合、これ以上タイルのサイズを大きくしてパッキングの効率を上げるという事は、この1%未満の数字を削る行為でしかありません。これ以上タイルサイズを大きくして、パッキング効率を向上させても無駄だといえます。<br>
+　一方でソーティングに関しては、このように一概に話すことはできません。ソーティングのキーとなる情報（Material ID, Light List IDなど）の種類が、画面内、タイル内に何種類現れるのか、そして、画面をタイルに分割したときに局所性があるのか、また、後続のシェーダーが、ソーティングによって、どの程度メモリアクセスや分岐のコヒーレンシーを得て、どの程度高速化するのかは、実際に動作させるまで分からないでしょう。したがって、パッキング／ソーティングを処理に組み込むときは、精密なプロファイリングが必須です。</p>
+<h2 id="簡単な実装を考える">簡単な実装を考える</h2>
+<p>今回は処理タスクは、ピクセルに紐づいているとして、パッキング／ソーティングしたピクセルの座標リストをUAVバッファに格納します。今回はソート用の鍵要素は、画面に描画されたMeshletのIDです。ソート／パッキングされたピクセルリストのUAVバッファは、画面解像度の2560x1440 pixel分を、1Dバッファとして用意します。タイルIDは64x64ピクセルごとに、画面左上からリニアに割り振るとします。ピクセルリストの情報は、ピクセルあたり4byte/pixelで十分です。ピクセルリストはタイルごとに一度だけ、グローバルメモリへのInterlocked操作を使ってオフセットを取得します。タイル境界では、32要素ごとのアラインメントを取ることにします。タイルを跨いだパッキングやソーティングは行いません。</p>
+<pre><code class="language-cpp">Texture2D&lt;uint3&gt; t_MeshletID : register(t0); // Input. Screen space sort keyes.
+RWByteAddressBuffer g_SortedPixels : register(u0); // Output. 
+RWByteAddressBuffer g_Counter : register(u1); // Counter(4 bytes) for packing pixels in g_SortedPixels. Need to be initialized with zero.
+</code></pre>
+<p>NumThreads は[512, 1, 1]=16 warpsでコンピュートシェーダーを起動します。1スレッドあたり8ピクセル処理すると、ちょうど4096ピクセル処理できます。
+groupsharedメモリを使って、ピクセルを分類して数えます。ソートの対象は4096ピクセルなので、最大で4096種類の分類が想定されますが、あくまでも、ソート＆パッキングされたピクセルリストを作る理由は、後続のシェーダーの並列実行性の向上であるので、完璧なソートを目指しません。ソート用の鍵(Sort Key)を畳み込んで、127種類(Container Key)として分類します。当然ながら、場合によっては異なる種類のピクセルが同一に扱われてソートされることになりますが、これを許容して処理を行います。これに関する考察は後ほどします。</p>
+<pre><code class="language-cpp">// Works space for gathering pixels that have the same sorting keys.
+static const uint NumContainers = 127; // Number of containers in a tile. Sort keys must be folded into this kinds.
+groupshared uint ItemCounts[NumContainers];  // 4 x 127 = 518 bytes.
+groupshared uint ItemOffsets[NumContainers]; // 4 x 127 = 518 bytes.
+groupshared uint ItemOffsetWrk[NumContainers / WaveSize]; // For storing prefix sum of wave boundaries such as 32, 64 and 96.
+groupshared uint TileOffset;
+</code></pre>
+<p>まず初めに、各pixelごとに、ソートのキー要素になるSort Keyを読み出します。今回は、Sort Keyは描画されたMeshlet IDをHash関数を使って計算します。Sort Keyがゼロの場合は、該当ピクセルにタスクがないものとして扱います。Sort Keyは32bitの値ですが、Sort Keyを0~126に畳み込んで、Container Keyにしたあとは、ソート作業では、Sort Keyはもう使いません。ピクセルの位置は、スレッドのIDとイテレーションの回数から算出できるので保持しません。Container Keyごとに、ピクセルを127種類に分類する為に、InterlockedAddで数を数えます。その時取得された値を、コンテナ内のオフセットとして保存しておきます。</p>
+<pre><code class="language-cpp">for (int i = 0; i &lt; 8; ++i) {
+ uint2 pixelPos = GetPixelPos(ThID + i * NumThreads, Gid);
+ containerKeys[i] = 0xFFFFFFFF;
+ if (pixelPos.x &gt;= screenExtents.x || pixelPos.y &gt;= screenExtents.y) {
+  // Out of bounds.
+  continue;
+ }
+ uint3 pixelColor = t_MeshletID.Load(int3(pixelPos, 0));
+ uint sortKey = Hash32_1((pixelColor.x &amp; 0xFF) | ((pixelColor.y &amp; 0xFF) &lt;&lt; 8) | ((pixelColor.z &amp; 0xFF) &lt;&lt; 16));
+ if (sortKey == 0) {
+  // Total black means a empty pixel.
+  // Hash32_1(0) always returns 0.
+  continue;
+ }
+
+ uint containerKey = sortKey % NumContainers;
+
+ InterlockedAdd(ItemCounts[containerKey], 1, containerLocalIndices[i]);
+ containerKeys[i] = containerKey;
+}
+GroupMemoryBarrierWithGroupSync⁠()
+</code></pre>
+<p>次に、WavePrefixSumを使って、127種類のコンテナ同士のオフセットを計算します。</p>
+<pre><code class="language-cpp">int containerID = ThID;
+int itemCnt;
+int itemOfs;
+if (ThID &lt; NumContainers) { // 0 ~ 126
+ itemCnt = ItemCounts[containerID];
+ itemOfs = WavePrefixSum(itemCnt);
+ if (ThID % WaveSize == WaveSize - 1) {
+  ItemOffsetWrk[ThID / WaveSize] = itemOfs + itemCnt; // [0]=sum(0:31), [1]=sum(32:63), [2]=sum(64:95)..
+ }
+}
+GroupMemoryBarrierWithGroupSync();
+
+if (ThID &lt; NumContainers) { // 0 ~ 126
+ for (int waveBoundary = 0; waveBoundary &lt; NumContainers / WaveSize; ++waveBoundary) { // for 32, 64, 96
+  if (ThID &gt;= (waveBoundary + 1) * WaveSize) {
+   itemOfs += ItemOffsetWrk[waveBoundary];
+  }
+ }
+ ItemOffsets[containerID] = itemOfs;
+}
+</code></pre>
+<p>画面全体におけるタイル同士のオフセットを計算する為に、ここで、UAVバッファに対して、InterlockedAddを使ってオフセットを取得します。タスク充填率が常に高い状態になることが分かっている場合は、Interlocked命令を使わずに固定オフセットでタイルごとの情報をしまった方が効率的です。ここでは、タスク充填率が変動するものとして、Interlocked命令でオフセットを計算します。単なるパッキングなら、32要素ごとのアラインメントを取らずにタイトなパッキングにすることも可能ですが、ソートしたリストとwarpのアラインメントが崩れてしまいます。</p>
+<pre><code class="language-cpp">if (ThID == NumContainers - 1) { // ThID: 126 should have the total number of container entires.
+ // The first item of each 64x64 tile will be placed with 32 items alignment.
+ uint TotalAlignedEntriesInTile = Roundup32(itemOfs + itemCnt);
+ g_Counter.InterlockedAdd(0, TotalAlignedEntriesInTile, TileOffset);
+}
+GroupMemoryBarrierWithGroupSync();
+</code></pre>
+<p>最後に、ソートされたピクセルリストをストアします。これでこのシェーダーの処理は終わりです。
+後続のシェーダーでは、ソートされたピクセルのバッファに、warpごとにアクセスして、処理するピクセル位置を取得することで、warp内の処理が、なるべく同じ処理をするように並べられた状態になるはずです。</p>
+<pre><code class="language-cpp">for (i = 0; i &lt; 8; ++i) {
+ if (containerKeys[i] == 0xFFFFFFFF)
+  continue;
+ uint2 pixelPos = GetPixelPos(ThID + i * NumThreads, Gid);
+ uint packedPixelPos = ((pixelPos.y &amp; 0xFFFF) &lt;&lt; 16) | (pixelPos.x &amp; 0xFFFF);
+ g_SortedPixels.Store((TileOffset + ItemOffsets[containerKeys[i]] + containerLocalIndices[i]) * 4, packedPixelPos);
+}
+</code></pre>
+<h2 id="container-keyのコンフリクトについて">Container Keyのコンフリクトについて</h2>
+<p>今回の例では、処理するピクセル数が、4096に対して、コンテナの数が127です。剰余算でSort KeyをContainer Keyに畳み込んだので、Sort Keyの種類が多い場合は高確率でコンフリクトが発生します。しかし、逆を言えば、Container Keyのコンフリクトが頻繁に発生する状況では、タイル内のSort Keyの種類が多いことが考えられ、この場合は、ソートによるコヒーレンシーの向上効果を得ること自体が難しいと考えられます。それでも、Container Keyは127種類しかないので偶発的なコンフリクトも考えられます。偶発的に発生するコンフリクトをある程度回避し、コンフリクト耐性を高める方法を示します。<br>
+コンテナのインデックスとSort Keyの対応付けを管理するため、Sort KeyをgroupsharedメモリにInterlockedCompareAndExchangeを使ってストアします。コンテナが空(0)だった場合は交換が成功します。失敗した場合でも、同一のSort Keyが格納されていれば、そのSort Keyが該当のコンテナをすでに確保しているという意味になるので、該当のコンテナのインデックスを使用します。<br>
+一方で、異なるSort Keyがすでに該当のコンテナに格納されている場合は、コンフリクトとなります。この場合は、空きコンテナをリニアサーチします。リニアサーチをどの程度行うかは実装次第で、コンテナを完璧に埋めるには、最悪126回のリニアサーチが必要になります。しかし、今回の実装では、あくまで偶発的に発生するコンフリクトの回避なので、2回しか行いません。最終的にコンフリクトが解決できなかった場合は、そのままコンテナのインデクスを使用します。この場合は、同じコンテナに異なるSort Keyのピクセルが格納されます。</p>
+<pre><code class="language-cpp">#if RESOLVE_CONTAINER_KEY_CONFLICTS
+groupshared uint OriginalKeys[NumContainers]; // 4 x 128 = 512 bytes, to store original sort keys.
+#endif
+
+#if RESOLVE_CONTAINER_KEY_CONFLICTS
+if (ThID &lt; NumContainers) {
+ OriginalKeys[ThID] = 0;
+}
+#endif
+
+#if RESOLVE_CONTAINER_KEY_CONFLICTS
+{
+ const int NumTries = 3;
+ uint orgVal;
+ int j;
+ [unroll]
+ for (j = 0; j &lt; NumTries; ++j) {
+  InterlockedCompareExchange(OriginalKeys[containerKey], 0, sortKey, orgVal);
+  if (orgVal == 0 || orgVal == sortKey) {
+   // Succeeded to allocate a slot for the sortKey.
+   break;
+  }
+  // Conflict happened. Linear search.
+  containerKey = (containerKey + 1) % NumContainers;
+ }
+}
+#endif
+</code></pre>
+<h2 id="タイル内をコンテナの要素数でソートする">タイル内をコンテナの要素数でソートする</h2>
+<p>最初の実装例では、タイル内の127種類のコンテナは、コンテナごとの要素数とは関係なくContainer Key順に格納されます。タイルごとに32要素のアラインメントをとりましたが、先頭のコンテナが少量だった場合は、簡単にアラインメントが崩れてしまいます。そこで、コンテナの要素数に基づいて、コンテナをソートしたいと思います。ただしあまり複雑なアルゴリズムを用いてソートすると、コストとパフォーマンスの向上が見合わなくなってしまうので、簡単なソートのみ適用します。ここで使うのは、32要素のRadixSortのようなアルゴリズムです。127種類のコンテナを、32種類に分類して、コンテナがUAVバッファにストアされる順番を入れ替えます。
+一番先頭にストアしたいのは、要素数が32にアラインしているコンテナです。これらは32要素にアラインしているバッファにストアすれば、完璧にwarpにフィットします。次に考えられるのは、コンテナの要素数が多いものです。要素数がある程度多いコンテナが隣接している場合は、warp内の分岐が最大2方向で済みます。要素数の多いコンテナ同士の間に少ないコンテナが挟まって、分岐の方向が増えてしまうのを避けれれば十分です。したがって、コンテナの要素数を8で割って、240~8を30~1にマッピングします。31は要素数が32にアラインしているコンテナにアサインします。このインデックスを反転させてソートすれば、アラインしているコンテナが先頭になり、次いで（おおよそ）要素数の大きい順にコンテナがソートされます。</p>
+<pre><code class="language-cpp">#if SORTING_CONTAINERS
+// Sort containers based on their item counts.
+{
+ uint radInput;
+ uint radLocalIdx;
+
+ if (ThID &lt; NumContainers) { // 0 ~ 126
+  // Each container's item count can be up to 4095 (0x0000_0FFF), however, we just want to put aligned containers and major containers first.
+  // We can clip this number with 240 (0xF0) which indicates 'major' enough. Also, we can clip minor work items less than 8(&gt;&gt;3) as 'minor' enough.
+  // So, radixInput can be from 0x00 to 0x1E (0 ~ 30) which is fit into single warp.
+  // #31 is a special number for containers aligned with 32.
+  radInput = min(ItemCounts[ThID] &gt;&gt; 3, 30);
+  radInput = ItemCounts[ThID] % WaveSize == 0 ? 31 : radInput;
+
+  // Reverse order. Bigger container first.
+  radInput = 31 - radInput;
+
+  InterlockedAdd(RadixCounts[radInput], 1, radLocalIdx);
+ }
+
+ GroupMemoryBarrierWithGroupSync();
+
+ if (ThID &lt; RadixWidth) { // 0 ~ 31
+  RadixOffsets[ThID] = WavePrefixSum(RadixCounts[ThID]);
+ }
+ GroupMemoryBarrierWithGroupSync();
+
+ if (ThID &lt; NumContainers) { // 0 ~ 126
+  int containerID = ThID;
+  int containerRank = RadixOffsets[radInput] + radLocalIdx;
+
+  // Store sorted array. This is the index for storing containers.
+  RadixSortedContainerIndex[containerRank] = containerID;
+ }
+ GroupMemoryBarrierWithGroupSync();
+}
+#endif
+</code></pre>
+<h2 id="観察">観察</h2>
+<p>実際にタイルごとにソートした結果を視覚化して確認したいと思います。今回はソートの対象は、Meshletで描画されたMeshletのIDです。特に深い意味はありませんが、Material IDの代わりと考えてもらえれば良いかと思います。ソートしたバッファは、1Dバッファなので、そのまま見ても面白くないので、タイル位置ごとにSort Keyで色付けしたピクセルをリニアに並べています。
+タイルサイズは64x64なので、タイルの半分の長さが、ちょうどwarpのサイズになります。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-meshlet-id">
+
+
+  <a data-fancybox="" href="/post/pixelsortingcs/Meshlet_hub3ac58224992baa3584aa2431ee18516_160885_2000x2000_fit_lanczos_3.png" data-caption="Meshlet ID">
+
+
+  <img data-src="/post/pixelsortingcs/Meshlet_hub3ac58224992baa3584aa2431ee18516_160885_2000x2000_fit_lanczos_3.png" class="lazyload" alt="" width="60%" height="1440">
+</a>
+
+
+  
+  
+  <figcaption>
+    Meshlet ID
+  </figcaption>
+
+
+</figure>
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-64x64タイルでソートされたものを可視化">
+
+
+  <a data-fancybox="" href="/post/pixelsortingcs/Sorted_hue45b4b6dfb42aa627f99cbaaf11911c2_52216_2000x2000_fit_lanczos_3.png" data-caption="64x64タイルでソートされたものを可視化">
+
+
+  <img data-src="/post/pixelsortingcs/Sorted_hue45b4b6dfb42aa627f99cbaaf11911c2_52216_2000x2000_fit_lanczos_3.png" class="lazyload" alt="" width="60%" height="1440">
+</a>
+
+
+  
+  
+  <figcaption>
+    64x64タイルでソートされたものを可視化
+  </figcaption>
+
+
+</figure>
+</p>
+<p>分かりにくいのでCropします。<br>
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-meshlet-id">
+
+
+  <a data-fancybox="" href="/post/pixelsortingcs/Meshlet_z_hue3a15d2ea9b6c0f041b6d08ca25a0fe2_13147_2000x2000_fit_lanczos_3.png" data-caption="Meshlet ID">
+
+
+  <img data-src="/post/pixelsortingcs/Meshlet_z_hue3a15d2ea9b6c0f041b6d08ca25a0fe2_13147_2000x2000_fit_lanczos_3.png" class="lazyload" alt="" width="60%" height="192">
+</a>
+
+
+  
+  
+  <figcaption>
+    Meshlet ID
+  </figcaption>
+
+
+</figure>
+<br>
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-sort-keyのコンフリクト回避ありコンテナの要素数によるソートあり">
+
+
+  <a data-fancybox="" href="/post/pixelsortingcs/Sorted_z_huca71900b33fb8fd5d274a3631e07a1ac_4159_2000x2000_fit_lanczos_3.png" data-caption="Sort Keyのコンフリクト回避：あり、コンテナの要素数によるソート：あり">
+
+
+  <img data-src="/post/pixelsortingcs/Sorted_z_huca71900b33fb8fd5d274a3631e07a1ac_4159_2000x2000_fit_lanczos_3.png" class="lazyload" alt="" width="60%" height="192">
+</a>
+
+
+  
+  
+  <figcaption>
+    Sort Keyのコンフリクト回避：あり、コンテナの要素数によるソート：あり
+  </figcaption>
+
+
+</figure>
+<br>
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-sort-keyのコンフリクト回避ありコンテナの要素数によるソートなし">
+
+
+  <a data-fancybox="" href="/post/pixelsortingcs/AvoidConflict_z_hu941350dadcb4a538a9f713348107e913_4434_2000x2000_fit_lanczos_3.png" data-caption="Sort Keyのコンフリクト回避：あり、コンテナの要素数によるソート：なし">
+
+
+  <img data-src="/post/pixelsortingcs/AvoidConflict_z_hu941350dadcb4a538a9f713348107e913_4434_2000x2000_fit_lanczos_3.png" class="lazyload" alt="" width="60%" height="192">
+</a>
+
+
+  
+  
+  <figcaption>
+    Sort Keyのコンフリクト回避：あり、コンテナの要素数によるソート：なし
+  </figcaption>
+
+
+</figure>
+<br>
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-sort-keyのコンフリクト回避なしコンテナの要素数によるソートなし">
+
+
+  <a data-fancybox="" href="/post/pixelsortingcs/Conflict_z_hu6b0c4553450b1136f016f9415413bf92_5030_2000x2000_fit_lanczos_3.png" data-caption="Sort Keyのコンフリクト回避：なし、コンテナの要素数によるソート：なし">
+
+
+  <img data-src="/post/pixelsortingcs/Conflict_z_hu6b0c4553450b1136f016f9415413bf92_5030_2000x2000_fit_lanczos_3.png" class="lazyload" alt="" width="60%" height="192">
+</a>
+
+
+  
+  
+  <figcaption>
+    Sort Keyのコンフリクト回避：なし、コンテナの要素数によるソート：なし
+  </figcaption>
+
+
+</figure>
+<br>
+まず、コンフリクト回避をしていないものは、コンフリクトが発生しているのが視覚化されてよくわかります。見た目がひどいので、コンフリクトの影響が大きいように見えますが、
+単なる２種類のコンフリクトであれば、warp内の分岐は2方向なので、見た目ほど酷い実行性能にならないはずです。コンフリクト回避が実行性能に与える影響はおそらく軽微でしょう。<br>
+コンテナ要素ごとのソートも、可視化すると良く見えますが、実際はタイルの後半に、要素数の少ないコンテナが密集して、分岐の多いwarpを作ることになるので、全体の速度で考えると
+見た目ほど速くなることはないでしょう。</p>
+<p>次に処理速度を計測してみます。RTX5080で2560x1440を処理したときに、NSightGraphicsで計測してみます。
+処理の計測では、デバッグ用の視覚化処理を省略して計測します。また、負荷を上げるため、オブジェクトのインスタンスの表示数を増やします。<br>
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-meshlet-idベンチマークケース">
+
+
+  <a data-fancybox="" href="/post/pixelsortingcs/Screen_b_huf6f86b56a7559ed7c20fbf1bb0aca1ab_1215867_2000x2000_fit_lanczos_3.png" data-caption="Meshlet ID　（ベンチマークケース）">
+
+
+  <img data-src="/post/pixelsortingcs/Screen_b_huf6f86b56a7559ed7c20fbf1bb0aca1ab_1215867_2000x2000_fit_lanczos_3.png" class="lazyload" alt="" width="60%" height="1440">
+</a>
+
+
+  
+  
+  <figcaption>
+    Meshlet ID　（ベンチマークケース）
+  </figcaption>
+
+
+</figure>
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+<figure class="center" id="figure-64x64タイルでソートされたものを可視化ベンチマークケース">
+
+
+  <a data-fancybox="" href="/post/pixelsortingcs/Sorted_b_hu09806bcf02189fadb70dd3e34095f155_356926_2000x2000_fit_lanczos_3.png" data-caption="64x64タイルでソートされたものを可視化（ベンチマークケース）">
+
+
+  <img data-src="/post/pixelsortingcs/Sorted_b_hu09806bcf02189fadb70dd3e34095f155_356926_2000x2000_fit_lanczos_3.png" class="lazyload" alt="" width="60%" height="1440">
+</a>
+
+
+  
+  
+  <figcaption>
+    64x64タイルでソートされたものを可視化（ベンチマークケース）
+  </figcaption>
+
+
+</figure>
+</p>
+<table>
+<thead>
+<tr>
+<th>Sort Keyのコンフリクト回避</th>
+<th>コンテナの要素数によるソート</th>
+<th>実行時間</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>あり</td>
+<td>あり</td>
+<td>0.06ms</td>
+</tr>
+<tr>
+<td>あり</td>
+<td>なし</td>
+<td>0.05ms</td>
+</tr>
+<tr>
+<td>なし</td>
+<td>なし</td>
+<td>0.03ms</td>
+</tr>
+<tr>
+<td>参考：1Dバッファとデバッグ視覚化バッファのクリア: 0.03ms</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>どのDispatchも前後にUAVバリアを設置したので、おおよそ正確な値と思われますが、0.01ms精度での計測は難しいので参考程度で。</p>
+<h2 id="考察">考察</h2>
+<p>もっと並列度を上げるためにいろいろ考えてしまいますが、処理負荷的にこの程度が適切だと思います。
+ソートやパッキングにコストをかけ過ぎれば後続の処理が早くなってもトータルで速くならないので、あくまで程々に。</p>
+<h2 id="ソース">ソース</h2>
+<pre><code class="language-cpp">#if !defined(DEBUG_VISUALIZATION)
+#define DEBUG_VISUALIZATION 1
+#endif
+#if !defined(RESOLVE_CONTAINER_KEY_CONFLICTS)
+#define RESOLVE_CONTAINER_KEY_CONFLICTS 1
+#endif
+#if !defined(SORTING_CONTAINERS)
+#define SORTING_CONTAINERS 1
+#endif
+
+Texture2D&lt;uint3&gt; t_MeshletID : register(t0); // Input. Screen space sort keyes.
+
+RWByteAddressBuffer g_SortedPixels : register(u0); // Output.  
+RWByteAddressBuffer g_Counter : register(u1); // Counter(4 bytes) for packing pixels in g_SortedPixels. Need to be initialized with zero.
+
+#if DEBUG_VISUALIZATION
+RWTexture2D&lt;float4&gt; g_SortedPixlTex : register(u2); // 2D tex for debug visualization.
+#endif
+
+#define NumThreads 512 // Thread group size.
+static const uint WaveSize = 32;
+static const uint2 screenExtents = uint2(2560, 1440); // For simplicty.
+
+// Works space for gathering pixels that have the same sorting keys.
+static const uint NumContainers = 127; // Number of containers in a tile. Sort keys must be folded into this kinds.
+groupshared uint ItemCounts[NumContainers];  // 4 x 127 = 518 bytes.
+groupshared uint ItemOffsets[NumContainers]; // 4 x 127 = 518 bytes.
+groupshared uint ItemOffsetWrk[NumContainers / WaveSize]; // For storing prefix sum of wave boundaries such as 32, 64 and 96.
+groupshared uint TileOffset;
+
+#if RESOLVE_CONTAINER_KEY_CONFLICTS
+groupshared uint OriginalKeys[NumContainers]; // 4 x 128 = 512 bytes, to store original sort keys.
+#endif
+
+#if SORTING_CONTAINERS
+// Working space for a radix sort to 'roughly' sort the containers.
+static const uint RadixWidth = 32;
+groupshared uint RadixCounts[RadixWidth]; // 4 x 32 = 128 bytes
+groupshared uint RadixOffsets[RadixWidth]; // 4 x32 = 128 bytes
+groupshared uint RadixSortedContainerIndex[NumContainers]; // 4 x 127 = 518 bytes.
+#endif
+
+uint TwoRoundXorShiftMulXorShift(uint s1, uint v1, uint s2, uint v2, uint s3, uint x)
+{
+	x ^= x &gt;&gt; s1;
+	x *= v1;
+	x ^= x &gt;&gt; s2;
+	x *= v2;
+	x ^= x &gt;&gt; s3;
+	return x;
+}
+uint Hash32_1(uint x)
+{
+	// https://github.com/skeeto/hash-prospector/issues/19
+	return TwoRoundXorShiftMulXorShift(15, 0x2c1b3c6d, 12, 0x297a2d39, 15, x);
+}
+
+uint Roundup32(uint x)
+{
+	return ((x + 31) / 32) * 32;
+}
+
+uint2 DecodeMorton2D64x64(uint mortonCode)
+{
+	uint x = mortonCode &amp; 0xFFF; // 0 ~ 4095
+	uint y = x &gt;&gt; 1;
+
+	x = (x &amp; 0x00000555); // x &amp; 0101_0101_0101b
+	x = (x | (x &gt;&gt; 1)) &amp; 0x00000333;// &amp; 0011_0011_0011b
+	x = (x | (x &gt;&gt; 2)) &amp; 0x0000030F;// &amp; 0011_0000_1111b
+	x = (x | (x &gt;&gt; 4)) &amp; 0x0000003F;// &amp; 0000_0011_1111b
+
+	y = (y &amp; 0x00000555);
+	y = (y | (y &gt;&gt; 1)) &amp; 0x00000333;
+	y = (y | (y &gt;&gt; 2)) &amp; 0x0000030F;
+	y = (y | (y &gt;&gt; 4)) &amp; 0x0000003F;
+
+	return uint2(x, y);
+}
+
+uint2 GetPixelPos(uint pixIdx, uint3 Gid, bool useMortonCode = true)
+{
+	uint2 tilePos = Gid.xy;
+	uint2 localPos;
+
+	if (useMortonCode) {
+		localPos = DecodeMorton2D64x64(pixIdx);
+	}
+	else {
+		localPos.x = pixIdx % 64;
+		localPos.y = pixIdx / 64;
+	}
+
+	return tilePos * uint2(64, 64) + localPos;
+}
+
+// Dispatch should be called with Dispatch(ScreenExtents.x / 64, ScreenExtents.y / 64, 1)
+[numthreads(NumThreads, 1, 1)]
+void main(uint3 GTid : SV_GroupThreadID, uint3 Gid : SV_GroupID)
+{
+	const uint ThID = GTid.x;
+
+	if (ThID &lt; NumContainers) {
+		ItemCounts[ThID] = 0;
+
+#if RESOLVE_CONTAINER_KEY_CONFLICTS
+		OriginalKeys[ThID] = 0;
+#endif
+
+#if SORTING_CONTAINERS
+		if (ThID &lt; RadixWidth) {
+			RadixCounts[ThID] = 0;
+		}
+#endif
+	}
+	GroupMemoryBarrierWithGroupSync();
+
+	uint containerKeys[8];
+	uint containerLocalIndices[8];
+	for (int i = 0; i &lt; 8; ++i) {
+		uint2 pixelPos = GetPixelPos(ThID + i * NumThreads, Gid);
+		containerKeys[i] = 0xFFFFFFFF;
+		if (pixelPos.x &gt;= screenExtents.x || pixelPos.y &gt;= screenExtents.y) {
+			// Out of bounds.
+			continue;
+		}
+		uint3 pixelColor = t_MeshletID.Load(int3(pixelPos, 0));
+		uint sortKey = Hash32_1((pixelColor.x &amp; 0xFF) | ((pixelColor.y &amp; 0xFF) &lt;&lt; 8) | ((pixelColor.z &amp; 0xFF) &lt;&lt; 16));
+		if (sortKey == 0) {
+			// Total black means a empty pixel.
+			// Hash32_1(0) always returns 0.
+			continue;
+		}
+
+		// Folding the SortKey with no care will cause accidental conflicts, but we may afford it for cost/perf balance.
+		uint containerKey = sortKey % NumContainers;
+
+#if RESOLVE_CONTAINER_KEY_CONFLICTS
+		{
+			const int NumTries = 3;
+			uint orgVal;
+			int j;
+			[unroll]
+			for (j = 0; j &lt; NumTries; ++j) {
+				InterlockedCompareExchange(OriginalKeys[containerKey], 0, sortKey, orgVal);
+				if (orgVal == 0 || orgVal == sortKey) {
+					// Succeeded to allocate a slot for the sortKey.
+					break;
+				}
+
+				// Conflict happened. Linear search.
+				containerKey = (containerKey + 1) % NumContainers;
+			}
+#if 0
+			if (j == NumTries) {
+				// Failed to resolve a conflict. Leave it as is considering cost/perf balance. 
+				// For debugging purpose, kick a DR with an infinite loop to see if this is really happened.
+				do {
+					InterlockedCompareExchange(OriginalKeys[containerKey], 0, sortKey, orgVal);
+				} while (orgVal != (uint) - 1);
+			}
+#endif
+		}
+#endif
+
+		InterlockedAdd(ItemCounts[containerKey], 1, containerLocalIndices[i]);
+		containerKeys[i] = containerKey;
+	}
+
+	GroupMemoryBarrierWithGroupSync();
+
+#if SORTING_CONTAINERS
+	// Sort containers based on their item counts.
+	{
+		uint radInput;
+		uint radLocalIdx;
+
+		if (ThID &lt; NumContainers) { // 0 ~ 126
+			// Each container's item count can be up to 4095 (0x0000_0FFF), however, we just want to put aligned containers and major containers first.
+			// We can clip this number with 240 (0xF0) which indicates 'major' enough. Also, we can clip minor work items less than 8(&gt;&gt;3) as 'minor' enough.
+			// So, radixInput can be from 0x00 to 0x1E (0 ~ 30) which is fit into single warp.
+			// #31 is a special number for containers aligned with 32.
+			radInput = min(ItemCounts[ThID] &gt;&gt; 3, 30);
+			radInput = ItemCounts[ThID] % WaveSize == 0 ? 31 : radInput;
+
+			// Reverse order. Bigger container first.
+			radInput = 31 - radInput;
+
+			InterlockedAdd(RadixCounts[radInput], 1, radLocalIdx);
+		}
+
+		GroupMemoryBarrierWithGroupSync();
+
+		if (ThID &lt; RadixWidth) { // 0 ~ 31
+			RadixOffsets[ThID] = WavePrefixSum(RadixCounts[ThID]);
+		}
+		GroupMemoryBarrierWithGroupSync();
+
+		if (ThID &lt; NumContainers) { // 0 ~ 126
+			int containerID = ThID;
+			int containerRank = RadixOffsets[radInput] + radLocalIdx;
+
+			// Store sorted array. This is the index for storing containers.
+			RadixSortedContainerIndex[containerRank] = containerID;
+		}
+		GroupMemoryBarrierWithGroupSync();
+	}
+#endif
+
+	// Count containers' entires in the tile and sub-allocate buffer to store sorted pixels.
+	{
+		int containerID = ThID;
+#if SORTING_CONTAINERS
+		if (ThID &lt; NumContainers) { // 0 ~ 126
+			containerID = RadixSortedContainerIndex[ThID];
+		}
+#endif
+
+		int itemCnt;
+		int itemOfs;
+		if (ThID &lt; NumContainers) { // 0 ~ 126
+			itemCnt = ItemCounts[containerID];
+			itemOfs = WavePrefixSum(itemCnt);
+			if (ThID % WaveSize == WaveSize - 1) {
+				ItemOffsetWrk[ThID / WaveSize] = itemOfs + itemCnt; // [0]=sum(0:31), [1]=sum(32:63), [2]=sum(64:95)..
+			}
+		}
+		GroupMemoryBarrierWithGroupSync();
+
+		if (ThID &lt; NumContainers) { // 0 ~ 126
+			for (int waveBoundary = 0; waveBoundary &lt; NumContainers / WaveSize; ++waveBoundary) { // for 32, 64, 96
+				if (ThID &gt;= (waveBoundary + 1) * WaveSize) {
+					itemOfs += ItemOffsetWrk[waveBoundary];
+				}
+			}
+			ItemOffsets[containerID] = itemOfs;
+		}
+
+		if (ThID == NumContainers - 1) { // ThID: 126 should have the total number of container entires.
+			// The first item of each 64x64 tile will be placed with 32 items alignment.
+			uint TotalAlignedEntriesInTile = Roundup32(itemOfs + itemCnt);
+			g_Counter.InterlockedAdd(0, TotalAlignedEntriesInTile, TileOffset);
+		}
+		GroupMemoryBarrierWithGroupSync();
+	}
+
+	for (i = 0; i &lt; 8; ++i) {
+		if (containerKeys[i] == 0xFFFFFFFF)
+			continue;
+
+		uint2 pixelPos = GetPixelPos(ThID + i * NumThreads, Gid);
+		uint packedPixelPos = ((pixelPos.y &amp; 0xFFFF) &lt;&lt; 16) | (pixelPos.x &amp; 0xFFFF);
+		g_SortedPixels.Store((TileOffset + ItemOffsets[containerKeys[i]] + containerLocalIndices[i]) * 4, packedPixelPos);
+
+#if DEBUG_VISUALIZATION
+		uint2 linearPixelPos = GetPixelPos(ItemOffsets[containerKeys[i]] + containerLocalIndices[i], Gid, false);
+
+		uint3 pixelColor = t_MeshletID.Load(int3(pixelPos, 0));
+		float r = (float)pixelColor.x / 255.0;
+		float g = (float)pixelColor.y / 255.0;
+		float b = (float)pixelColor.z / 255.0;
+
+		g_SortedPixlTex[linearPixelPos] = float4(r, g, b, 1);
+#endif
+	}
+}
+</code></pre>
+
+    </div>
+
+    
+
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tag/direct3d/">Direct3D</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=https://shikihuiku.github.io/post/pixelsortingcs/&amp;text=%e3%82%b9%e3%82%af%e3%83%aa%e3%83%bc%e3%83%b3%e3%82%b9%e3%83%9a%e3%83%bc%e3%82%b9%e3%81%a7%e3%83%94%e3%82%af%e3%82%bb%e3%83%ab%e4%bd%8d%e7%bd%ae%e3%81%94%e3%81%a8%e3%81%ae%e3%82%bf%e3%82%b9%e3%82%af%e3%82%92%e3%82%bd%e3%83%bc%e3%83%86%e3%82%a3%e3%83%b3%e3%82%b0/%e3%83%91%e3%83%83%e3%82%ad%e3%83%b3%e3%82%b0%e3%81%99%e3%82%8b%e3%81%a8%e3%81%8d%e3%81%aeCompute%20Shader" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=https://shikihuiku.github.io/post/pixelsortingcs/&amp;t=%e3%82%b9%e3%82%af%e3%83%aa%e3%83%bc%e3%83%b3%e3%82%b9%e3%83%9a%e3%83%bc%e3%82%b9%e3%81%a7%e3%83%94%e3%82%af%e3%82%bb%e3%83%ab%e4%bd%8d%e7%bd%ae%e3%81%94%e3%81%a8%e3%81%ae%e3%82%bf%e3%82%b9%e3%82%af%e3%82%92%e3%82%bd%e3%83%bc%e3%83%86%e3%82%a3%e3%83%b3%e3%82%b0/%e3%83%91%e3%83%83%e3%82%ad%e3%83%b3%e3%82%b0%e3%81%99%e3%82%8b%e3%81%a8%e3%81%8d%e3%81%aeCompute%20Shader" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=%e3%82%b9%e3%82%af%e3%83%aa%e3%83%bc%e3%83%b3%e3%82%b9%e3%83%9a%e3%83%bc%e3%82%b9%e3%81%a7%e3%83%94%e3%82%af%e3%82%bb%e3%83%ab%e4%bd%8d%e7%bd%ae%e3%81%94%e3%81%a8%e3%81%ae%e3%82%bf%e3%82%b9%e3%82%af%e3%82%92%e3%82%bd%e3%83%bc%e3%83%86%e3%82%a3%e3%83%b3%e3%82%b0/%e3%83%91%e3%83%83%e3%82%ad%e3%83%b3%e3%82%b0%e3%81%99%e3%82%8b%e3%81%a8%e3%81%8d%e3%81%aeCompute%20Shader&amp;body=https://shikihuiku.github.io/post/pixelsortingcs/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=https://shikihuiku.github.io/post/pixelsortingcs/&amp;title=%e3%82%b9%e3%82%af%e3%83%aa%e3%83%bc%e3%83%b3%e3%82%b9%e3%83%9a%e3%83%bc%e3%82%b9%e3%81%a7%e3%83%94%e3%82%af%e3%82%bb%e3%83%ab%e4%bd%8d%e7%bd%ae%e3%81%94%e3%81%a8%e3%81%ae%e3%82%bf%e3%82%b9%e3%82%af%e3%82%92%e3%82%bd%e3%83%bc%e3%83%86%e3%82%a3%e3%83%b3%e3%82%b0/%e3%83%91%e3%83%83%e3%82%ad%e3%83%b3%e3%82%b0%e3%81%99%e3%82%8b%e3%81%a8%e3%81%8d%e3%81%aeCompute%20Shader" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="whatsapp://send?text=%e3%82%b9%e3%82%af%e3%83%aa%e3%83%bc%e3%83%b3%e3%82%b9%e3%83%9a%e3%83%bc%e3%82%b9%e3%81%a7%e3%83%94%e3%82%af%e3%82%bb%e3%83%ab%e4%bd%8d%e7%bd%ae%e3%81%94%e3%81%a8%e3%81%ae%e3%82%bf%e3%82%b9%e3%82%af%e3%82%92%e3%82%bd%e3%83%bc%e3%83%86%e3%82%a3%e3%83%b3%e3%82%b0/%e3%83%91%e3%83%83%e3%82%ad%e3%83%b3%e3%82%b0%e3%81%99%e3%82%8b%e3%81%a8%e3%81%8d%e3%81%aeCompute%20Shader%20https://shikihuiku.github.io/post/pixelsortingcs/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=https://shikihuiku.github.io/post/pixelsortingcs/&amp;title=%e3%82%b9%e3%82%af%e3%83%aa%e3%83%bc%e3%83%b3%e3%82%b9%e3%83%9a%e3%83%bc%e3%82%b9%e3%81%a7%e3%83%94%e3%82%af%e3%82%bb%e3%83%ab%e4%bd%8d%e7%bd%ae%e3%81%94%e3%81%a8%e3%81%ae%e3%82%bf%e3%82%b9%e3%82%af%e3%82%92%e3%82%bd%e3%83%bc%e3%83%86%e3%82%a3%e3%83%b3%e3%82%b0/%e3%83%91%e3%83%83%e3%82%ad%e3%83%b3%e3%82%b0%e3%81%99%e3%82%8b%e3%81%a8%e3%81%8d%e3%81%aeCompute%20Shader" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  
+    
+    
+    
+      
+    
+    
+    
+    <div class="media author-card content-widget-hr">
+      
+        
+        <img class="avatar mr-3 avatar-circle" src="/author/shikihuiku/avatar_hu83bef21d3d3e76bee62dd138e5083bbc_32201_270x270_fill_q90_lanczos_center.jpg" alt="shikihuiku">
+      
+
+      <div class="media-body">
+        <h5 class="card-title"><a href="https://shikihuiku.github.io/">shikihuiku</a></h5>
+        
+        <p class="card-text">リアルタイムレンダリングが好き</p>
+        <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/shikihuiku" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/shikihuiku" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+</ul>
+
+      </div>
+    </div>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/workgraph_in_hlsl/">Work Graph in HLSL</a></li>
+      
+      <li><a href="/post/rtxdi_second_step/">RTXDIのminimal-sampleを理解する(2)</a></li>
+      
+      <li><a href="/post/rtxdi_first_step/">RTXDIのminimal-sampleを理解する(1)</a></li>
+      
+      <li><a href="/post/projection_matrix/">Projection Matrixについて</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js" integrity="sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/highlight.min.js" integrity="sha512-7t8APmYpzEsZP7CYoA7RfMPV9Bb+PJHa9x2WiUnDXZx3XHveuyWUtvNOexhkierl5flZ3tr92dP1mMS+SGlD+A==" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js" integrity="sha256-EErZamuLefUnbMBQbsEqu1USa+btR2oIlCpBJbyD4/g=" crossorigin="anonymous"></script>
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    <script>const isSiteThemeDark = false;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks",
+        'slides' : "Slides"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.341e58d06db179e1d53f3322b6883f4c.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    
+  </p>
+
+  
+  
+
+
+
+
+
+
+  <p class="powered-by">
+    
+    Published with
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic Website Builder</a>
+    
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
