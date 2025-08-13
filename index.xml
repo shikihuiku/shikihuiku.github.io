@@ -5,12 +5,392 @@
     <link>https://shikihuiku.github.io/</link>
       <atom:link href="https://shikihuiku.github.io/index.xml" rel="self" type="application/rss+xml" />
     <description>shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Wed, 06 Aug 2025 15:46:21 +0900</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sun, 10 Aug 2025 12:16:56 +0900</lastBuildDate>
     <image>
       <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png</url>
       <title>shikihuiku – 色不異空 – Real-time rendering topics in Japanese.</title>
       <link>https://shikihuiku.github.io/</link>
     </image>
+    
+    <item>
+      <title>Resampled Importance Samplingについて</title>
+      <link>https://shikihuiku.github.io/post/ris_revisit/</link>
+      <pubDate>Sun, 10 Aug 2025 12:16:56 +0900</pubDate>
+      <guid>https://shikihuiku.github.io/post/ris_revisit/</guid>
+      <description>&lt;p&gt;知識のアップデートという事で、2020年に書いたImportance Resamplingの記事を書き直します。Siggraph2023で行われた、「A Gentle Introduction to ReSTIR」というコースが包括的にRISやReSTIRについて説明してくれています。コースノートも参照可能ですので本格的に学びたい方は、ぜひこちらの方を皮切りに勉強することをお勧めします。ここでは、Weighted Reservoir Samplingの手法やReSTIRのフレームワークについては説明しません。RISについてのみ説明します。&lt;/p&gt;
+&lt;h3 id=&#34;参考文献リスト&#34;&gt;参考文献リスト&lt;/h3&gt;
+&lt;p&gt;Wyman, C., Kettunen, M., Lin, D., Bitterli, B., Yuksel, C., Jarosz, W., &amp;amp; Kozlowski, P. (2023). &lt;em&gt;A Gentle Introduction to ReSTIR Path Reuse in Real-Time&lt;/em&gt;. ACM SIGGRAPH 2023 Courses.&lt;br&gt;
+Bitterli et al. (2020), &amp;lsquo;Spatiotemporal Reservoir Resampling for Real-Time Ray Tracing with Dynamic Direct Lighting&amp;rsquo;&lt;br&gt;
+Lin et al. (2022), &amp;lsquo;Generalized Resampled Importance Sampling&amp;rsquo;&lt;br&gt;
+Veach (1997), &amp;lsquo;Robust Monte Carlo Methods for Light Transport Simulation&amp;rsquo;&lt;/p&gt;
+&lt;h2 id=&#34;モンテカルロ積分&#34;&gt;モンテカルロ積分&lt;/h2&gt;
+&lt;p&gt;レンダリングの話はひとまず置いておいて、ある関数(被積分関数):$f(x)$を、領域(ドメイン):$\Omega$で積分したものを$I$とします。&lt;/p&gt;
+&lt;p&gt;$$
+I = \int_{\Omega} f(x) dx
+$$&lt;/p&gt;
+&lt;p&gt;上記の積分がClosed Form(簡単な算術形式)で表せない場合は、モンテカルロ法による推定が有効な手法となります。モンテカルロ法による積分の推定を、モンテカルロ積分と呼びます。
+また、モンテカルロ法で推定値を計算する行為そのものをモンテカルロ推定、MC推定などと呼びます。
+モンテカルロ法で推定した積分の値を$\langle I \rangle$とするならば、ドメイン:$\Omega$内の、$M$個の一様分布で生成したサンプル:$S$を用いて、以下のように計算できます。&lt;br&gt;
+この式は、ドメイン:$\Omega$における関数:$f(x)$の平均値にドメインの大きさを乗じたものと解釈することもできます。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{gather}
+\text{with} \quad S=\{X_1​,X_2​,\: &amp;hellip;\:,X_M \} \quad \text{where}\quad X_i \sim Uniform(\Omega), \newline
+I \approx \langle I \rangle = |\Omega|\frac{1}{M}\sum^{M}_{i=1} f(X_i)
+\end{gather}
+$$&lt;/p&gt;
+&lt;p&gt;有限個のサンプルでは、計算結果は必ずしも積分の真の値と一致しませんが、サンプル:$S$の分布が、ドメイン:$\Omega$と一致する限り、このモンテカルロ推定の期待値は、積分の値に等しくなります。推定の期待値が真値に一致する状態を、Unbiasedもしくは不偏であるといいます。&lt;/p&gt;
+&lt;p&gt;$$
+E[\langle I \rangle] = I
+$$&lt;/p&gt;
+&lt;p&gt;また、$f(x)$のサポート (関数の非ゼロ領域）がドメイン:$\Omega$全体より小さい場合は、$\Omega$で積分しても、$f(x)$のサポート:$supp(f)$で積分しても同じ値なります。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{gather}
+\text{with}\quad supp(f) \subseteq \Omega \quad \text{where}\quad supp(f)=\{x ∣ f(x) \neq 0\},\quad  \newline
+I = \int_{supp(f)} f(x) dx
+\end{gather}
+$$&lt;/p&gt;
+&lt;p&gt;同様に、サンプル:$S$の一様分布が、$f(x)$のサポートを覆う限りは、ドメイン：$\Omega$全域を覆ってなくても、モンテカルロ法による積分の推定は可能です。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{gather}
+\text{with}\quad S=\{X_1​,X_2​,\: &amp;hellip; \: ,X_M\} \quad \text{where}\quad X_i \sim Uniform(supp(f)) \quad \text{and}\quad supp(f) \subseteq \Omega, \newline
+I \approx \langle I \rangle = |supp(f)|\frac{1}{M}\sum^{M}_{i=1} f(X_i)
+\end{gather}
+$$&lt;/p&gt;
+&lt;h2 id=&#34;importance-sampling&#34;&gt;Importance Sampling&lt;/h2&gt;
+&lt;p&gt;M個のサンプル:$S$が、確率密度関数:$p(x)$に基づく分布で与えられるとき、被積分関数:$f(x)$のドメイン：$\Omega$による積分をモンテカルロ法で推定:$\langle I \rangle$する場合、以下のようになります。先ほどの式で乗算されていた、ドメインの大きさ：$|\Omega|$や、サンプル分布領域の大きさ$|supp(f)|$の役割は、確率密度関数:$p(x)$が担います。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{gather}
+\text{with}\quad S=\{X_1, X_2,\: &amp;hellip; \:, X_M\} \quad \text{where} \quad X_i \sim p(x) \quad \text{and} \quad X_i \in \Omega, \newline
+\langle I \rangle = \frac{1}{M}\sum^{M}_{i=1} \frac{f(X_i)}{p(X_i)}
+\end{gather}
+$$&lt;/p&gt;
+&lt;p&gt;ドメイン:$\Omega$全域において$f(x)$が非ゼロであるならば、確率密度関数:$p(x)$がドメイン全域において$&amp;gt;0$であれば、この推定の期待値はドメイン:$\Omega$における関数:$f(x)$の積分の値に等しくなります。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{gather}
+\text{with} \quad \Omega \subseteq supp(f) \quad \text{and} \quad \Omega = supp(p),\newline
+\qquad E[\langle I \rangle] = I 
+\end{gather}
+$$&lt;/p&gt;
+&lt;p&gt;$f(x)$のサポートがドメイン:$\Omega$全体より小さい場合は、$f(x)$のサポートにおいて$p(x)$が$&amp;gt;0$ならば、この推定の期待値は積分の値に等しくなります。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{gather}
+\text{with} \quad supp(f) \subseteq \Omega \quad \text{and} \quad supp(f) \subseteq supp(p),\newline
+E[\langle I \rangle] = I 
+\end{gather}
+$$&lt;/p&gt;
+&lt;p&gt;ここから先は、被積分関数:$f(x)$のサポートは積分のドメインに含まれる: $supp(f) \subseteq \Omega$として説明します。&lt;/p&gt;
+&lt;h2 id=&#34;1サンプルのimportance-sampling&#34;&gt;1サンプルのImportance Sampling&lt;/h2&gt;
+&lt;p&gt;ここで、サンプルが一つだけのImportance Samplingを考えてみます。&lt;br&gt;
+直感的に、このMC推定は分散が大きいと考えられますが、もしも、確率密度関数:$p(x)$が被積分関数:$f(x)$に完全に比例している場合、この推定値は、$supp(f)$全域において一定の値を返します。そして、その値は積分の真の値と一致するはずです。しかし、実際には$f(x)$に完全に比例する$p(x)$を用意するには、事前に$f(x)$の積分が解析的に解ける必要があり、これは、モンテカルロ積分の適用と矛盾します。しかし、たとえサンプルが１つだけのモンテカルロ積分でも有効な推定で、上記で説明した、確率分布関数のサポートの条件を満たせば、その期待値は積分の値と一致します。ただし、推定値の分散は、一般的に著しく大きいと考えられます。&lt;/p&gt;
+&lt;p&gt;$$
+\langle I \rangle = \frac{f(X)}{p(X)}
+$$&lt;/p&gt;
+&lt;h2 id=&#34;multiple-importance-samling--mis&#34;&gt;Multiple Importance Samling : MIS&lt;/h2&gt;
+&lt;p&gt;次に、サンプル:$X_i$ごとに異なる確率密度関数:$p_i(x)$を用いてサンプリングして、被積分関数:$f(x)$の積分をモンテカルロ法で推定:$\langle I \rangle$する場合を考えます。&lt;br&gt;
+M個のサンプル:$S$が、それぞれの要素に対応する確率密度関数: $\{p_1(x), p_2(x), &amp;hellip; , p_m(x)\}$ に基づく分布で与えられるとき、MC推定は最もシンプルな形では以下のように書けます。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{gather}
+\text{with} \quad S =\{X_1,\: &amp;hellip; \:, X_M\}, \quad \text{where} \quad X_i \sim p_i(x) \: (\text{for}\: i=1,\: &amp;hellip; \:,M) \quad \text{and} \quad X_i \in \Omega \newline
+\langle I \rangle = \frac{1}{M}\sum^{M}_{i=1} \frac{f(X_i)}{p_i(X_i)}
+\end{gather}
+$$&lt;/p&gt;
+&lt;p&gt;この式は、複数の確率密度関数を用いた、1サンプルのImportance SamplingのMC推定の平均をとったものと解釈できます。このように複数の確率密度関数を用いてサンプリングして行うMC推定をMultiple Importance Sampling:MISと言います。この時、それぞれの確率密度関数の事を、サンプリング戦略と呼びます。個々の戦略は違えど、目的は同じなので、複数のサンプリング戦略という言葉は、複数の確率密度関数よりも直感的で分かりやすいかもしれません。&lt;/p&gt;
+&lt;p&gt;MISでは、サンプリング戦略ごとに重みづけをすることができます。上式のように、$1/M$と一定の値を乗算していた部分に、サンプリング戦略ごとに異なる$x$の関数による係数:$m_i(x)$を導入します。
+通称MISウエイトと呼ばれるこの関数によって、サンプリング戦略の重要度を、サンプル値に応じて変化させます。MISウエイトは、サンプリング戦略ごとに異なる関数なので、同じサンプル値:$x$でも、異なるサンプリング戦略の$m_i(x)$は、異なる値を返す点に注意が必要です。MISウエイトは、サンプリング戦略ごとに得意な範囲（$f(x)$と比例した形近い形の範囲）で、大きなウエイトを返すように設計することで、MC推定の分散の低減を目指します。&lt;/p&gt;
+&lt;p&gt;一般的には、サンプリング戦略の数とサンプリング戦略ごとに生成するサンプル数は、それぞれ独立の変数で、MISは複数サンプリング戦略の加重平均という解釈が正しいです。ここでは、$M$個のサンプリングを$M$種類のサンプリング戦略でサンプリングしているので混乱しやすいですが、あくまで、複数サンプルの加重平均という解釈ではなく、複数サンプリング戦略による1サンプルImportance Samplingの加重平均と解釈した方が良いと思います。&lt;/p&gt;
+&lt;p&gt;$$
+\langle I \rangle = \sum^{M}_{i=1} m_i(X_i) \frac{f(X_i)}{p_i(X_i)}
+$$&lt;/p&gt;
+&lt;p&gt;上記のMC推定の期待値が積分の値と一致するためには、以下の条件を満たす必要があります。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;どのサンプル値:$x$においても、$f(x)$のサポート内は、すべてのサンプリング戦略のMISウエイト関数の合計は1である必要があります。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;$$
+\sum^{M}_{i=1} m_i(x) = 1 \qquad \text{if}\quad x \subseteq supp(f)
+$$&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;ある確率密度関数:$p_i(x)$が、あるサンプル値:$x$を生成しない場合（つまり$p_i(x)=0$）、$m_i(x)$はゼロである必要があります。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;$$
+m_i(x) = 0 \qquad \text{if} \quad x \notin supp(p_i)
+$$&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;すべての$p_i(x)$のサポートの和集合が、$supp(f)$を包含する必要があります。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;$$
+supp(f) \subseteq \bigcup_{i=1}^{M} supp(p_i)
+$$&lt;/p&gt;
+&lt;h2 id=&#34;balance-heuristic&#34;&gt;Balance Heuristic&lt;/h2&gt;
+&lt;p&gt;MISウエイト関数として、$m_i(x)$を以下のように計算するものが、Balance Heuristicとして提案されており、良いMISウエイトとして一般的に使われています。
+この式は、一見して、$m_i(x)$の総和が1になることが分かります。加えて、サンプリング戦略ごとに確率が高い範囲で、大きなウエイトを返すよう設計されています。言い換えれば、いくつかの確率密度関数が、それぞれ高確率になる領域で、$f(x)$に比例する形に近くなっていれば、このMISウエイトは良い選択になると言えると思います。&lt;/p&gt;
+&lt;p&gt;$$
+m_i(x) = \frac{p_i(x)}{\sum_{j}p_j(x)}
+$$&lt;/p&gt;
+&lt;h2 id=&#34;misウエイトの総和が１であることの意味&#34;&gt;MISウエイトの総和が１であることの意味&lt;/h2&gt;
+&lt;p&gt;MISウエイトの総和が1であることが、MC推定が不偏であることの条件になっていることについて、少し考えてみたいと思います。&lt;br&gt;
+MISウエイトの総和が1であるならば、$M$個の、MISウエイトと被積分関数の乗算:$m_i(x)f(x)$の総和をドメインで積分した値は、
+$f(x)$の積分に等しくなるのは直感的にわかるかと思います。これは、ドメイン全域、サンプリング戦略全てを対象とした積分です。&lt;/p&gt;
+&lt;p&gt;$$
+\int_{\Omega}f(x)dx = \int_{\Omega} \sum_{i=1}^{M}m_i(x)f(x) dx = \sum_{i=1}^{M} \int_{\Omega} m_i(x)f(x) dx
+$$&lt;/p&gt;
+&lt;p&gt;一方で、MISによる推定では、各サンプルは、それぞれ別のサンプリング戦略から生成され、それらサンプルの値は異なると考えるべきです。
+そして、異なるサンプルの値のMISウエイト関数同士には総和の条件がありません。&lt;/p&gt;
+&lt;p&gt;MISウエイトを用いたMC推定の式は、上式における$m_i(x)f(x)$の積分の総和に対応していると考えられます。そのため、各サンプリング戦略は等しく用いられる必要があります。
+$M$個のサンプリング戦略が、それぞれ1サンプルのImportance Samplingで、$m_i(x)f(x)$の積分を推定している見ることができ、
+その総和は$f(x)$の積分の推定になると解釈できます。&lt;/p&gt;
+&lt;p&gt;$$
+\langle I \rangle = \sum^{M}_{i=1} m_i(X_i) \frac{f(X_i)}{p_i(X_i)}
+$$&lt;/p&gt;
+&lt;h2 id=&#34;unbiased-contribution-weight-ucw&#34;&gt;Unbiased Contribution Weight: UCW&lt;/h2&gt;
+&lt;p&gt;これまでサンプルの生成において、確率密度関数が閉形式もしくはclosed formとして計算可能な場合について説明してきましたが、そうでない場合について考えてみます。&lt;/p&gt;
+&lt;p&gt;あるサンプル$X$が複雑な過程を経て生成された場合に、その生成における確率密度関数を計算することが困難な場合でも、期待値が、そのサンプルの生成確率の逆数になる値:$W_{X}$が分かれば、不偏なモンテカルロ積分を行うことができます。この$W_X$のことを、Unbiased Contribution Weight: UCWもしくは、不偏寄与重みと呼びます。&lt;/p&gt;
+&lt;p&gt;$$
+E[W_{X} | X] = \frac{1}{p(X)}
+$$&lt;/p&gt;
+&lt;p&gt;条件付き期待値の書式で書かれている理由は、あるサンプル$X$が与えられた後に、$W_{X}$を計算するからです。
+UCWが分かれば、1サンプルのMC推定を以下のように定義することができ、その期待値は被積分関数:$f(x)$の積分の値となります。&lt;/p&gt;
+&lt;p&gt;$$
+E[f(X) W_{X}] = E[f(X) / p(X)] = E[\langle I \rangle] = I
+$$&lt;/p&gt;
+&lt;p&gt;UCWは、ここでは、単純な確率密度関数の逆数の言い換えのように感じますが、サンプル:$X$が生成された後で計算できればよく、また、値が確率密度関数の逆数に一致しなくても、その期待値が一致することで、MC推定の不偏性が保てるという点で⁠重要な意味を持ちます。&lt;/p&gt;
+&lt;h2 id=&#34;resampled-importance-sampling-ris&#34;&gt;Resampled Importance Sampling: RIS&lt;/h2&gt;
+&lt;p&gt;Importance Samplingにおいて、サンプルの生成確率は、確率密度関数:$p(x)$に基づいています。確率密度関数は、全体を積分すると1である必要があるため、少なくとも積分可能な関数でなくてはなりません。そのため、モンテカルロ積分のサンプリングを、ある別の重みづけで行いたいとして、勝手なサンプリング関数や分布を用意しても、直接Importance Samplingすることはできません。&lt;/p&gt;
+&lt;p&gt;少々雑な言い方をすれば、RISは、MC推定の期待値を変えることなく、サンプルの分布を、任意の重みづけ関数:$\hat{p}(x)$に基づくようにするためのものです。
+簡単に手順を説明すれば、まず、多数のサンプルを、ある確率密度関数:$p(x)$に基づいて事前に生成して、次に、サンプルそれぞれに、任意の重みづけ関数:$\hat{p}(x)$で重みづけをして、その重みに比例する形でサンプルを選択することで、積分の対象の関数:$f(x)$と乗算するサンプルである、選択サンプルの分布を$\hat{p}(x)$に比例した形に近づけます。&lt;/p&gt;
+&lt;p&gt;もし、$\hat{p}(x)$が$p(x)$よりも$f(x)$に比例した形に近ければ、$\hat{p}(x)$を用いたRISによる推定は、$p(x)$を用いたImportance Samplingよりも、分散が低減されるはずです。これがRISを使う動機になります。では、$\hat{p}(x)$に$f(x)$そのものを用いれば、理想的で良いのかという事になりますが、$\hat{p}(x)$はRISで推定値を計算する過程で何度も評価されるので、$\hat{p}(x)$は$f(x)$に比べて計算コストがかなり低いことが、RISを合理的に使うための前提条件になります。まとめると、RISを合理的に使う条件は以下の通りになります。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$p(x)$に比べて$\hat{p}(x)$が$f(x)$に対して比例した形に近い&lt;/li&gt;
+&lt;li&gt;$f(x)$に比べて$\hat{p}(x)$の評価コストが大きく低い&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;この二つの条件を満たす$\hat{p}(x)$が事前に分かるときは、RISを効果的に使用できます。&lt;/p&gt;
+&lt;h2 id=&#34;resampled-importance-sampling-risidentically-distributed-samples&#34;&gt;Resampled Importance Sampling: RIS（Identically distributed samples）&lt;/h2&gt;
+&lt;p&gt;RISの一番簡単な例として、生成されるサンプルが同一の確率密度関数:$p(x)$に基づく場合について説明します。はじめに、ある確率密度関数:$p(x)$に基づいてM個のサンプル候補を生成します。&lt;/p&gt;
+&lt;p&gt;$$
+S=\{X_1, X_2,\: &amp;hellip; \: , X_M \} \quad \text{where} \quad X_i \sim p(x) \quad \text{and} \quad X_i \in \Omega
+$$&lt;/p&gt;
+&lt;p&gt;次に、各生成サンプルに、リサンプリング重み:$w_i$を計算します。リサンプリング重みを制御する関数:$\hat{p}(x)$は、サンプルの生成確率と関係ない任意の関数で、確率密度関数である必要もありません。
+直感的に、サンプルの生成率:$p(x)$が小さく$\hat{p}(x)$が大きい値を取る領域では、$w_i$は大きな値になるのが分かります。&lt;/p&gt;
+&lt;p&gt;$$
+w_i = \frac{1}{M} \frac{\hat{p}(X_i)}{p(X_i)} \quad (\text{for}\: i=1,\: &amp;hellip; \:,M)
+$$&lt;/p&gt;
+&lt;p&gt;そして、計算されたリサンプリング重み:$w_i$に比例する形で、サンプルを選択します。
+リサンプリング重みは、$\hat{p}(X_i)$と$p(X_i)$の比で計算されているので、全体的なサンプルの選択確率は、$\hat{p}(x)$に比例する形に近づくようになっています。
+以降は、選択されたサンプルを$Y$と表記します。そして、選択されたサンプルのUnbiased Contribution Weights: UCW:$W_Y$を計算します。&lt;/p&gt;
+&lt;p&gt;$$
+W_Y = \frac{1}{\hat{p}(Y)} \sum_{i=1}^{M}w_i
+$$&lt;/p&gt;
+&lt;p&gt;最後に、被積分関数:$f(Y)$とUCW:$W_Y$を乗算することで、RISによるMC推定となります。&lt;/p&gt;
+&lt;p&gt;$$
+\langle I \rangle = f(Y)W_{Y}
+$$&lt;/p&gt;
+&lt;p&gt;この、RISによるMC推定の不偏性を保つためには、$f(x)$のサポートにおいて、以下の条件を満たす必要があります。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{gather}
+\text{with} \quad supp(f) \subseteq supp(\hat{p}) \subseteq supp(p), \newline
+\quad E[\langle I \rangle] = I
+\end{gather}
+$$&lt;/p&gt;
+&lt;h2 id=&#34;risの理解について&#34;&gt;RISの理解について&lt;/h2&gt;
+&lt;p&gt;RISの理解として、まず、$W_Y$の$\sum_M w_i$の部分は、確率密度関数:$p(x)$に基づく$M$個のサンプルで、リサンプリング重み関数:$\hat{p}(x)$をImportance Samplingしていると考えることができます。
+したがって、その推定値は、ドメイン:$\Omega$における、$\hat{p}(x)$の積分と考えることができます。この推定値を$\langle I_{\hat{p}} \rangle$とします。
+$p(x)$のサポートが、$\hat{p}(x)$のサポートを内包すれば、$\langle I_{\hat{p}} \rangle$の期待値は、$\hat{p}(x)$の積分に一致します。
+$$
+\begin{gather}
+\text{with} \quad supp(\hat{p}) \subseteq supp(p) \subseteq \Omega, \newline
+\qquad E[\langle I_{\hat{p}} \rangle]＝\int_{\Omega} \hat{p}(x)dx
+\end{gather}
+$$&lt;/p&gt;
+&lt;p&gt;UCW: $W_Y$は、$\hat{p}(Y) / \langle I_{\hat{p}} \rangle$の逆数となっているので、$\hat{p}(x)$を正規化して確率密度関数にした関数:$\bar{p}(x)$に、サンプル$Y$を渡した値の逆数と考えることができます。&lt;/p&gt;
+&lt;p&gt;$$
+W_Y = \frac{1}{\hat{p}(Y)} \sum_{i=1}^{M}w_i \approx \frac{|\hat{p}|}{\hat{p}(Y)} = \frac {1}{\bar{p}(Y)}
+$$&lt;/p&gt;
+&lt;p&gt;そして、$\langle I \rangle = f(Y)W_{Y}$は、被積分関数:$f(x)$の確率密度関数:$\bar{p}(x)$による、1サンプルのImportance Samplingと考えることができます。
+このようにRISを理解すると、RISによるMC推定の不偏性は、&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$supp(\hat{p}) \subseteq supp(p)$であることで、$E[\langle I_{\hat{p}} \rangle]$の不偏性が保てる。&lt;/li&gt;
+&lt;li&gt;$supp(f) \subseteq supp(\hat{p})$であることで、$E[\langle I \rangle]$の不偏性が保てる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;と考えることができます。&lt;/p&gt;
+&lt;h2 id=&#34;リサンプリングmisウエイト&#34;&gt;リサンプリングMISウエイト&lt;/h2&gt;
+&lt;p&gt;上記の解釈では、$W_Y$は、$\bar{p}(x)$の逆数でした。特に$\langle I_{\hat{p}} \rangle$の部分は、実質的にImportance Samplingになっています。
+この部分は、$\int \hat{p}$の推定が出来れば良いわけで、Multiple Importance Samplingに変更しても問題ありません。
+したがって、$w_i$の式にある、$1/M$という係数は、MISウエイトと考えることができます。これをリサンプリングMISウエイト:$m_i(x)$とします。
+$$
+w_i = m_i(X_i) \frac{\hat{p}(X_i)}{p(X_i)}
+$$
+今のところ、同一の確率密度関数から全てのサンプルを生成しているので、リサンプリングMISウエイトは$1/M$が適切です。
+$$
+m_i(x) = \frac{1}{M}
+$$&lt;/p&gt;
+&lt;h2 id=&#34;ris手順の一般化&#34;&gt;RIS手順の一般化&lt;/h2&gt;
+&lt;p&gt;RISでは、RISで選択されたサンプルを、次のRISのサンプル候補として扱い、再帰的にRISを適用することができます。
+そのために、RISの計算手順の一般化をします。先ほどの説明とは少し順序が入れ替わります。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;$M$個のサンプル:$S$をドメイン:$\Omega$で用意します。ついで、各サンプルのUCWを用意します。$Ｗ_{X_i}$はサンプル$X_i$のUCWで、サンプルの生成確率:$p(X_i)$がわかる場合は、単に$1/p(X_i)$になります。
+$$
+\begin{gather}
+S=\{X_1, X_2,\: &amp;hellip; \: , X_M \} \in \Omega \newline
+\{W_{X_1}, W_{X_2},\: &amp;hellip; \: , W_{X_M}\}
+\end{gather}
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;各サンプルのリサンプリングMISウエイト:$m_i(X_i)$を計算します。すべてのサンプルが同一の確率密度関数から生成された場合は、$m_i(X_i) = 1/M$が適切となります。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;$$
+m_i(X_i) = \frac{1}{M} \quad (\text{for}\: i=1,\: &amp;hellip; \:,M)
+$$&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;リサンプリング重み:$w_i$を計算します。UCWとリサンプリングMISウエイトがわかれば、以下のように計算することができます。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;$$
+w_i = m_i(X_i) \hat{p}(X_i) W_{X_i} \quad (\text{for}\: i=1,\: &amp;hellip; \:,M)
+$$&lt;/p&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;リサンプリング重み:$w_i$に比例する形でサンプル列:$S$からサンプルを選択します。選択されたサンプルを$Y$とします。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;サンプル$Y$の新しいUCW:$W_Y$を計算します。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;$$
+W_Y = \frac{1}{\hat{p}(Y)} \sum_{i=1}^{M}w_i
+$$&lt;/p&gt;
+&lt;ol start=&#34;6&#34;&gt;
+&lt;li&gt;最後に、選択されたサンプル$Y$を用いて、$f(Y)$とUCW:$W_Y$を乗算することで、RISによるMC推定となります。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;$$
+\langle I \rangle = f(Y)W_{Y}
+$$&lt;/p&gt;
+&lt;p&gt;この一般化で、RISの候補サンプルと対応するUCWから、リサンプリング重みを計算するように手順を変更しました。
+これによって、RISの候補サンプルは、必ずしもサンプルの生成確率が計算可能なサンプルである必要がなく、UCWが計算可能ならばRISの候補サンプルになれることを示しています。&lt;/p&gt;
+&lt;h2 id=&#34;resampled-importance-sampling-differently-distributed-samples&#34;&gt;Resampled Importance Sampling, Differently Distributed Samples&lt;/h2&gt;
+&lt;p&gt;次に、サンプルごとに異なる確率密度関数:$p_i(x)$を用いた場合のRISについて説明します。これは、RISのMultiple Importance Sampling版と考えられます。&lt;/p&gt;
+&lt;p&gt;まず、サンプル列$S$は、サンプルごとに対応する確率密度関数$p_i(x)$によって生成します。&lt;/p&gt;
+&lt;p&gt;$$
+S =\{X_1,\: &amp;hellip; \:, X_M\}, \quad \text{where} \quad X_i \sim p_i(x) \: (\text{for}\: i=1,\: &amp;hellip; \:,M) \quad \text{and} \quad X_i \in \Omega \newline
+$$&lt;/p&gt;
+&lt;p&gt;UCW:$W_{X_i}$は、サンプルの生成に使った確率密度関数:$p_i(x)$がわかっているので、以下のように計算できます。
+$$
+W_{X_i} = \frac {1}{p_i(X_i)} \quad (\text{for}\: i=1,\: &amp;hellip; \:,M)
+$$&lt;/p&gt;
+&lt;p&gt;次に、リサンプリングMISウエイト:$m_i(X_i)$を計算します。これは、先のMultiple Importance Samplingの項で説明したMISウエイトと同様です。
+不偏である条件は、各サンプリング戦略の$m_i(x)$の総和が1であること、代表的なMISウエイトとして、Balance Heuristicsが挙げられるのも同様です。ここでは、各サンプルの生成に使った確率密度関数が
+分かるので、Balance Heuristicsで計算します。&lt;/p&gt;
+&lt;p&gt;$$
+m_i(X_i) = \frac{p_i(X_i)}{\sum_{j=1}^{M}p_j(X_i)}
+$$&lt;/p&gt;
+&lt;p&gt;次に、リサンプリングの選択ウエイト:$w_i$を以下のように計算します。&lt;/p&gt;
+&lt;p&gt;$$
+w_i = m_i(X_i) \hat{p}(X_i) W_{X_i}
+$$&lt;/p&gt;
+&lt;p&gt;そして、リサンプリング重み:$w_i$に比例する形でサンプル列:$S$からサンプルを選択し、そのサンプルを$Y$とします。そしてUCWを更新します。&lt;/p&gt;
+&lt;p&gt;$$
+W_Y = \frac{1}{\hat{p}(Y)} \sum_{i=1}^{M}w_i
+$$&lt;/p&gt;
+&lt;p&gt;最後に、選択されたサンプル$Y$を用いて、$f(Y)$とUCW:$W_Y$を乗算することで、RISによるMC推定となります。&lt;/p&gt;
+&lt;p&gt;$$
+\langle I \rangle = f(Y)W_{Y}
+$$&lt;/p&gt;
+&lt;p&gt;結局、$\langle I_{\hat{p}} \rangle$に該当する部分がMultiple Importance Sampling化された部分以外は、同一確率密度関数を使ったRISと特に違いはありません。
+不偏であるための条件等も、Multiple Importance Samplingの不偏条件に準じます。&lt;/p&gt;
+&lt;h2 id=&#34;risのサンプル選択に関する重みづけ&#34;&gt;RISのサンプル選択に関する重みづけ&lt;/h2&gt;
+&lt;p&gt;RISでは、候補サンプルの中から$w_i$に比例した形でサンプルを選択します。$i$番目のサンプルを選択する確率:$p_s(i)$は以下のとおりです。
+$$
+p_s(i) = \frac{w_i}{\sum_{j=1}^{M}w_j}
+$$
+このサンプルの選択による重みづけは、ここまで言及していませんでしたが、確率的選択をするという事は、その重みづけが必要になってくるはずです。&lt;/p&gt;
+&lt;p&gt;ここで、RISの候補サンプルごとに、ある寄与関数:$g_i(x)$を定義します。これは、とりあえずのRISの被積分関数だと考えてください。
+そこで、$w_i$に比例した形で、あるサンプルインデックス:$s$が選択されたとします。寄与関数:$g_s(x)$に、対応するUCW:$W_{X_s}$を乗じたものに、さらに選択確率の重みづけ:$1/p_s(s)$を乗じたものの期待値を考えます。この期待値は、選択サンプルの全て場合の、選択確率に基づく加重平均と等しいはずです。
+したがって、各々の加重平均の重み（分子側）と、選択確率に基づく重みづけ（分母側）は、相殺します。結果的に$g_i(X_i)W_i$の総和が残り、これは、$g_i(x)$の積分の総和に等しくなります。
+$$
+E[\frac{g_s(X_s)W_{X_s}}{p_s(s)}] = E[\sum_{i=1}^{M}g_i(X_i)W_i \frac{p_s(i)}{p_s(i)}] = \sum_{i=1}^{M} \int_{\Omega} g_i(x) dx
+$$&lt;/p&gt;
+&lt;p&gt;では逆に、右辺が、もともとの被積分関数:$f(x)$の積分になるように$g_i(x)$を考えると、$g_i(x)$は以下のようであるべきだと分かります。
+$c_i(x)$は同じサンプル値$x$において、総和が1になるとします。これはMISウエイトと同じ考え方です。&lt;/p&gt;
+&lt;p&gt;$$
+\text{if} \quad g_i(x) = c_i(x)f(x) \qquad \text{with} \quad \sum_{i=1}^{M} c_i(x) = 1,
+$$&lt;/p&gt;
+&lt;p&gt;$$
+E[\frac{c_s(X_s)f(X_s)W_{X_s}}{p_s(s)}] = E[\sum_{i=1}^{M} c_i(X_s)f(X_s)W_{X_s}]= \int_{\Omega} f(x) dx
+$$&lt;/p&gt;
+&lt;p&gt;UCWは、$f(x)$との乗算の期待値が$f(x)$の積分になる値であるべきなので、RISのサンプル選択を行ったら、UCWは以下のように更新されるべきです。&lt;/p&gt;
+&lt;p&gt;$$
+W_Y = c_s(X_s) \frac{\sum_{j=1}^{M}w_j}{w_s}W_{X_s}
+$$&lt;/p&gt;
+&lt;p&gt;$w_s$を展開すると、以下の式が得られます。$X_s$は選択されたサンプルなので$Y$と表記します。&lt;/p&gt;
+&lt;p&gt;$$
+W_Y = \frac{c_s(Y)}{m_s(Y)} \frac{1}{\hat{p}(Y)} \sum_{j=1}^{M}w_j
+$$&lt;/p&gt;
+&lt;p&gt;$m_i(x)$は$\langle I_{\hat{p}} \rangle$の推定で使われるMISウエイトなので、リサンプリングMISウエイトと呼ばれ、$c_i(x)$は$\langle I \rangle$の推定で使われるMISウエイトなので、Contribution MIS Weights, 寄与MISウエイトと呼ばれます。$m_i(x)$と$c_i(x)$に同じ関数を使用した場合は、$W_Y$の式の先頭にある係数は相殺されるので、元のRISの式と一致します。Contribution MIS Weightsについては、後の項で軽く触れます。&lt;/p&gt;
+&lt;h2 id=&#34;risにおけるmisウエイトについて&#34;&gt;RISにおけるMISウエイトについて&lt;/h2&gt;
+&lt;h3 id=&#34;balance-heuristicsについて&#34;&gt;Balance Heuristicsについて&lt;/h3&gt;
+&lt;p&gt;$$
+m_i(x) = \frac{p_i(x)}{\sum_{j=1}^{M}p_j(x)}
+$$&lt;/p&gt;
+&lt;p&gt;Balance Heuristicsは、Multi Importance Samplingにおいて一般的に良いMISウエイトを算出できます。RISにおいても、リサンプリングMISウエイトで一般的に良いとされているのは、Balance Heuristicsです。
+しかし、RISの候補に使うサンプリング戦略数:$M$が増えると、分母の総和の項数が多くなり計算コストが高くなります。例えば、$M=20$のRISを計算する時には、確率密度関数を400回評価しないと全てのMISウエイトが計算できません。計算量は$O(M^2)$になります。加えて、RISを再帰的に適用した場合の候補サンプルは、そのサンプルを生成した確率密度関数:$p(x)$が簡単に導出できない場合があります。そのため、MISウエイトの計算自体が困難になることがあります。そのため、RISにおいてBalance Heuristicsは、サンプリング戦略数が少なく、各戦略の確率密度関数が計算可能な時に実用的であるといえると思います。&lt;/p&gt;
+&lt;h3 id=&#34;generalized-balance-heuristics&#34;&gt;Generalized Balance Heuristics&lt;/h3&gt;
+&lt;p&gt;RISを再帰的に適用する場合、候補サンプルのUCWは必ず計算されていますが、候補サンプルの確率密度関数がわからない、もしくは追跡するのが困難な場合があります。そのため、リサンプリングMISウエイトに、Balance Heuristicsの代わりとしてGeneralized Balance Heuristicsを使うことが考えられます。
+このMISウエイトは、RISで選択されたサンプルは、ある程度$\hat{p}(x)$の分布に基づくものになっているという仮定のもと、以下のようにリサンプリングMISウエイトを計算します。&lt;/p&gt;
+&lt;p&gt;$$
+m_i(x) = \frac{\hat{p_i}(x)}{\sum_{j=1}^{M}\hat{p_j}(x)}
+$$&lt;/p&gt;
+&lt;p&gt;このMISウエイトが不偏性を維持するためには、$supp(\hat{p})$が、対応する候補サンプルの取りうる範囲に含まれている必要があります。&lt;/p&gt;
+&lt;h3 id=&#34;contribution-mis-weights&#34;&gt;Contribution MIS Weights&lt;/h3&gt;
+&lt;p&gt;前の項で示した通り、RISのMISウエイトにBalance Heuristics等を使うと、最悪で$O(M^2)$の計算コストがかかります。計算コストを削減しつつ、MISを適用する方法として、
+リサンプリングMISウエイトと寄与MISウエイトに、別の関数を使う方法があります。リサンプリングMISウエイトは、候補サンプルの数だけ計算されるのに対して、寄与MISウエイトは、サンプル選択後に一度だけ計算されるので、例えば、リサンプリングMISウエイトに$m_i()=1/M$などの比較的簡単な関数を使い、寄与MISウエイトにBalance Heuristics、もしくはGeneralized Balanced Heuristicsを使うことが考えられると思います。こうすることで、$O(M^2)$だったBalance Heuristicsの計算コストを、O(M)に削減することができます。ただし、このRIS推定の分散は、リサンプリングMISウエイトにBalance Heuristicsを使った場合に比べて分散が増えてしまいます。&lt;/p&gt;
+&lt;h3 id=&#34;pairwise-mis-weight&#34;&gt;Pairwise MIS Weight&lt;/h3&gt;
+&lt;p&gt;Pairwise MISの考え方は、実践的なReSTIRのアルゴリズムと一緒に考えるとわかりやすいです(この記事ではReSTIRのアルゴリズムについては言及しません。詳しくは他の資料を当たってください)。たとえば、ReSTIRのリサンプリング過程で、過去のピクセルや、近傍のピクセルのRISと、現在評価中のピクセルのRISを結合してリサンプリングするとします。この場合、現在評価中のピクセルのRISのサンプルが基準のサンプルとなります。これをPairwise MISでは、Canonical Sampleと呼びます。Canonical Sampleの分布は、被積分関数:$f(x)$のサポートを1サンプルで覆います。そしてリサンプリングMISウエイトは、Canonical Sampleと他のサンプルとの相対的な関係で計算します。ここで、Canonical Sampleのインデックスを$c$とします。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{align}
+m_i(x) &amp;amp;= \frac{1}{M-1}\frac{p_i(x)}{p_i(x) + p_c(x)},                     &amp;amp; \text{if} \quad i &amp;amp;\ne c \newline
+m_c(x) &amp;amp;= \frac{1}{M-1}\sum_{i\ne c}^{M} \frac{p_c(x)}{p_i(x) + p_c(x)},   &amp;amp; \text{if} \quad i &amp;amp;= c
+\end{align}
+$$&lt;/p&gt;
+&lt;p&gt;Canonical SampleのMISウエイトのみ、$O(M)$の計算量が必要となりますが、Balance Heuristicsよりも計算コストが低いのがわかります。そして、MISウエイトの総和が1になる条件を満たしているのは、式より簡単にわかります。ただし、上式は、Canonical Sampleに、不必要に大きなウエイトを割り振ってしまいます。例えば、全てのサンプルが同一の$p(x)$より生成されていると仮定した場合、理想的には、全てのMISウエイトは等しくなるべきですが、$m_c(x)$が全体のほぼ$1/2$のウエイトを占めてしまいます。&lt;br&gt;
+このことを考慮すると、上式は以下のように修正されます。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{align}
+m_i(x) &amp;amp;= \frac{1}{M-1}\frac{p_i(x)}{p_i(x) + p_c(x)/(M-1)},                         &amp;amp; \text{if} \quad i &amp;amp;\ne c \newline
+m_c(x) &amp;amp;= \frac{1}{M-1}\sum_{i\ne c}^{M} \frac{p_c(x)/(M-1)}{p_i(x) + p_c(x)/(M-1)}, &amp;amp; \text{if} \quad i &amp;amp;= c
+\end{align}
+$$&lt;/p&gt;
+&lt;p&gt;さらに、上式にGeneralized Balance Heuristicの考え方を導入すれば、Generalized Pairwise MISになります。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{align}
+m_i(x) &amp;amp;= \frac{1}{M-1}\frac{\hat{p_i}(x)}{\hat{p_i}(x) + \hat{p_c}(x)/(M-1)},                         &amp;amp; \text{if} \quad i &amp;amp;\ne c \newline
+m_c(x) &amp;amp;= \frac{1}{M-1}\sum_{i\ne c}^{M} \frac{\hat{p_c}(x)/(M-1)}{\hat{p_i}(x) + \hat{p_c}(x)/(M-1)}, &amp;amp; \text{if} \quad i &amp;amp;= c
+\end{align}
+$$&lt;/p&gt;
+&lt;p&gt;関数$\hat{p}(x)$は、あくまで、それぞれのRISサンプルが十分な数になった時に推定として有効な関数なので、Canonical Sample以外の$m_i(x)$の値が大きいにもかかわらず、そのサンプルの信頼性が低い場合も考えられます。Canonical Sampleは、被積分関数のドメイン由来のサンプルなので、これを優先するようにウエイトに固定で、$1/M$を加えることで、保守的なリサンプリングMISウエイトにすることができます。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{align}
+m_i(x) &amp;amp;= \frac{1}{M}\frac{\hat{p_i}(x)}{\hat{p_i}(x) + \hat{p_c}(x)/(M-1)},                                         &amp;amp; \text{if} \quad i &amp;amp;\ne c \newline
+m_c(x) &amp;amp;= \frac{1}{M} \Big( 1 + \sum_{i\ne c}^{M}\frac{\hat{p_c}(x)/(M-1)}{\hat{p_i}(x) + \hat{p_c}(x)/(M-1)} \Big), &amp;amp; \text{if} \quad i &amp;amp;= c
+\end{align}
+$$&lt;/p&gt;
+&lt;p&gt;Canonical Sampleとその他のサンプルの信頼性に相対的な指標を適用したい場合は、サンプルごとにConfidence Weight:$c_i$を導入することもできます。例えば、この値は、それまでRISで選択対象になったサンプル数などを基準にすることが考えられます。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{align}
+\text{where} \quad c = \sum_{j=1}^{M} c_j, \newline
+m_i(x) &amp;amp;= \frac{c_i}{c}\frac{(c - c_c)\hat{p_i}(x)}{(c- c_c)\hat{p_i}(x) + c_c\hat{p_c}(x)},                               &amp;amp; \text{if} \quad i &amp;amp;\ne c \newline
+m_c(x) &amp;amp;= \frac{c_c}{c} + \sum_{i\ne c}^{M} \frac{c_i}{c} \frac{c_c \hat{p_c}(x)}{(c - c_c)\hat{p_i}(x) + c_c \hat{p_c}(x)}, &amp;amp; \text{if} \quad i &amp;amp;= c
+\end{align}
+$$&lt;/p&gt;
+&lt;p&gt;Confidence Weightを導入して、Canonical Sampleを保守的に選択しなくて良い場合は元の形にConfidence Weightを適用したものを使用できます。&lt;/p&gt;
+&lt;p&gt;$$
+\begin{align}
+m_i(x) &amp;amp;= \frac{c_i\hat{p_i}(x)}{(c- c_c)\hat{p_i}(x) + c_c\hat{p_c}(x)},                               &amp;amp; \text{if} \quad i &amp;amp;\ne c \newline
+m_c(x) &amp;amp;= \sum_{i\ne c}^{M} \frac{c_i}{c} \frac{c_c \hat{p_c}(x)}{(c - c_c)\hat{p_i}(x) + c_c \hat{p_c}(x)}, &amp;amp; \text{if} \quad i &amp;amp;= c
+\end{align}
+$$&lt;/p&gt;
+&lt;hr&gt;
+</description>
+    </item>
     
     <item>
       <title>スクリーンスペースでピクセル位置ごとのタスクをソーティング/パッキングするときのCompute Shader</title>
@@ -3869,411 +4249,6 @@ DepthBuffer のフォーマットはクラス内部に保持されて、Guiに�
 &lt;a href=&#34;https://developer.nvidia.com/orca&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ORCA&lt;/a&gt;をはじめ、CC-BY等のオープンライセンスの元で公開されているアセットなどもあるので、これらを活用してレンダリングのテストを行う事も可能だと思います。&lt;/p&gt;
 &lt;p&gt;今回は、簡単にですが Falcor を触ってみました。この手の軽量なレンダリングフレームワークというのは、自作含めて多数あると思いますが、RasterとDXRをシームレスにサポートしている軽量フレームワークはあまり見かけません。
 そういう意味ではユニークな存在かもしれません。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Importance Resampling 関連</title>
-      <link>https://shikihuiku.github.io/memo/restir/</link>
-      <pubDate>Fri, 11 Sep 2020 11:59:35 +0900</pubDate>
-      <guid>https://shikihuiku.github.io/memo/restir/</guid>
-      <description>&lt;h3 id=&#34;参考資料&#34;&gt;参考資料&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Importance Resampling for Global Illumination&lt;br&gt;
-
-&lt;a href=&#34;https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=1662&amp;amp;context=etd&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=1662&amp;context=etd&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Rendering Millions of Dynamic Lights in Real-Time&lt;br&gt;
-
-&lt;a href=&#34;https://news.developer.nvidia.com/rendering-millions-of-dynamics-lights-in-realtime/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://news.developer.nvidia.com/rendering-millions-of-dynamics-lights-in-realtime/&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h1 id=&#34;resampled-importance-sampling&#34;&gt;Resampled Importance Sampling&lt;/h1&gt;
-&lt;h2 id=&#34;importance-resamplingの概要&#34;&gt;Importance Resamplingの概要&lt;/h2&gt;
-&lt;ol&gt;
-&lt;li&gt;確率分布$p$に基づいたM個($(M \ge 1$)のサンプル、$(X = \langle X_1, X_2, &amp;hellip; , X_M \rangle $を生成する&lt;/li&gt;
-&lt;li&gt;各サンプルのウエイト$ｗ_j$を計算する&lt;/li&gt;
-&lt;li&gt;$X$のなかから、一つのサンプル$Y$を、ウエイト$\langle w_1, w_2, &amp;hellip; , w_M \rangle$に基づいて選ぶ&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;もし、$w_j = \frac{g(X_j)}{p(X_j)}$としたならば、サンプル$Y$は、おおよそ$g$に基づいて分布する。
-上記のリサンプリングの効果とは、密度$p$のソースのから、サンプルを取り出し、&amp;ldquo;filter&amp;quot;することで、
-結果として、サンプル$Y$がおおよそ$g$の分布になるようにすることである。&lt;/p&gt;
-&lt;p&gt;これを図解した下記の例は、8個のサンプルを生成して、それぞれのウエイトを計算した場合のイメージになる。
-
-
-
-
-
-
-  
-
-
-
-  
-  
-
-
-
-
-
-
-
-
-
-
-
-&lt;figure class=&#34;center&#34; &gt;
-
-
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_01_huc2b7e299a054b0e62f25ef75ba296b6a_42113_2000x2000_fit_lanczos_3.PNG&#34; &gt;
-
-
-  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_01_huc2b7e299a054b0e62f25ef75ba296b6a_42113_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;603&#34;&gt;
-&lt;/a&gt;
-
-
-
-&lt;/figure&gt;
-
-
-
-
-
-
-
-  
-
-
-
-  
-  
-
-
-
-
-
-
-
-
-
-
-
-&lt;figure class=&#34;center&#34; &gt;
-
-
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_02_hu6161093dfe7af2499131def0ae96c035_41116_2000x2000_fit_lanczos_3.PNG&#34; &gt;
-
-
-  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_02_hu6161093dfe7af2499131def0ae96c035_41116_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;690&#34;&gt;
-&lt;/a&gt;
-
-
-
-&lt;/figure&gt;
-
-
-
-
-
-
-
-  
-
-
-
-  
-  
-
-
-
-
-
-
-
-
-
-
-
-&lt;figure class=&#34;center&#34; &gt;
-
-
-  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/restir/RIS_03_hu2c51de8f2302371bf0bcff8fcc4d9e76_68621_2000x2000_fit_lanczos_3.PNG&#34; &gt;
-
-
-  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/restir/RIS_03_hu2c51de8f2302371bf0bcff8fcc4d9e76_68621_2000x2000_fit_lanczos_3.PNG&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;862&#34;&gt;
-&lt;/a&gt;
-
-
-
-&lt;/figure&gt;
-&lt;/p&gt;
-&lt;p&gt;サンプル数である$M$を分布の補間変数としてとらえることができる。
-$M=1$のとき、$Y$は$p$に従って分布する。$M\rightarrow\infty$とすると、$Y$の分布は$g$に近づく。
-一般的には、$M$が有限個である事によって導入されるバイアスを無視できる程度に小さくするためには、$M$は非常に大きくなけれならない。&lt;/p&gt;
-&lt;p&gt;注釈：サンプル列$X$から、あるサンプル$Y$が選択される確率は $w_i / w_{sum}$で計算できるが、積分の範囲に対して、そのサンプルが選択される確率を考えると、
-これに$M \cdot p(X_i)$を乗算する必要がある。したがって、そのサンプルが選択される確率は$M \cdot g(X_i) / w_{sum} $となる。これはそのまま次項でのImportance Samplingの確率となっている。また、$M / w_{sum} $は、サンプル列$X$において一定なので、$g(X_i)$に比例する関数で、選択が行われている事になる。&lt;/p&gt;
-&lt;h2 id=&#34;resampled-importance-samplingの概要&#34;&gt;Resampled Importance Samplingの概要&lt;/h2&gt;
-&lt;p&gt;Importance Resamplingの考え方をImporntace Samplingに導入したものをResampled Importance Sampling（RIS)と呼ぶ。&lt;br&gt;
-下記の積分を求めたいとする。
-$$ I = \int_{\Omega} f(x) d\mu(x) $$&lt;/p&gt;
-&lt;p&gt;二つの確率密度関数$p$と、確率に即した値を返す関数$g$を導入する。
-$p$は、比較的簡単に計算でき、正規化することができるが、上記積分をImportance Samplingするのにあまり良い分布となっていないとする。
-$g$は、良い分布特性を持っているが、計算が複雑で正規化されていない、またはするのが困難だとする。
-通常のImportance Samplingでは、$p$を使う事しかできないが、RISを使うことで、$g$の分布特性をunbiasedな条件下で使うことができる。
-$X$(Resamplingによって生成されたサンプル列)および$Y$(Xからウエイトに基づいて乱択されたサンプル)がImporntace Resamplingを用いて導出された場合の、RISのEstimatorは以下の通りとなる。&lt;/p&gt;
-&lt;p&gt;$$ \hat I_{ris} = \frac{1}{N} \sum^{N}_{i=1} w(X_i, Y_i) \frac{f(Y_i)}{g(Y_i)} $$&lt;/p&gt;
-&lt;p&gt;ウエイト関数$w$は、$g$が正規化されていないことと、$Y$の分布が$g$を近似するようにする必要があることの二つを考慮して選択されなければならない。
-そのための適切なウエイト関数$w$は実は非常に単純で、リサンプリングステップで計算された重みの平均である。&lt;/p&gt;
-&lt;p&gt;$$ w(X_i, Y_i) = \frac{1}{M} \sum^{M}_ {j=1} w_ {ij} = \frac{1}{M} \sum^{M}_ {j=1} \frac{g(X_{ij})}{p(X_{ij})}$$&lt;/p&gt;
-&lt;p&gt;注釈：$X_i$, $Y_i$はそれぞれが、Importance Samplingの$i$番目の試行の時に作られた、M個のサンプル列$X_i$と、そこから選択された一つのサンプル$Y_i$を指す。
-$w_{ij}$は、Importance Samplingの$i$番目の試行の時に作られた、M個のサンプル集合の、$j$番目のサンプルのウエイトを指す。&lt;/p&gt;
-&lt;p&gt;注釈２：ウエイトは、結局のところ、二つの関数$p(x)$と$g(x)$のプロファイル（関数の形状および大きさ）の比になる。(例えば、$g(x)$が$p(x)$に対して、平均で2倍の値を持つ場合は、
-$g(Y_i)$で除算すると、推定値が期待値の$1/2$に収束してしまう。$w$はその補正として2倍の補正を掛ける役割を担う。)&lt;/p&gt;
-&lt;p&gt;上記の2式を合わせると下記の通りになる。
-$$ \hat I_{ris} = \frac{1}{N} \sum^{N}_ {i=1} \left( \frac{f(Y_i)}{g(Y_i)} \cdot \frac{1}{M} \sum^{M}_ {j=1} \frac{g(X_{ij})}{p(X_{ij})} \right) $$&lt;/p&gt;
-&lt;p&gt;$M=1$のときは、RISは$p$によるImportance Samplingになる。RISがunbiasedである条件は、$f$が非ゼロの領域では、$p, q$共に非ゼロである必要があるのと、$M,N$共にゼロより大きい必要がある。
-RISがunbiasとすると、誤差は分散に起因するもののみとなる。ターゲット分布関数$g$と共に、パラメーター$M,N$を適切に選ぶことが分散の低減につながる。&lt;/p&gt;
-&lt;p&gt;レンダリングにおいて、ライティングの関数を$f=F_s GVL_e$とするとき、ターゲット分布関数$g$を、$g=F_s GL_e$とすることができる。レイのトラバースが必要な$V$項を取り除いたものである。正規化されている必要がないのでそのまま使用できる。&lt;/p&gt;
-&lt;p&gt;次は、適切な$M,N$の設定である。&lt;/p&gt;
-&lt;h2 id=&#34;robust-approximations-of-m-and-n&#34;&gt;Robust Approximations of M and N&lt;/h2&gt;
-&lt;p&gt;詳細は割愛するが、最適なM,Nを選ぶための計算には、実際のモンテカルロ法の試行が必要になる。しかし実際にはモンテカルロ法の試行の前に知りたい。
-ここではサンプルの生成や実際の推定値の計算にかかる時間を基にして、$M,N$の導出を行う。
-$T_x$を$p$に基づいてサンプルを生成してウエイトを計算するのにかかる時間とし、$T_y$をIRS Estimatorで推定値を計算する時間とすると、全体の計算時間は以下の様になる。
-$$ T=MNT_x + N(r(M) + T_y) $$
-$r$はリサンプリングにかかる時間で、離散的な分布からサンプルを選ぶ作業は高度に最適化されており、時間は無視できるとすると以下の様になる。
-$$ T=MNT_x + NT_y　$$&lt;/p&gt;
-&lt;p&gt;ここで、リサンプリングの各ステップに同じ計算時間を割り当てるとすると、以下の様になる。
-$$MNT_x = NT_y $$&lt;/p&gt;
-&lt;p&gt;この条件下では$M$は以下の様に求まる。
-$$M=\frac{T_y}{T_x} $$&lt;/p&gt;
-&lt;p&gt;注釈：$N$は上式から求まらないが、総計算時間の関数として計算することができる。$M$は、$T_y$($V$項を含んだシェーディングの評価)が、他の項の計算に比べてどのくらい時間がかかるかによって
-決定されるといえると思う。時間がかかればかかるほど$M$を大きくした方が良いという事になる。&lt;/p&gt;
-&lt;p&gt;レンダリングするシーンの複雑度が均一であれば、この値は事前計算することができる。$T_x, T_y$を得るために数千のPrimaryRayをキャストして計算する。&lt;/p&gt;
-&lt;p&gt;
-&lt;a href=&#34;https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.70.139&amp;amp;rep=rep1&amp;amp;type=pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt; 参照論文 &lt;/a&gt; のレンダリングの例では、二つのポリゴンライトと環境マップを用いてライティングしている。この場合RISは同じ計算量で分散を70%低減できた。しかし、ライティングから環境マップを取り除くと、分散を10%しか低減出来なかった。
-これは、$L_e$の成分にあった環境マップが分散を導入していたからで、これはターゲット分布関数$g$のウエイトとして計算されていた。(つまり$L_e$が導入した分散に効果的に作用した。)
-しかし、これが取り除かれると、$V$項による分散が支配的となり、通常のImportance Samplingとの差が得られなくなった。&lt;/p&gt;
-&lt;h1 id=&#34;weighted-reservoir-sampling&#34;&gt;Weighted Reservoir Sampling&lt;/h1&gt;
-&lt;p&gt;上記Resampled Importance Samplingは、計算時に$M$個のサンプルストリームを用意する必要があった。これを、実際にストレージを確保して保存することなく実現するための手法がWeighted Reservoir Samplingになる。
-WRSではサンプルストリームに値を追加するたびにDraw（分布に基づく乱択）を行う代わりに、ストリームに何個要素を追加しても、ウエイトの合計値である$w_ {sum}$と現在の出力である$y$のみ記録することでRISと同等の機能を実現する。&lt;/p&gt;
-&lt;h2 id=&#34;weighted-reservoir-samplingの手法&#34;&gt;Weighted Reservoir Samplingの手法&lt;/h2&gt;
-&lt;p&gt;以下はWRSのpuseudo codeである。サンプルストリームの要素の追加(update)のたびに、$w_ {sum}$を更新しつつ乱択を行う。Reservoirは常に選択候補となる一つのサンプルを保持する形となる。同じストリームから複数のサンプルを乱択することは出来ないが、必要なストレージが非常に少ないのが特徴。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;class Reservoir
-  y ← 0 // The output sample
-  w ← 0 // The weight for the output stream
-  wsum ← 0 // The sum of weights
-  M ← 0 // The number of samples seen so far
-
-  function p(x)
-    return probability of x
-
-  function g(x)
-    return target distribution of x
-
-  function update(xi, wi, cnt)
-    wsum ← wsum + wi
-    M ← M + cnt
-    if rand() &amp;lt; (wi /wsum) then
-      y ← xi
-
-  function reservoirSampling()
-    Reservoir r
-    for i ← 1 to StreamLen do
-      generate xi
-      r.update(xi, g(xi)/p(xi), 1)
-
-    w ← (1 / g(y))(wsum / M)
-    return y, w
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h2 id=&#34;combine-multiple-reservoirs&#34;&gt;Combine Multiple Reservoirs&lt;/h2&gt;
-&lt;p&gt;WRSの特長として、個々のストリームにアクセスすることなく、生成された複数のストリームを結合することができることが挙げられる。結合の方法は以下の通りで新しいReservoirに、結合するReservoirを入力することで行う。
-s.update()の第二引数のウエイトは、結合する際のReservoirのターゲット分布関数$g$が同じ場合は、r.wsumと等価である。しかし、結合する際のReservoirのターゲット分布関数が異なる場合、 $g(y)/g&amp;rsquo;(y)$をr.wsumに乗算する必要がある。
-これはそのための計算である。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;function combineReservoirs(g, r1, r2, . . . , rk)
-  Reservoir s // a new reservor
-
-  foreach r ∈ {r1, . . . , rk } do
-    s.update(r.y, g(r.y) · r.w · r.M, r.M)
-
-  w ← (1 / g(s.y))(s.wsum / s.M)
-  return s.y, w
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;注釈１：ウエイトのスケーリング(g(r.y) · r.w · r.M)について。&lt;br&gt;
-結合元の$w$は、
-$$\frac{1}{g&amp;rsquo;(y&amp;rsquo;)} \frac{1}{M&amp;rsquo;} \sum^{M&amp;rsquo;}_ {i=1} \frac{g&amp;rsquo;(X_i)}{p&amp;rsquo;(X_i)} $$
-なのだが、これは通常のImportance Samplingにおける確率密度関数の逆数に相当するものでなくてはならない。（通常1/p(x)で表すが本式のpとは意味が異なる。）
-したがって、これに$g(y&amp;rsquo;)$ を乗算すると、以下の様になり、これは、通常のRISの一つのウエイトである、$g / p$と同義になる。（ただし、この場合のベースの確率密度関数（先ほどpと呼んでいたものに相当するもの）が実際にどんなプロファイルかは知らない）
-$$\frac{g(y&amp;rsquo;)}{g&amp;rsquo;(y&amp;rsquo;)} \frac{1}{M&amp;rsquo;} \sum^{M&amp;rsquo;}&lt;em&gt;{i=1} \frac{g&amp;rsquo;(X_i)}{p&amp;rsquo;(X_i)} $$
-そして、この$y&amp;rsquo;$は、$M&amp;rsquo;$個のサンプルの中から選択されたサンプルなので、加重平均で確率計算するために、その分のウエイトに相当する$M&amp;rsquo;$を乗算する。
-$$\frac{g(y&amp;rsquo;)}{g&amp;rsquo;(y&amp;rsquo;)} \sum^{1}&lt;/em&gt;{M&amp;rsquo;} \frac{g&amp;rsquo;(X_i)}{p&amp;rsquo;(X_i)} $$
-このように、ウエイトのスケーリングを解釈する事ができる。&lt;br&gt;
-また、結合後のウエイトの計算部分((1 / g(s.y))(s.wsum / s.M))は、まず、(s.wsum / s.M)の部分は、全てのサンプルのg/pの平均値になり、関数pとgのプロファイルの比と考える事ができる。
-また、この値は、全てのサンプルのg/pの平均値なので、候補となった全サンプルにおいて一定の値と解釈でき、最終的な確率密度の逆数は、1/gに比例していると考える事ができる。&lt;/p&gt;
-&lt;p&gt;注釈２：Biasについて。&lt;br&gt;
-実際には、結合先と結合元で、確率密度関数や、ターゲット分布関数が異なれば、もとから一つのサンプル集合だった場合とは異なる演算になる。ただ、これによってBiasが導入されるかは別である。
-実際は、結合結果として選択されたサンプルが、結合元の確率密度関数でゼロになる場合にBiasが導入されることになる。この場合は、無効なウエイト値が計算に入るので、実際の値より小さくなる方向にBiasがかかるはずである。
-それ以外では、結果的に分散を大きくするかもしれないが、Biasが導入されることはない。&lt;/p&gt;
-&lt;h2 id=&#34;naive-unbiased-combine&#34;&gt;Naive Unbiased combine&lt;/h2&gt;
-&lt;p&gt;UnbiasedなWRSの結合をするためには、結合前のターゲット分布関数もしくは、確率密度関数が必要になる。（正確にはその両方。p(), g()の両方が非ゼロである事が確認できる必要がある）
-Reservoirを結合してサンプルの選択をするところまでは同じだが、最後に、選択されたサンプルが、結合前のターゲット分布関数で有効であるかどうかを確認して、無効であればウエイトから除外するようにしている。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;function combineReservoirsUnbiased(g, r1, r2, . . . , rk, g1, g2, . . . , gk)
-  Reservoir s // a new reservor
-
-  s.combineReservoirs(g, r1, r2, . . . , rk)
-
-  Z ← 0
-  foreach gi ∈ {g1, . . . , gk } do
-  if gi(s.y) &amp;gt; 0 then
-    Z ← Z + ri.M
-
-  w ← (1 / g(s.y))(s.wsum / Z)
-  return s.y, w
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h2 id=&#34;なぜこれでunbiasedになるか&#34;&gt;なぜこれでUnbiasedになるか&lt;/h2&gt;
-&lt;p&gt;一見すると、$\frac{w_{sum}}{M}$を乗算する代わりに、$\frac{w_{sum}}{Z}$を乗算するが、一方で$w_{sum}$の計算時には、結合前のターゲット分布関数の値に関わらず加算をしているので
-矛盾しているように見える。ここで簡単な例を使って考えてみる。&lt;/p&gt;
-&lt;p&gt;
-&lt;a href=&#34;https://developer.download.nvidia.com/devblogs/ReSTIR.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ReSTIR&lt;/a&gt; のFig7で使われている$p(), g()$を例として、$p_1()$で作られた一つの$M_1$個のサンプルのReservoirと、$p_2()$で作られた$M_2$個のReservoir
-を結合する場合を考える。$g(), p1(), p2()$はそれぞれ以下の通りで、$p_2()$は0.5を超えるとゼロになる。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;$ g(x) = 2 -2x$, $ p_1(x) = 1$&lt;/li&gt;
-&lt;li&gt;$ g(x) = 2 -2x$, $ p_2(x) = 2H(1/2 -x) $(p2(x)=0 if x &amp;gt; 0.5 otherwise =2)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;ここで、p1側のReservoirが、0.6のサンプルを選択していて、p2側のReservoirが0.3のサンプルを選択している状態だとする。この二つを結合した結果、0.6のサンプルが選択された場合のBiased 結合によるウエイトは以下の様に計算される。
-$$\frac{1}{g(0.6)} \frac{g(0.6) · w_1 · M_1 + g(0.3) · w_2 · M_2}{M_1 + M_2} $$
-ここで、さらに簡単にするため、$M_1=M_2=1$とすると、上記の式は以下の様になる。
-$$\frac{1}{g(0.6)} \frac{g(0.6)/p_1(0.6) + g(0.3)/p_2(0.3)}{2} $$
-一方で、最初の定義より、$p_2(0.6)$がゼロである事が分かっているので、p2側のReservoirから0.6のサンプルが生成されることは無い。ここで改めて、0.6のサンプル発生からの結合の過程を通じて、最終的に0.6のサンプルが選択される確率考えると、p1側のReservoirに0.6というサンプルが発生する確率と、結合したときにp1側が選択される同時確率で表す事ができる。
-$$ p1(0.6) \frac{g(0.6)/p_1(0.6)}{g(0.6)/p_1(0.6) + g(0.3)/p_2(0.3)} $$
-この式より分かることは、$M_1+M_2=2$で除算しているBiased 結合は実際の発生確率の逆数よりも小さい値になることが分かる。そしてそれをUnbiased にするには、2では無く1、すなわち$M$ではなく$Z$で除算するのが正しい事が分かる。
-念のため、$M_1$と$M_2$に対する条件を自由した場合に、$p_1$側が選択される確率は以下の様に表す事ができる。
-$$ \frac{1}{w_1} \frac{g(0.6) · w_1 · M_1}{g(0.6) · w_1 · M1 + g(0.3) · w_2 · M_2} $$&lt;/p&gt;
-&lt;p&gt;ここからも、$M$ではなく$Z$で除算することでBiasが排除できる事が分かる。&lt;/p&gt;
-&lt;h2 id=&#34;結合時の安定性について&#34;&gt;結合時の安定性について&lt;/h2&gt;
-&lt;p&gt;
-&lt;a href=&#34;https://developer.download.nvidia.com/devblogs/ReSTIR.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ReSTIR&lt;/a&gt; のFig7では、結合時の数値安定性についても言及している。
-先の$p_2$を以下の様に変更し、全域で発生確率が非ゼロになるが、0.5を超えると非常に小さい確率となるように変更している。&lt;br&gt;
-$ p_2(x) = max(1.9&amp;hellip;H(1/2 -x), 10^{-4}) $(p2(x)=10^{-4} if x &amp;gt; 0.5 otherwise =1.9&amp;hellip;)&lt;/p&gt;
-&lt;p&gt;このようにした場合に、先の単純な例を用いて、$p_1$側から0.3、$p_2$側から0.6、そして結合による選択で0.6が選択された場合のウエイトは以下の様に算出される。
-$$\frac{1}{g(0.6)} \frac{g(0.3)/p_1(0.3) + g(0.6)/p_2(0.6)}{2} $$
-一方で、p1側から0.6、p2側から0.3、そして結合による選択で0.6が選択された場合のウエイトは以下の様に算出される。
-$$\frac{1}{g(0.6)} \frac{g(0.6)/p_1(0.6) + g(0.3)/p_2(0.3)}{2} $$
-先の通り、$p_2(0.6)$は極小なので、$g(0.6)/p_2(0.6)$は極大化する。両者はどちらも0.6を出力するが、サンプルが発生した経緯でウエイトが大きく異なるうえに、$p_2$側は極稀にしか発生しない。
-安定した値に収束させるには非常に数多くの、結合後のサンプルが必要となる。&lt;/p&gt;
-&lt;h2 id=&#34;mis-combineについて&#34;&gt;MIS Combineについて&lt;/h2&gt;
-&lt;p&gt;
-&lt;a href=&#34;https://developer.download.nvidia.com/devblogs/ReSTIR.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ReSTIR&lt;/a&gt; の4.3項では、MISを使った結合に言及している。
-これも、先ほどUnbiasedの説明をした例を使って考える。以下の式は、$p_1$側から0.6が生成されて結合した際に0.6が選択される確率と、$p_2$側から0.6が生成されて0.6選択される場合の確率である。
-選択されない側のサンプルは単にｘとしているがこれにあまり深い意味はない。
-$$ \frac{1}{w_1} \frac{g(0.6) · w_1 · M_1}{g(0.6) · w_1 · M1 + g(x) · w_2 · M_2} $$
-$$ \frac{1}{w_2} \frac{g(0.6) · w_2 · M_2}{g(x) · w_1 · M1 + g(0.6) · w_2 · M_2} $$
-端的に言えば、$p_1, p_2$を結合した後に0.6が出力されるのは上記2つのうちのいずれかである。また、結合した結果$p_1$側を選択した場合に算出されるウエイトは以下の通りだが、
-$$\frac{1}{g(0.6)} \frac{g(0.6) · w_1 · M_1 + g(x) · w_2 · M_2}{M_1 + M_2} $$
-これを少し変形すると以下の様に書ける。
-$$\frac{M_1}{M_1 + M_2} \frac{1}{g(0.6) · M_1} \{g(0.6) · w_1 · M_1 + g(x) · w_2 · M_2\}  $$
-このとき、先頭の項にある$\frac{M_1}{M_1 + M_2}$を$p_1$側のサンプリング戦略のMISウエイトと見做すことができる。そして$p_2$側も同様に考える事ができ、MISウエイトの合計値が1なので、Biasが発生することもない。
-つまり、結合時のMISウエイトは、各サンプリング戦略のサンプル数の加重平均であると言える。また、MISウエイトは、その値のサンプルを出力する可能性のあるサンプル戦略のウエイトの合計値が1になるのであれば、どのようなウエイトでもBiasを導入することは無いことが知られている。これを利用して、先の項で説明した結合時の安定性を改善する事ができる。例えば論文にある通り、各戦略での初期サンプルの発生確率の加重平均にする事もできる。
-ここで、$x_s$は最終的に選択されたサンプルの値で、$S$はサンプリング戦略数。$p_s()$は各サンプリング戦略の初期サンプル発生確率である。
-$$ \frac{p_s(x_s)}{\sum^{S}_{i=1}p_i(x_s)} $$
-このようにすれば、先の$p_2(0.6)$のような極小の確率で発生するサンプルがあった場合に、最終的なImportanceWeightの極大化を防ぐ事ができる。&lt;/p&gt;
-&lt;h2 id=&#34;閑話休題-restirhttpsdeveloperdownloadnvidiacomdevblogsrestirpdf-のfig7について&#34;&gt;閑話休題 
-&lt;a href=&#34;https://developer.download.nvidia.com/devblogs/ReSTIR.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ReSTIR&lt;/a&gt; のFig7について&lt;/h2&gt;
-&lt;h4 id=&#34;まずはグラフabについて&#34;&gt;まずは、グラフ(a)(b)について。&lt;/h4&gt;
-&lt;p&gt;被積分関数については言及がないが$ f(x) = 2-2x$と仮定する。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;$ g(x) = 2 -2x$, $ p_1(x) = 1$&lt;/li&gt;
-&lt;li&gt;$ g(x) = 2 -2x$, $ p_2(x) = 2H(1/2 -x) $(p2(x)=0 if x &amp;gt; 0.5 otherwise =2)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;としている。&lt;br&gt;
-$1/p(y)$をVisualizeしているといってるが、この$1/p(y)$はRISのEffectivePDFの逆数、つまり、$\frac{1}{g(y)} \frac{1}{M} \sum^{M}_ {i=1} \frac{g(X_i)}{p(X_i)} $を指していると思われる。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;一つは、サンプルのヒストグラムの逆数をプロットしたもの&lt;br&gt;
-Importance Samplingを、$f(x)$に沿って行えたとするならば、生成されたサンプルのヒストグラムは、$f(x)$に比例しなくてはならない。
-したがって、サンプルのヒストグラムを正規化して逆数をとれば、$1/f(x)$に沿うと考えられる。このグラフは、サンプル数に基づいて、ヒストグラムを正規化して逆数にしたグラフと思われる。
-$p_2$が0.5以上のサンプルを生成しないので、そこに大きな境界が出来ている。（実際の運用なら単純によろしくない。)　0.5以上は、$p_1$の方で生成されるが、こちらのサンプル確率は単純に$g(x)$(つまりf(x))に比例しているため、
-1に近づくにつれてサンプルの生成される確率が低下している。それに伴ってヒストグラムの乱れが顕著に見られる様になっていると思われる。また、0.5以下ではサンプル数が多い傾向があり、0.5以上ではサンプル数が少ない傾向があるが、これは$p_2$が偏った範囲でサンプルを生成することによる影響と思われる。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;もう一つは、RISのウエイトの平均値&lt;br&gt;
-こちらは単純に先のRISのウエイト（実質的なサンプルの確率としてのウエイト。Effective PDF）の逆数の平均だから解釈は簡単。サンプルの出現確率と、RISのウエイト値は、統計的に一致していない場合は、真値からのBiasが生じる事になる。
-グラフ(a)は、0.5以上で、明らかな乖離が見られる。サンプルを発生させない$p_2$のウエイトを算入しているためBiasが発生しているのが分かる。&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;次にグラフcdについて&#34;&gt;次に、グラフ(c)(d)について。&lt;/h4&gt;
-&lt;p&gt;$ p_2(x) = max(1.9&amp;hellip;H(1/2 -x), 10^{-4}) $ (p2(x)=10^{-4} if x &amp;gt; 0.5 otherwise =1.9&amp;hellip;)&lt;br&gt;
-に変更し、$p_2$で非常に低確率で0.5以上のサンプルが生成されるように変更したもの。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;0.5以上のサンプルが生成されるとき、$p_2=10^{-4}$なので、$\frac{g(X_i)}{p(X_i)} $の部分は値が非常に大きくなると思われる。すると、$p_2$内でのResamplingで選択される可能性が高く、
-また、$p_2$の$w_{sum}$も大きくなることから、$p_1,p_2$を結合する時に選択される可能性が高くなる。
-また結合後の$w_{sum}$への影響も大きいので、選択の可否に関わらず、$p_2$側で、0.5以上のサンプルが生成されることにより、最終的なウエイト値に大きな乱れを導入する原因になっている。(c)&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;MIS（おそらく初期サンプルの発生確率の加重平均）で結合する場合、各サンプリング戦略（この場合は、結合対象の各RISのこと。いわゆる$p_1,p_2$）における初期サンプルの確率が計算出来なくてはならない。しかし、RISでは、自身のサンプル戦略の結果として出たサンプルのウエイト値（サンプルの確率）は計算されるるが、任意のサンプルの確率を計算する術がない。しかしここでは何らかのサンプルの確率に相当するものが計算できるものとして話を進める。&lt;br&gt;
-$p_2$で非常に低確率な0.5以上のサンプルが出た場合は、RISのウエイトは極大化するはずである。しかしMISウエイトを初期サンプルの発生確率の加重平均にすれば、極小化した出現確率による除算は高確率で相殺することができる。(d)&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;restirのsupplementary-filesの方に記載があるmisに関する議論&#34;&gt;ReSTIRのSupplementary Filesの方に記載があるMISに関する議論&lt;/h2&gt;
-&lt;p&gt;
-&lt;a href=&#34;https://research.nvidia.com/publication/2020-07_Spatiotemporal-reservoir-resampling&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;こちら&lt;/a&gt; のSupplementary Documentでは、RISを結合する際のMISのウエイトの計算方法について
-言及している。この手法にとってとても重要な部分なのだが、とにかくこちらに記載がある。&lt;br&gt;
-二つの手法が紹介され、一つはTalbot et alの手法と、本論文の提案手法である、Bitterli et alの手法を比較している。質の良いMISウエイトを計算するには、任意のサンプルの、個々のサンプル戦略に於けるPDFが計算できる必要があるが、RISは、自身が選出したサンプルのウエイト値（PDFの逆数に相当する値）を計算することしかできない。そこで、PDFの代替となる値を計算する必要がある。重要なのは、この値はMISのウエイトを計算するためのもので、各サンプリング戦略(各RIS)におけるPDFと必ずしも一致する必要がない。
-ただ、unbiasedなウエイトを算出するだけなら、&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;あるサンプルに於ける各サンプリング戦略のウエイトの合計値が1&lt;/li&gt;
-&lt;li&gt;ある戦略で、あるサンプルのPDFがゼロならば、そのウエイトはゼロ
-の二つを守れば良い。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Talbot et alの方法は、各RISを結合の際に、結合対象サンプルを、全てのRISのターゲット分布関数:$g$で評価してウエイト$g_i / g_{sum}$を計算し、正規化（$m$の平均が1.0になるように）して、これをサンプルのウエイト値に乗算して結合している。直感的で分かりやすい。上記の項で説明したMIS Combineというよりは、結合時の各戦略の選択確率のモジュレーションと解釈した方が適切だと思われる。
-ターゲット分布関数:$g$の評価回数が2次的に増大するのがこの方法の大きな欠点である。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;function combineReservoirsTalbotMIS(g, r1, r2, . . . , rk, g1, g2, . . . , gk)
-  Reservoir s // a new reservor
-
-  foreach r_i ∈ {r1, . . . , rk } do
-
-    // calculate normalized MIS weight using g()
-    g_sum ← 0
-    foreach g_j ∈ {g1, . . . , gk } do
-      g_sum ← g_sum + g_j(r.y)
-    m ← g_i(r.y) / (g_sum / k)
-
-    s.update(r.y, g(r.y) · r.w · r.M · m, r.M)
-
-  w ← (1 / g(s.y))(s.wsum / s.M)
-  return s.y, w
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;本論文の提案手法であるBitterli et alの手法では、結合して、最終的に選択されたサンプルを使って、各戦略のターゲット分布関数の加重平均でMISウエイトを計算している。
-最終的に$1/M$の代わりにこれを乗算している。この手法では、ターゲット分布関数の評価回数はサンプリング戦略数（結合するRISの数）なので、
-Talbot et alの方法に比べたら、明らかに計算量が少ない。&lt;/p&gt;
-&lt;p&gt;&lt;del&gt;注釈：この式はまだ理解できてない。例えば一つの戦略で、Mに非常に大きな数を使った場合、s.wsumはそれに準じて大きな数になる。
-一方でmは、ターゲット分布関数に変化が無い場合、サンプリング戦略数が増えればそれに準じて小さな値になっていくはずである。
-これら両者は直交したパラメーターで、直接の関係がない。しかし、s.wsum · mは、1/gを正規化するために作用する必要があるが、これでは正規化できないはずだ。&lt;/del&gt;&lt;/p&gt;
-&lt;p&gt;&lt;del&gt;もし、全てのサンプリング戦略でMが1であると仮定すると、g(r.y) · r.wの部分はg/pに相当して、s.wsumは、サンプリング戦略数分の$\sum{g/p}$で、サンプリング戦略数で割ればg/pの平均値として解釈できる。
-一方でmは、各サンプリング戦略のターゲット分布関数が同じものだった場合は、サンプリング戦略数の逆数となる。選択されたサンプルのターゲット分布関数が、
-他の戦略に対して相対的に大きければ、ウエイトが大きくなり、逆ならば小さくなるようなMISウエイトとして解釈できる。&lt;/del&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;function combineReservoirsMIS(g, r1, r2, . . . , rk, g1, g2, . . . , gk)
-  Reservoir s // a new reservor
-
-  foreach r ∈ {r1, . . . , rk } do
-    s.update(r.y, g(r.y) · r.w · r.M, r.M)
-
-
-  // calculate normalized MIS weight using g()
-  g_sum ← 0
-  foreach g_j ∈ {g1, . . . , gk } do
-    g_sum ← g_sum + g_j(r.y)
-
-  m ← g_*(r.y) / g_sum // g_* : target distribution that contributed s.y
-
-  w ← (1 / g(s.y))(s.wsum · m)
-  return s.y, w
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;私の考えでは、上記の記載は、すべてのRISのMが1である場合は正しく動作するが、それ以外では誤りで、選択されたRISのMの値$M_s$で除算しなくてはならないはずである。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;  w ← (1 / (g(s.y) * Ms)) (s.wsum · m)
-&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     
