@@ -5,12 +5,254 @@
     <link>https://shikihuiku.github.io/memo/</link>
       <atom:link href="https://shikihuiku.github.io/memo/index.xml" rel="self" type="application/rss+xml" />
     <description>Memoes</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 07 Sep 2021 21:48:09 +0900</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sun, 07 Sep 2025 16:02:09 +0900</lastBuildDate>
     <image>
       <url>https://shikihuiku.github.io/images/icon_hu127225d7ed9c50974404790b7c221374_401884_512x512_fill_lanczos_center_3.png</url>
       <title>Memoes</title>
       <link>https://shikihuiku.github.io/memo/</link>
     </image>
+    
+    <item>
+      <title>C言語とかの配列を画像として見れる形で保存して表示する簡単な方法</title>
+      <link>https://shikihuiku.github.io/memo/simpletextimagefilelikeppm/</link>
+      <pubDate>Sun, 07 Sep 2025 16:02:09 +0900</pubDate>
+      <guid>https://shikihuiku.github.io/memo/simpletextimagefilelikeppm/</guid>
+      <description>&lt;h3 id=&#34;動機&#34;&gt;動機&lt;/h3&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://raytracing.github.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Ray Tracing In One Weekend&lt;/a&gt;を見てて思ったのですが、PPMはシンプルな画像フォーマットですが、Windows環境ではビュワーが必要です。プログラムから直接Windowを開いてレンダリング画像を表示することはもちろん可能だと思いますが、コードが環境依存になりやすい方法で、きれいに抽象化するためにはそれなりのライブラリが必要になるかと思います。やはり、何らかの画像ファイルに画像を出力したいですが、テキスト形式のPPMのように簡単なフォーマットで、C++に限らずどの言語でも簡単に実装できて、画像はビュワーをインストールすることなく見れるようなものが望ましいです。こんな方法は何かないかと考えてみました。&lt;/p&gt;
+&lt;h3 id=&#34;ppm&#34;&gt;PPM&lt;/h3&gt;
+&lt;p&gt;PPMは、これ以上ないほどにシンプルで、どんなプログラミング言語でもテキストファイルを記述できるスキルがあれば、PPMフォーマットの出力プログラムを書くことは簡単です。
+一方で、PPMはWindows環境では一般的な画像ファイルフォーマットではないため、出力された画像を見るためには、PPMを扱えるビュワーを別途用意する必要があります。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;P3
+2 2
+255
+255 0 0 255 0 0
+255 0 0 255 0 0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;上記は、2x2ピクセルのPPM画像の例で、先頭の&lt;code&gt;P3&lt;/code&gt;がRGBカラー画像であることを示して、次の行の&lt;code&gt;2 2&lt;/code&gt;が画像の横と縦の大きさ、次の行の&lt;code&gt;255&lt;/code&gt;は画像のRGB各成分の最大値を示し、
+その次の行からは、RGBの各色がスペース区切りで記述されます。&lt;/p&gt;
+&lt;h3 id=&#34;htmlのcanvas要素&#34;&gt;HTMLのcanvas要素&lt;/h3&gt;
+&lt;p&gt;上記のPPMファイルの代わりの手法として、HTMLのcanvas要素に、簡単なJavascriptでRGB配列で格納した画像を表示する方法です。
+配列の前後に少々テキストが追加されますが、画像の縦と横の幅とピクセルの配列以外は、基本的には固定文字列の記述なので、プログラムとしての複雑さはありません。
+配列の可読性もPPMと同レベルといえると思います。そして、出力はHTMLファイルなので、ブラウザを画像ビュワーとして使うことができます。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;&amp;lt;body&amp;gt;
+&amp;lt;canvas id=&amp;quot;c1&amp;quot; width=2 height=2&amp;gt;&amp;lt;/canvas&amp;gt;
+&amp;lt;script&amp;gt;
+const pixels = [
+255, 0, 0, 255,   255, 0, 0, 255,
+255, 0, 0, 255,   255, 0, 0, 255,
+];
+document.getElementById(&#39;c1&#39;).getContext(&#39;2d&#39;).putImageData(new ImageData(new Uint8ClampedArray(pixels), 2, 2), 0, 0);
+&amp;lt;/script&amp;gt;
+&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;以下の関数は、C++の関数で、配列を受け取り、HTMLのcanvas要素に画像を表示するHTMLを出力します。
+基本的には上記と同様のHTMLを出力しますが、画像の拡大縮小機能と、チャネルごとのマスク機能、それからPNGファイルとして（あらためて）画像を保存するボタンを追加しています。
+PPMを出力するよりはコードは長くなりますが、プログラムらしい実装は前半部分に少しあるだけで、後半の部分は固定の文字列を出力しているだけです。C++の関数自体の複雑さは、PPMファイルを出力する関数と大差ありません。他言語への移植も簡単です。
+一方で、出力画像はブラウザ上で直接確認でき、実装における環境依存の要素も排除できていると思います。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;fstream&amp;gt;
+#include &amp;lt;iostream&amp;gt;
+
+/**
+ * Exports pixel data to a HTML file.
+ * @param path The directory path where the HTML file will be saved.
+ * @param data A pointer to the pixel data array. The data is expected to be in RGBA (4 elements per pixel) or RGB (3 elements per pixel) format.
+ * @param width The width of the image in pixels.
+ * @param height The height of the image in pixels.
+ * @param alphaEnable If true, the data is treated as RGBA. If false, it is treated as RGB.
+ * @param imagefilePath The PNG image file name to be used when the save button is pressed.
+ * @return bool Returns true on successful export, false otherwise.
+ */
+bool ExportPixels(const char* path, const unsigned char* data, size_t width, size_t height, bool alphaEnable = false, const char* imagefilePath = nullptr)
+{
+	if (width * height == 0) {
+		std::cerr &amp;lt;&amp;lt; &amp;quot;Error: Empy image: &amp;quot; &amp;lt;&amp;lt; path &amp;lt;&amp;lt; std::endl;
+		return false;
+	}
+	std::ofstream outFile(path);
+	if (!outFile.is_open()) {
+		std::cerr &amp;lt;&amp;lt; &amp;quot;Error: Could not open the file: &amp;quot; &amp;lt;&amp;lt; path &amp;lt;&amp;lt; std::endl;
+		return false;
+	}
+
+	outFile &amp;lt;&amp;lt; &amp;quot;&amp;lt;!DOCTYPE html&amp;gt;&amp;quot; &amp;lt;&amp;lt; std::endl &amp;lt;&amp;lt; &amp;quot;&amp;lt;html&amp;gt;&amp;lt;body&amp;gt;&amp;lt;script&amp;gt;&amp;quot; &amp;lt;&amp;lt; std::endl;
+
+	outFile &amp;lt;&amp;lt; &amp;quot;const pixels = [&amp;quot; &amp;lt;&amp;lt; std::endl;
+	for (size_t y = 0; y &amp;lt; height; ++y) {
+		for (size_t x = 0; x &amp;lt; width; ++x) {
+			outFile &amp;lt;&amp;lt; static_cast&amp;lt;int&amp;gt;(*data++) &amp;lt;&amp;lt; &amp;quot;, &amp;quot; &amp;lt;&amp;lt; static_cast&amp;lt;int&amp;gt;(*data++) &amp;lt;&amp;lt; &amp;quot;, &amp;quot; &amp;lt;&amp;lt; static_cast&amp;lt;int&amp;gt;(*data++) &amp;lt;&amp;lt; &amp;quot;, &amp;quot;;
+			if (alphaEnable)
+				outFile &amp;lt;&amp;lt; static_cast&amp;lt;int&amp;gt;(*data++) &amp;lt;&amp;lt; &amp;quot;, &amp;quot;;
+			else
+				outFile &amp;lt;&amp;lt; &amp;quot;255, &amp;quot;;
+		}
+		outFile &amp;lt;&amp;lt; std::endl;
+	}
+	outFile &amp;lt;&amp;lt; &amp;quot;];&amp;quot; &amp;lt;&amp;lt; std::endl;
+
+	outFile &amp;lt;&amp;lt; &amp;quot;const imageWidth = &amp;quot; &amp;lt;&amp;lt; width &amp;lt;&amp;lt; std::endl;
+	outFile &amp;lt;&amp;lt; &amp;quot;const imageHeight = &amp;quot; &amp;lt;&amp;lt; height &amp;lt;&amp;lt; std::endl;
+	outFile &amp;lt;&amp;lt; &amp;quot;const imagefilePath = &#39;&amp;quot; &amp;lt;&amp;lt; (imagefilePath == nullptr ? &amp;quot;image.png&amp;quot; : imagefilePath) &amp;lt;&amp;lt; &amp;quot;&#39;&amp;quot; &amp;lt;&amp;lt; std::endl;
+
+	const char* fixedCode = &amp;quot;&amp;quot;
+		&amp;quot;let checkboxStateMask = 0x1F;&amp;quot;
+		&amp;quot;let pixelScale = 1;&amp;quot;
+		&amp;quot;addCheckbox(&#39;R&#39;); addCheckbox(&#39;G&#39;); addCheckbox(&#39;B&#39;); addCheckbox(&#39;A&#39;);&amp;quot;
+		&amp;quot;addCheckbox(&#39;CheckerboardBG&#39;);&amp;quot;
+		&amp;quot;addRange(&#39;PixelScale&#39;);&amp;quot;
+		&amp;quot;addSaveButton();&amp;quot;
+		&amp;quot;&amp;quot;
+		&amp;quot;const lineBreak = document.createElement(&#39;br&#39;);&amp;quot;
+		&amp;quot;document.body.appendChild(lineBreak);&amp;quot;
+		&amp;quot;&amp;quot;
+		&amp;quot;const imageCanvas = document.createElement(&#39;canvas&#39;);&amp;quot;
+		&amp;quot;imageCanvas.width = imageWidth; imageCanvas.height = imageHeight;&amp;quot;
+		&amp;quot;&amp;quot;
+		&amp;quot;const drawCanvas = document.createElement(&#39;canvas&#39;);&amp;quot;
+		&amp;quot;document.body.appendChild(drawCanvas);&amp;quot;
+		&amp;quot;&amp;quot;
+		&amp;quot;function setChannelImage() {&amp;quot;
+		&amp;quot;    const tempPixels = new Uint8ClampedArray(pixels);&amp;quot;
+		&amp;quot;    let r = checkboxStateMask &amp;amp; 1;&amp;quot;
+		&amp;quot;    let g = (checkboxStateMask &amp;gt;&amp;gt; 1) &amp;amp; 1;&amp;quot;
+		&amp;quot;    let b = (checkboxStateMask &amp;gt;&amp;gt; 2) &amp;amp; 1;&amp;quot;
+		&amp;quot;    let a = (checkboxStateMask &amp;gt;&amp;gt; 3) &amp;amp; 1;&amp;quot;
+		&amp;quot;    const checkAlpha = (checkboxStateMask &amp;amp; 0x0F) == 0x08;&amp;quot;
+		&amp;quot;    let aOfs = a == 1 ? 0 : 255;&amp;quot;
+		&amp;quot;    let rOfs = checkAlpha ? 255 : 0;&amp;quot;
+		&amp;quot;    for (let i = 0; i &amp;lt; tempPixels.length; i += 4) {&amp;quot;
+		&amp;quot;        tempPixels[i + 0] = Math.min(255, pixels[i + 0] * r + rOfs);&amp;quot;
+		&amp;quot;        tempPixels[i + 1] = pixels[i + 1] * g;&amp;quot;
+		&amp;quot;        tempPixels[i + 2] = pixels[i + 2] * b;&amp;quot;
+		&amp;quot;        tempPixels[i + 3] = Math.min(255, pixels[i + 3] * a + aOfs);&amp;quot;
+		&amp;quot;    }&amp;quot;
+		&amp;quot;    const imageCtx = imageCanvas.getContext(&#39;2d&#39;);&amp;quot;
+		&amp;quot;    imageCtx.putImageData(new ImageData(new Uint8ClampedArray(tempPixels), imageCanvas.width, imageCanvas.height), 0, 0);&amp;quot;
+		&amp;quot;    drawCanvas.width = imageWidth * pixelScale; drawCanvas.height = imageHeight * pixelScale;&amp;quot;
+		&amp;quot;    const drawCtx = drawCanvas.getContext(&#39;2d&#39;);&amp;quot;
+		&amp;quot;    drawCtx.imageSmoothingEnabled = false;&amp;quot;
+		&amp;quot;    if (checkboxStateMask &amp;amp; 0x10) { &amp;quot;
+		&amp;quot;       let tileSize = 16 * pixelScale;&amp;quot;
+		&amp;quot;       for (let y = 0; y &amp;lt; drawCanvas.height; y += tileSize) { for (let x = 0; x &amp;lt; drawCanvas.width; x += tileSize) {&amp;quot;
+		&amp;quot;           const colIdx = (x / tileSize + y / tileSize) % 2;&amp;quot;
+		&amp;quot;           drawCtx.fillStyle = colIdx ? \&amp;quot;#808080FF\&amp;quot; : \&amp;quot;#a0a0a0FF\&amp;quot;;&amp;quot;
+		&amp;quot;           drawCtx.fillRect(x, y, tileSize, tileSize);&amp;quot;
+		&amp;quot;       }}&amp;quot;
+		&amp;quot;    } else {&amp;quot;
+		&amp;quot;       drawCtx.fillStyle = &#39;black&#39;;&amp;quot;
+		&amp;quot;       drawCtx.fillRect(0, 0, drawCanvas.width, drawCanvas.height);&amp;quot;
+		&amp;quot;    }&amp;quot;
+		&amp;quot;    drawCtx.drawImage(imageCanvas, 0, 0, drawCanvas.width, drawCanvas.height);&amp;quot;
+		&amp;quot;}&amp;quot;
+		&amp;quot;&amp;quot;
+		&amp;quot;function checkState()&amp;quot;
+		&amp;quot;{&amp;quot;
+		&amp;quot;    function checkboxState(id) {&amp;quot;
+		&amp;quot;        let chbox = document.getElementById(id);&amp;quot;
+		&amp;quot;        return chbox ? chbox.checked ? 1 : 0 : 1;&amp;quot;
+		&amp;quot;    }&amp;quot;
+		&amp;quot;    function rangeState(id) {&amp;quot;
+		&amp;quot;        let r = document.getElementById(id);&amp;quot;
+		&amp;quot;        return r ? r.value : 1;&amp;quot;
+		&amp;quot;    }&amp;quot;
+		&amp;quot;    let newCheckboxStateMask = checkboxState(&#39;R&#39;) | checkboxState(&#39;G&#39;) &amp;lt;&amp;lt; 1 | checkboxState(&#39;B&#39;) &amp;lt;&amp;lt; 2 | checkboxState(&#39;A&#39;) &amp;lt;&amp;lt; 3 | checkboxState(&#39;CheckerboardBG&#39;) &amp;lt;&amp;lt; 4;&amp;quot;
+		&amp;quot;    let newPixelScale = rangeState(&#39;PixelScale&#39;);&amp;quot;
+		&amp;quot;    if (newCheckboxStateMask != checkboxStateMask || newPixelScale != pixelScale) {&amp;quot;
+		&amp;quot;        checkboxStateMask = newCheckboxStateMask;&amp;quot;
+		&amp;quot;        pixelScale = newPixelScale;&amp;quot;
+		&amp;quot;        setChannelImage();&amp;quot;
+		&amp;quot;    }&amp;quot;
+		&amp;quot;}&amp;quot;
+		&amp;quot;&amp;quot;
+		&amp;quot;function addCheckbox(id) {&amp;quot;
+		&amp;quot;    const checkbox = document.createElement(&#39;input&#39;);&amp;quot;
+		&amp;quot;    checkbox.type = &#39;checkbox&#39;;&amp;quot;
+		&amp;quot;    checkbox.checked = true;&amp;quot;
+		&amp;quot;    checkbox.id = id;&amp;quot;
+		&amp;quot;    const label = document.createElement(&#39;label&#39;);&amp;quot;
+		&amp;quot;    label.htmlFor = id;&amp;quot;
+		&amp;quot;    label.textContent = id;&amp;quot;
+		&amp;quot;    document.body.appendChild(checkbox);&amp;quot;
+		&amp;quot;    document.body.appendChild(label);&amp;quot;
+		&amp;quot;    checkbox.addEventListener(&#39;change&#39;, function() {checkState(); });&amp;quot;
+		&amp;quot;}&amp;quot;
+		&amp;quot;function addRange(id) {&amp;quot;
+		&amp;quot;   const inputElm = document.createElement(&#39;input&#39;);&amp;quot;
+		&amp;quot;   inputElm.type = &#39;range&#39;;&amp;quot;
+		&amp;quot;   inputElm.min = 1;&amp;quot;
+		&amp;quot;   inputElm.max = 8;&amp;quot;
+		&amp;quot;   inputElm.value = 1;&amp;quot;
+		&amp;quot;   inputElm.id = id;&amp;quot;
+		&amp;quot;   const label = document.createElement(&#39;label&#39;);&amp;quot;
+		&amp;quot;   label.htmlFor = id;&amp;quot;
+		&amp;quot;   label.textContent = id;&amp;quot;
+		&amp;quot;   document.body.appendChild(inputElm);&amp;quot;
+		&amp;quot;   document.body.appendChild(label);&amp;quot;
+		&amp;quot;   inputElm.addEventListener(&#39;input&#39;, function() {checkState(); });&amp;quot;
+		&amp;quot;}&amp;quot;
+		&amp;quot;function addSaveButton() {&amp;quot;
+		&amp;quot;    const saveButton = document.createElement(&#39;button&#39;);&amp;quot;
+		&amp;quot;    saveButton.textContent = &#39;Save Image&#39;;&amp;quot;
+		&amp;quot;    saveButton.addEventListener(&#39;click&#39;, () =&amp;gt; {&amp;quot;
+		&amp;quot;      const imageDataURL = imageCanvas.toDataURL(&#39;image/png&#39;);&amp;quot;
+		&amp;quot;	   const link = document.createElement(&#39;a&#39;);&amp;quot;
+		&amp;quot;	   link.download = imagefilePath;&amp;quot;
+		&amp;quot;	   link.href = imageDataURL;&amp;quot;
+		&amp;quot;	   link.click();&amp;quot;
+		&amp;quot;    });&amp;quot;
+		&amp;quot;    document.body.appendChild(saveButton);&amp;quot;
+		&amp;quot;};&amp;quot;
+		&amp;quot;setChannelImage();&amp;quot;
+		&amp;quot;&amp;quot;;
+	outFile &amp;lt;&amp;lt; fixedCode &amp;lt;&amp;lt; std::endl;
+
+	outFile &amp;lt;&amp;lt; &amp;quot;&amp;lt;/script&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;&amp;quot; &amp;lt;&amp;lt; std::endl;
+
+	return true;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;適当なサンプルの配列を、上記の関数で、HTMLに出力して、ブラウザで表示すると以下のようになります。
+素っ気ないですが、とりあえずの確認であれば十分かと思います。
+
+
+
+
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure class=&#34;center&#34; &gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://shikihuiku.github.io/memo/simpletextimagefilelikeppm/image_hu66e72589fc260375063b72c602ae49cc_110996_2000x2000_fit_lanczos_3.png&#34; &gt;
+
+
+  &lt;img data-src=&#34;https://shikihuiku.github.io/memo/simpletextimagefilelikeppm/image_hu66e72589fc260375063b72c602ae49cc_110996_2000x2000_fit_lanczos_3.png&#34; class=&#34;lazyload&#34; alt=&#34;&#34; width=&#34;50%&#34; height=&#34;563&#34;&gt;
+&lt;/a&gt;
+
+
+
+&lt;/figure&gt;
+&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>ClearUnorderedAccessView*の使い方</title>
